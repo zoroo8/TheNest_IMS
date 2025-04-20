@@ -101,7 +101,7 @@ pageEncoding="UTF-8"%>
         </div>
       </div>
 
-      <!-- View Toggle (Staff Only) -->
+      <!-- View Toggle -->
       <div class="view-toggle">
         <button class="view-toggle-btn active" data-view="all">
           All My Requests

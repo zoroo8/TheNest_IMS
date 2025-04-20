@@ -116,7 +116,7 @@ pageEncoding="UTF-8"%>
         </div>
       </div>
 
-      <!-- View Toggle (Admin Only) -->
+      <!-- View Toggle -->
       <div class="view-toggle">
         <button class="view-toggle-btn active" data-view="all">
           All Requests
@@ -529,8 +529,6 @@ pageEncoding="UTF-8"%>
         viewBtns.forEach((btn) => {
           btn.addEventListener("click", function () {
             const requestId = this.getAttribute("data-id");
-            // Here you would fetch request details based on ID
-            // For now, we'll just show the modal
             viewRequestModal.style.display = "block";
             modalBackdrop.style.display = "block";
           });
@@ -622,14 +620,12 @@ pageEncoding="UTF-8"%>
           .addEventListener("click", function () {
             const form = document.getElementById("newRequestForm");
             if (form.checkValidity()) {
-              // Here you would submit the form data to the server
               alert("Request submitted successfully!");
               newRequestModal.style.display = "none";
               modalBackdrop.style.display = "none";
               // Reset form
               form.reset();
             } else {
-              // Trigger browser's native form validation
               form.reportValidity();
             }
           });
@@ -639,9 +635,7 @@ pageEncoding="UTF-8"%>
           btn.addEventListener("click", function () {
             const requestId = this.getAttribute("data-id");
             if (confirm("Are you sure you want to approve this request?")) {
-              // Here you would send approval to the server
               alert(`Request ${requestId} approved successfully!`);
-              // Close modal if it's open
               viewRequestModal.style.display = "none";
               modalBackdrop.style.display = "none";
             }
@@ -653,9 +647,7 @@ pageEncoding="UTF-8"%>
           btn.addEventListener("click", function () {
             const requestId = this.getAttribute("data-id");
             if (confirm("Are you sure you want to reject this request?")) {
-              // Here you would send rejection to the server
               alert(`Request ${requestId} rejected.`);
-              // Close modal if it's open
               viewRequestModal.style.display = "none";
               modalBackdrop.style.display = "none";
             }
@@ -671,7 +663,6 @@ pageEncoding="UTF-8"%>
                 "Are you sure you want to mark this request as dispatched?"
               )
             ) {
-              // Here you would send dispatch status to the server
               alert(`Request ${requestId} marked as dispatched!`);
             }
           });
@@ -680,12 +671,10 @@ pageEncoding="UTF-8"%>
         // View toggle functionality
         document.querySelectorAll(".view-toggle-btn").forEach((btn) => {
           btn.addEventListener("click", function () {
-            // Remove active class from all buttons
             document
               .querySelectorAll(".view-toggle-btn")
               .forEach((b) => b.classList.remove("active"));
 
-            // Add active class to clicked button
             this.classList.add("active");
 
             const view = this.getAttribute("data-view");

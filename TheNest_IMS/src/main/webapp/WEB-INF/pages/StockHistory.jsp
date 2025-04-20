@@ -616,9 +616,6 @@ pageEncoding="UTF-8"%>
           btn.addEventListener("click", function (e) {
             e.preventDefault();
             const transactionId = this.getAttribute("data-id");
-
-            // Here you would fetch transaction details based on ID
-            // For demo purposes, we'll just show the modal
             viewTransactionModal.style.display = "block";
             modalBackdrop.style.display = "block";
           });
@@ -629,9 +626,6 @@ pageEncoding="UTF-8"%>
           btn.addEventListener("click", function (e) {
             e.preventDefault();
             const transactionId = this.getAttribute("data-id");
-
-            // Here you would fetch transaction details based on ID and populate the form
-            // For demo purposes, we'll just show the modal
             document.getElementById("editTransactionId").value =
               "TRX-2023-" + transactionId;
 
@@ -676,12 +670,10 @@ pageEncoding="UTF-8"%>
           .addEventListener("click", function () {
             const form = document.getElementById("editTransactionForm");
             if (form.checkValidity()) {
-              // Here you would submit the form data to the server
               alert("Transaction updated successfully!");
               editTransactionModal.style.display = "none";
               modalBackdrop.style.display = "none";
             } else {
-              // Trigger browser's native form validation
               form.reportValidity();
             }
           });
@@ -763,8 +755,6 @@ pageEncoding="UTF-8"%>
         });
 
         function updateChart(view) {
-          // Here you would fetch data based on the selected view (daily, weekly, monthly)
-          // For demo purposes, we'll just update with random data
           let labels = [];
           let stockInData = [];
           let stockOutData = [];

@@ -612,9 +612,6 @@ pageEncoding="UTF-8"%>
             e.preventDefault();
             const itemId = this.getAttribute("data-id");
             document.getElementById("itemModalTitle").textContent = "Edit Item";
-
-            // Here you would fetch item details based on ID and populate the form
-            // For demo purposes, we'll just show the modal
             itemModal.style.display = "block";
             modalBackdrop.style.display = "block";
           });
@@ -625,9 +622,6 @@ pageEncoding="UTF-8"%>
           btn.addEventListener("click", function (e) {
             e.preventDefault();
             const itemId = this.getAttribute("data-id");
-
-            // Here you would fetch item details based on ID and populate the form
-            // For demo purposes, we'll just show the modal with some dummy data
             const itemName =
               this.closest(".stock-card").querySelector(
                 ".stock-card-title"
@@ -682,12 +676,10 @@ pageEncoding="UTF-8"%>
           .addEventListener("click", function () {
             const form = document.getElementById("itemForm");
             if (form.checkValidity()) {
-              // Here you would submit the form data to the server
               alert("Item saved successfully!");
               itemModal.style.display = "none";
               modalBackdrop.style.display = "none";
             } else {
-              // Trigger browser's native form validation
               form.reportValidity();
             }
           });
@@ -698,12 +690,10 @@ pageEncoding="UTF-8"%>
           .addEventListener("click", function () {
             const form = document.getElementById("orderForm");
             if (form.checkValidity()) {
-              // Here you would submit the order to the server
               alert("Order submitted successfully!");
               orderModal.style.display = "none";
               modalBackdrop.style.display = "none";
             } else {
-              // Trigger browser's native form validation
               form.reportValidity();
             }
           });

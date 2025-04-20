@@ -501,7 +501,6 @@ pageEncoding="UTF-8"%>
         viewBtns.forEach((btn) => {
           btn.addEventListener("click", function () {
             const requestId = this.getAttribute("data-id");
-            // Here you would fetch request details based on ID
 
             // Show/hide appropriate buttons based on request status
             const statusCell = this.closest("tr")
@@ -591,7 +590,7 @@ pageEncoding="UTF-8"%>
             `;
             itemsList.appendChild(newItemRow);
 
-            // Add event listener to the new remove button
+            // Event listener to the new remove button
             newItemRow
               .querySelector(".remove-item")
               .addEventListener("click", function () {
@@ -603,7 +602,6 @@ pageEncoding="UTF-8"%>
         document.querySelectorAll(".remove-item").forEach((btn) => {
           btn.addEventListener("click", function () {
             const itemRow = this.closest(".item-row");
-            // Don't remove if it's the only item row
             if (document.querySelectorAll(".item-row").length > 1) {
               itemRow.parentNode.removeChild(itemRow);
             }
@@ -616,7 +614,6 @@ pageEncoding="UTF-8"%>
           .addEventListener("click", function () {
             const form = document.getElementById("newRequestForm");
             if (form.checkValidity()) {
-              // Here you would submit the form data to the server
               alert("Request submitted successfully!");
               newRequestModal.style.display = "none";
               modalBackdrop.style.display = "none";
@@ -633,9 +630,7 @@ pageEncoding="UTF-8"%>
           btn.addEventListener("click", function () {
             const requestId = this.getAttribute("data-id");
             if (confirm("Are you sure you want to cancel this request?")) {
-              // Here you would send cancellation to the server
               alert(`Request ${requestId} cancelled.`);
-              // Close modal if it's open
               viewRequestModal.style.display = "none";
               modalBackdrop.style.display = "none";
             }
@@ -646,11 +641,8 @@ pageEncoding="UTF-8"%>
         document.querySelectorAll(".resubmit-btn").forEach((btn) => {
           btn.addEventListener("click", function () {
             const requestId = this.getAttribute("data-id");
-            // Here you would open the edit form with the request data
             alert(`Resubmitting request ${requestId}...`);
-            // Close current modal
             viewRequestModal.style.display = "none";
-            // Open new request modal with prefilled data
             newRequestModal.style.display = "block";
           });
         });
@@ -664,7 +656,6 @@ pageEncoding="UTF-8"%>
                 "Confirm that you have received all items in this request?"
               )
             ) {
-              // Here you would send received status to the server
               alert(`Request ${requestId} marked as received!`);
             }
           });

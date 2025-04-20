@@ -18,7 +18,6 @@ public class HomeController extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) 
             throws ServletException, IOException {
-        // Forward to the home page - updated to match the correct case
         request.getRequestDispatcher("/WEB-INF/pages/Home.jsp").forward(request, response);
     }
     

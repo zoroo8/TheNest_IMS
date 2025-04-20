@@ -18,15 +18,12 @@ public class StaffStockRequestsController extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) 
             throws ServletException, IOException {
-        // Forward to the staff stock requests page
         request.getRequestDispatcher("/WEB-INF/pages/StaffStockRequests.jsp").forward(request, response);
     }
     
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) 
             throws ServletException, IOException {
-        // This will be implemented later for handling staff stock request submissions
-        // For now, just redirect back to the staff stock requests page
         response.sendRedirect("staff-stock-requests");
     }
 }

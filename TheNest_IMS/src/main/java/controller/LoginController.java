@@ -18,15 +18,12 @@ public class LoginController extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) 
             throws ServletException, IOException {
-        // Forward to the login page
         request.getRequestDispatcher("/WEB-INF/pages/Login.jsp").forward(request, response);
     }
     
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) 
             throws ServletException, IOException {
-        // This will be implemented later for authentication
-        // For now, just redirect to home
         response.sendRedirect("home");
     }
 }

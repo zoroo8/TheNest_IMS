@@ -152,7 +152,8 @@ pageEncoding="UTF-8"%>
       }
 
       .hero-image img {
-        max-width: 100%;
+        width: 40%;
+        height: 5%;
         animation: float 6s ease-in-out infinite;
       }
 
@@ -484,7 +485,7 @@ pageEncoding="UTF-8"%>
         </div>
         <div class="hero-image">
           <img
-            src="${pageContext.request.contextPath}/assets/images/inventory-illustration.png"
+            src="${pageContext.request.contextPath}/assets/images/inventory-illustration.jpg"
             alt="Inventory Management Illustration"
           />
         </div>

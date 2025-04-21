@@ -1,4 +1,4 @@
-package controller;
+package com.ims.controller;
 
 import java.io.IOException;
 import jakarta.servlet.ServletException;
@@ -7,24 +7,23 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
-@WebServlet("/staff-dashboard")
-public class StaffDashboardController extends HttpServlet {
+@WebServlet("/home")
+public class HomeController extends HttpServlet {
     private static final long serialVersionUID = 1L;
     
-    public StaffDashboardController() {
+    public HomeController() {
         super();
     }
     
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) 
             throws ServletException, IOException {
-        String jspPath = "/WEB-INF/pages/StaffDashboard.jsp";
-        request.getRequestDispatcher(jspPath).forward(request, response);
+        request.getRequestDispatcher("/WEB-INF/pages/Home.jsp").forward(request, response);
     }
     
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) 
             throws ServletException, IOException {
-        response.sendRedirect("staff-dashboard");
+        doGet(request, response);
     }
 }

@@ -1,4 +1,4 @@
-package controller;
+package com.ims.controller;
 
 import java.io.IOException;
 import jakarta.servlet.ServletException;
@@ -7,23 +7,23 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
-@WebServlet("/home")
-public class HomeController extends HttpServlet {
+@WebServlet("/products")
+public class ProductsController extends HttpServlet {
     private static final long serialVersionUID = 1L;
-    
-    public HomeController() {
+
+    public ProductsController() {
         super();
     }
-    
+
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) 
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        request.getRequestDispatcher("/WEB-INF/pages/Home.jsp").forward(request, response);
+        request.getRequestDispatcher("/WEB-INF/pages/Products.jsp").forward(request, response);
     }
-    
+
     @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) 
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        doGet(request, response);
+        response.sendRedirect("products");
     }
 }

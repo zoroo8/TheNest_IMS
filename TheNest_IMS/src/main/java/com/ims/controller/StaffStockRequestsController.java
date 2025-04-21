@@ -1,4 +1,4 @@
-package controller;
+package com.ims.controller;
 
 import java.io.IOException;
 import jakarta.servlet.ServletException;
@@ -7,23 +7,23 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
-@WebServlet("/inventory")
-public class CurrentStockLevelsController extends HttpServlet {
+@WebServlet("/staff-stock-requests")
+public class StaffStockRequestsController extends HttpServlet {
     private static final long serialVersionUID = 1L;
     
-    public CurrentStockLevelsController() {
+    public StaffStockRequestsController() {
         super();
     }
     
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) 
             throws ServletException, IOException {
-        request.getRequestDispatcher("/WEB-INF/pages/CurrentStockLevels.jsp").forward(request, response);
+        request.getRequestDispatcher("/WEB-INF/pages/StaffStockRequests.jsp").forward(request, response);
     }
     
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) 
             throws ServletException, IOException {
-        response.sendRedirect("inventory");
+        response.sendRedirect("staff-stock-requests");
     }
 }

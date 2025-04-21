@@ -1,4 +1,4 @@
-package controller;
+package com.ims.controller;
 
 import java.io.IOException;
 import jakarta.servlet.ServletException;

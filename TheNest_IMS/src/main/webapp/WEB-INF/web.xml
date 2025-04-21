@@ -10,5 +10,10 @@
         <welcome-file>home</welcome-file>
         <welcome-file>login</welcome-file>
     </welcome-file-list>
+
+    <servlet-mapping>
+    <servlet-name>default</servlet-name>
+    <url-pattern>/resources/*</url-pattern>
+</servlet-mapping>
     
 </web-app>

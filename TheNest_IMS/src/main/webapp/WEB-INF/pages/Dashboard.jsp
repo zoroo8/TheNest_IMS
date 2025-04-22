@@ -91,7 +91,7 @@ pageEncoding="UTF-8"%>
           <i class="bi bi-gear"></i>
           <span>Settings</span>
         </a>
-        <a href="${pageContext.request.contextPath}/logout" class="menu-item">
+        <a href="Logout" class="menu-item">
           <i class="bi bi-box-arrow-right"></i>
           <span>Logout</span>
         </a>

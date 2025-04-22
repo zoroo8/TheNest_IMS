@@ -26,61 +26,7 @@ pageEncoding="UTF-8"%>
     />
   </head>
   <body>
-    <!-- Sidebar -->
-    <div class="sidebar">
-      <div class="sidebar-header">
-        <div class="sidebar-logo">
-          <img
-            src="${pageContext.request.contextPath}/assets/images/nest-logo.png"
-            alt="The Nest Logo"
-          />
-          <span class="sidebar-logo-text">The Nest</span>
-        </div>
-        <div class="user-info">
-          Welcome, <strong>Staff User</strong>
-          <div class="user-role">Staff</div>
-        </div>
-      </div>
-      <div class="sidebar-menu">
-        <a
-          href="${pageContext.request.contextPath}/staff-dashboard"
-          class="menu-item active"
-        >
-          <i class="bi bi-speedometer2"></i>
-          <span>Dashboard</span>
-        </a>
-        <a
-          href="${pageContext.request.contextPath}/inventory"
-          class="menu-item"
-        >
-          <i class="bi bi-box-seam"></i>
-          <span>Inventory</span>
-        </a>
-        <a
-          href="${pageContext.request.contextPath}/my-requests"
-          class="menu-item"
-        >
-          <i class="bi bi-list-check"></i>
-          <span>My Requests</span>
-        </a>
-        <a
-          href="${pageContext.request.contextPath}/new-request"
-          class="menu-item"
-        >
-          <i class="bi bi-plus-circle"></i>
-          <span>New Request</span>
-        </a>
-        <div class="menu-divider"></div>
-        <a href="${pageContext.request.contextPath}/profile" class="menu-item">
-          <i class="bi bi-person"></i>
-          <span>My Profile</span>
-        </a>
-        <a href="${pageContext.request.contextPath}/logout" class="menu-item">
-          <i class="bi bi-box-arrow-right"></i>
-          <span>Logout</span>
-        </a>
-      </div>
-    </div>
+    <jsp:include page="components/Sidebar.jsp" />
 
     <!-- Main Content -->
     <div class="main-content">

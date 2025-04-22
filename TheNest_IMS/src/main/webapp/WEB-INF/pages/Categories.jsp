@@ -30,65 +30,7 @@ pageEncoding="UTF-8"%>
     />
   </head>
   <body>
-    <!-- Sidebar -->
-    <div class="sidebar">
-      <div class="sidebar-header">
-        <div class="sidebar-logo">
-          <img
-            src="${pageContext.request.contextPath}/assets/images/nest-logo.png"
-            alt="The Nest Logo"
-          />
-          <span class="sidebar-logo-text">The Nest</span>
-        </div>
-        <div class="user-info">
-          Welcome, <strong>Admin User</strong>
-          <div class="user-role">Administrator</div>
-        </div>
-      </div>
-      <div class="sidebar-menu">
-        <a href="dashboard" class="menu-item">
-          <i class="bi bi-speedometer2"></i>
-          <span>Dashboard</span>
-        </a>
-        <a href="inventory" class="menu-item">
-          <i class="bi bi-box-seam"></i>
-          <span>Inventory</span>
-        </a>
-        <a href="products" class="menu-item">
-          <i class="bi bi-cart"></i>
-          <span>Products</span>
-        </a>
-        <a href="categories" class="menu-item active">
-          <i class="bi bi-tags"></i>
-          <span>Categories</span>
-        </a>
-        <a href="stock-requests" class="menu-item">
-          <i class="bi bi-list-check"></i>
-          <span>Stock Requests</span>
-        </a>
-        <a href="suppliers" class="menu-item">
-          <i class="bi bi-truck"></i>
-          <span>Suppliers</span>
-        </a>
-        <a href="users" class="menu-item">
-          <i class="bi bi-people"></i>
-          <span>Users</span>
-        </a>
-        <a href="reports" class="menu-item">
-          <i class="bi bi-graph-up"></i>
-          <span>Reports</span>
-        </a>
-        <div class="menu-divider"></div>
-        <a href="settings" class="menu-item">
-          <i class="bi bi-gear"></i>
-          <span>Settings</span>
-        </a>
-        <a href="logout" class="menu-item">
-          <i class="bi bi-box-arrow-right"></i>
-          <span>Logout</span>
-        </a>
-      </div>
-    </div>
+    <jsp:include page="components/Sidebar.jsp" />
 
     <!-- Main Content -->
     <div class="main-content">
@@ -498,7 +440,7 @@ pageEncoding="UTF-8"%>
       </div>
     </div>
 
-    <!-- JavaScript for functionality -->
+    <!-- JavaScript -->
     <script>
       document.addEventListener("DOMContentLoaded", function () {
         // Elements
@@ -592,7 +534,7 @@ pageEncoding="UTF-8"%>
           });
         }
 
-        // View Category buttons (redirect to products page filtered by category)
+        // View Category buttons
         viewButtons.forEach((button) => {
           button.addEventListener("click", function () {
             const categoryId = this.getAttribute("data-id");
@@ -600,7 +542,6 @@ pageEncoding="UTF-8"%>
               this.closest(".category-card").querySelector(
                 ".category-name"
               ).textContent;
-            // Redirect to products page with category filter
             window.location.href = `products?category=${categoryId}`;
           });
         });
@@ -621,7 +562,7 @@ pageEncoding="UTF-8"%>
             document.getElementById("categoryIcon").value = iconValue;
             document.getElementById(
               "categoryDescription"
-            ).value = `Description for ${categoryName} category`; // Example data
+            ).value = `Description for ${categoryName} category`;
 
             openModal(categoryModal);
           });
@@ -639,7 +580,6 @@ pageEncoding="UTF-8"%>
             deleteCategoryName.textContent = categoryName;
             openModal(deleteModal);
 
-            // Store the category ID for the delete confirmation
             confirmDeleteBtn.setAttribute("data-id", categoryId);
           });
         });
@@ -664,9 +604,7 @@ pageEncoding="UTF-8"%>
         // Save category button
         if (saveCategoryBtn) {
           saveCategoryBtn.addEventListener("click", function () {
-            // Validate form
             if (categoryForm.checkValidity()) {
-              // Get form data
               const formData = {
                 id: categoryId.value,
                 name: categoryName.value,
@@ -674,10 +612,8 @@ pageEncoding="UTF-8"%>
                 description: categoryDescription.value,
               };
 
-              // Here you would typically send the data to the server
               console.log("Saving category:", formData);
 
-              // For demo purposes, show success message and simulate refresh
               const isNewCategory = !formData.id;
               const successMessage = isNewCategory
                 ? `Category "${formData.name}" created successfully!`
@@ -685,8 +621,6 @@ pageEncoding="UTF-8"%>
 
               alert(successMessage);
 
-              // In a real application, you would refresh the data from the server
-              // For demo, we'll just reload the page
               setTimeout(() => {
                 window.location.reload();
               }, 500);
@@ -703,14 +637,9 @@ pageEncoding="UTF-8"%>
           confirmDeleteBtn.addEventListener("click", function () {
             const categoryId = this.getAttribute("data-id");
 
-            // Here you would typically send the delete request to the server
             console.log("Deleting category ID:", categoryId);
 
-            // For demo purposes, show success message and simulate refresh
             alert(`Category deleted successfully!`);
-
-            // In a real application, you would refresh the data from the server
-            // For demo, we'll just reload the page
             setTimeout(() => {
               window.location.reload();
             }, 500);
@@ -719,16 +648,12 @@ pageEncoding="UTF-8"%>
           });
         }
 
-        // Enhance the icon selector with preview
         if (categoryIcon) {
-          // Update preview when selection changes
           categoryIcon.addEventListener("change", function () {
             const selectedIcon = this.value;
             const iconPreview = document.querySelector(".icon-preview i");
             if (iconPreview) {
-              // Remove all bi-* classes
               iconPreview.className = "";
-              // Add the bi class and the selected icon class
               iconPreview.classList.add("bi", selectedIcon);
             }
           });

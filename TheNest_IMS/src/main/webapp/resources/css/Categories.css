@@ -9,7 +9,7 @@
   --text-color: #212121; /* Near black */
   --white: #ffffff; /* White */
   --danger-color: #424242; /* Dark grey */
-  --warning-color: #81c784; /* Light green */
+  --warning-color: #81c784; /* Light green instead of orange */
   --success-color: #4caf50; /* Green */
   --shadow-sm: 0 2px 5px rgba(0, 0, 0, 0.05);
   --shadow-md: 0 4px 15px rgba(0, 0, 0, 0.08);
@@ -59,24 +59,42 @@ body {
 }
 
 .input-group {
-  position: relative;
+  display: flex;
+  align-items: center;
   width: 100%;
+  border: 1px solid var(--gray-medium);
+  border-radius: var(--border-radius);
+  background-color: var(--white);
 }
 
 .input-icon {
-  position: absolute;
-  left: 12px;
-  top: 50%;
-  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
   color: var(--gray-dark);
-  z-index: 1;
-  pointer-events: none;
+  padding: 0 12px;
+  flex-shrink: 0;
+  width: 40px;
 }
 
 .input-with-icon {
-  padding-left: 45px;
-  width: 100%;
-  text-indent: 15px;
+  flex: 1;
+  border: none;
+  padding: 12px 12px 12px 0;
+  font-size: 14px;
+  color: var(--text-color);
+  background: transparent;
+  min-width: 0;
+  text-indent: 0;
+}
+
+.input-with-icon:focus {
+  outline: none;
+}
+
+.input-group:focus-within {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(46, 125, 50, 0.1);
 }
 
 .form-control {

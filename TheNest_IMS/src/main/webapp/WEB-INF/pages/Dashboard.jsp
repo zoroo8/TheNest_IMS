@@ -27,76 +27,7 @@ pageEncoding="UTF-8"%>
     />
   </head>
   <body>
-    <!-- Sidebar -->
-    <div class="sidebar">
-      <div class="sidebar-header">
-        <div class="sidebar-logo">
-          <img
-            src="${pageContext.request.contextPath}/assets/images/nest-logo.png"
-            alt="The Nest Logo"
-          />
-          <span class="sidebar-logo-text">The Nest</span>
-        </div>
-        <div class="user-info">
-          Welcome, <strong>Admin User</strong>
-          <div class="user-role">Administrator</div>
-        </div>
-      </div>
-      <div class="sidebar-menu">
-        <a
-          href="${pageContext.request.contextPath}/dashboard"
-          class="menu-item active"
-        >
-          <i class="bi bi-speedometer2"></i>
-          <span>Dashboard</span>
-        </a>
-        <a
-          href="${pageContext.request.contextPath}/inventory"
-          class="menu-item"
-        >
-          <i class="bi bi-box-seam"></i>
-          <span>Inventory</span>
-        </a>
-        <a
-          href="${pageContext.request.contextPath}/manual-stock-adjustment"
-          class="menu-item"
-        >
-          <i class="bi bi-sliders"></i>
-          <span>Stock Adjustment</span>
-        </a>
-        <a
-          href="${pageContext.request.contextPath}/stock-requests"
-          class="menu-item"
-        >
-          <i class="bi bi-list-check"></i>
-          <span>Stock Requests</span>
-        </a>
-        <a
-          href="${pageContext.request.contextPath}/suppliers"
-          class="menu-item"
-        >
-          <i class="bi bi-truck"></i>
-          <span>Suppliers</span>
-        </a>
-        <a href="${pageContext.request.contextPath}/users" class="menu-item">
-          <i class="bi bi-people"></i>
-          <span>Users</span>
-        </a>
-        <a href="${pageContext.request.contextPath}/reports" class="menu-item">
-          <i class="bi bi-graph-up"></i>
-          <span>Reports</span>
-        </a>
-        <div class="menu-divider"></div>
-        <a href="${pageContext.request.contextPath}/settings" class="menu-item">
-          <i class="bi bi-gear"></i>
-          <span>Settings</span>
-        </a>
-        <a href="${pageContext.request.contextPath}/logout" class="menu-item">
-          <i class="bi bi-box-arrow-right"></i>
-          <span>Logout</span>
-        </a>
-      </div>
-    </div>
+    <jsp:include page="components/Sidebar.jsp" />
 
     <!-- Main Content -->
     <div class="main-content">
@@ -328,23 +259,26 @@ pageEncoding="UTF-8"%>
 
     <script>
       document.addEventListener("DOMContentLoaded", function () {
-        // Product Trends Chart
+        // Initialize Charts
         const trendsCtx = document
           .getElementById("productTrendsChart")
           .getContext("2d");
+        const distributionCtx = document
+          .getElementById("productDistributionChart")
+          .getContext("2d");
+
+        // Product Trends Chart
         const trendsChart = new Chart(trendsCtx, {
           type: "line",
           data: {
-            labels: ["January", "February", "March", "April", "May", "June"],
+            labels: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
             datasets: [
               {
-                label: "Products Sold",
-                data: [50, 75, 100, 120, 150, 200],
+                label: "Product Movement",
+                data: [30, 45, 60, 35, 25, 50, 40],
                 borderColor: "#2e7d32",
                 backgroundColor: "rgba(46, 125, 50, 0.1)",
-                borderWidth: 2,
-                tension: 0.3,
-                fill: true,
+                tension: 0.4,
               },
             ],
           },
@@ -353,29 +287,13 @@ pageEncoding="UTF-8"%>
             maintainAspectRatio: false,
             plugins: {
               legend: {
-                display: false,
-              },
-            },
-            scales: {
-              y: {
-                beginAtZero: true,
-                grid: {
-                  color: "rgba(0, 0, 0, 0.05)",
-                },
-              },
-              x: {
-                grid: {
-                  display: false,
-                },
+                position: "top",
               },
             },
           },
         });
 
         // Product Distribution Chart
-        const distributionCtx = document
-          .getElementById("productDistributionChart")
-          .getContext("2d");
         const distributionChart = new Chart(distributionCtx, {
           type: "doughnut",
           data: {
@@ -384,7 +302,6 @@ pageEncoding="UTF-8"%>
               {
                 data: [50, 30, 20],
                 backgroundColor: ["#2e7d32", "#4caf50", "#8bc34a"],
-                borderWidth: 0,
               },
             ],
           },
@@ -396,9 +313,194 @@ pageEncoding="UTF-8"%>
                 position: "bottom",
               },
             },
-            cutout: "70%",
           },
         });
+
+        // Date Filter Functionality
+        const dateRangeBtn = document.querySelector(".date-range-btn");
+        const dateOptions = document.querySelectorAll(".date-option");
+
+        dateOptions.forEach((option) => {
+          option.addEventListener("click", (e) => {
+            e.preventDefault();
+            const selectedRange = e.target.textContent;
+            dateRangeBtn.innerHTML = `<i class="bi bi-calendar3"></i> ${selectedRange} <i class="bi bi-chevron-down"></i>`;
+            dateOptions.forEach((opt) => opt.classList.remove("active"));
+            option.classList.add("active");
+            // TODO: Add date range filter logic here
+          });
+        });
+
+        // Share Button Functionality
+        const shareBtn = document.querySelector(".btn-outline.me-2");
+        shareBtn.addEventListener("click", async () => {
+          try {
+            await navigator.share({
+              title: "Dashboard - The Nest Inventory System",
+              text: "Check out our inventory dashboard",
+              url: window.location.href,
+            });
+          } catch (err) {
+            alert("Sharing is not supported on this browser");
+          }
+        });
+
+        // Export Button Functionality
+        const exportBtn = document.querySelector(".btn-primary");
+        exportBtn.addEventListener("click", () => {
+          if (confirm("Do you want to export the dashboard data?")) {
+            exportBtn.classList.add("loading");
+
+            setTimeout(() => {
+              try {
+                const tables = document.querySelectorAll(".data-table");
+                let csvContent = "";
+
+                tables.forEach((table) => {
+                  const title = table
+                    .closest(".table-card")
+                    .querySelector(".table-title").textContent;
+                  csvContent += title + "\n\n";
+
+                  const headers = Array.from(table.querySelectorAll("th"))
+                    .map((th) => th.textContent)
+                    .join(",");
+                  csvContent += headers + "\n";
+
+                  const rows = table.querySelectorAll("tbody tr");
+                  rows.forEach((row) => {
+                    const cells = Array.from(row.querySelectorAll("td"))
+                      .map((td) => td.textContent.trim())
+                      .join(",");
+                    csvContent += cells + "\n";
+                  });
+
+                  csvContent += "\n\n";
+                });
+
+                const blob = new Blob([csvContent], { type: "text/csv" });
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement("a");
+                a.setAttribute("href", url);
+                a.setAttribute("download", "dashboard-report.csv");
+                a.click();
+                window.URL.revokeObjectURL(url);
+                alert("Export completed successfully!");
+              } catch (error) {
+                alert("Failed to export data. Please try again.");
+                console.error("Export error:", error);
+              } finally {
+                exportBtn.classList.remove("loading");
+              }
+            }, 1000);
+          }
+        });
+
+        // Stock Availability Actions
+        document.querySelectorAll(".action-buttons a").forEach((button) => {
+          button.addEventListener("click", (e) => {
+            e.preventDefault();
+            const action = button.classList.contains("view-item")
+              ? "view"
+              : button.classList.contains("edit-item")
+              ? "edit"
+              : "delete";
+            const productId = button.getAttribute("data-id");
+            const productName = button
+              .closest("tr")
+              .querySelector("td").textContent;
+
+            switch (action) {
+              case "view":
+                alert(`Viewing details for ${productName}`);
+                // TODO: Implement view functionality
+                break;
+              case "edit":
+                if (confirm(`Do you want to edit ${productName}?`)) {
+                  // TODO: Implement edit functionality
+                  alert("Edit functionality will be implemented soon");
+                }
+                break;
+              case "delete":
+                if (
+                  confirm(`Are you sure you want to delete ${productName}?`)
+                ) {
+                  button.closest("tr").remove();
+                  alert(`${productName} has been deleted`);
+                }
+                break;
+            }
+          });
+        });
+
+        // Chart View Controls
+        const chartControls = document.querySelectorAll(
+          ".chart-controls button"
+        );
+        chartControls.forEach((control) => {
+          control.addEventListener("click", (e) => {
+            const parent = control.closest(".chart-controls");
+            parent
+              .querySelectorAll("button")
+              .forEach((btn) => btn.classList.remove("active"));
+            control.classList.add("active");
+
+            const view = control.getAttribute("data-chart-view");
+            const chartId = control
+              .closest(".chart-card")
+              .querySelector("canvas").id;
+
+            if (chartId === "productTrendsChart") {
+              updateTrendsChart(view);
+            } else if (chartId === "productDistributionChart") {
+              updateDistributionChart(view);
+            }
+          });
+        });
+
+        // Chart update functions
+        function updateTrendsChart(view) {
+          let labels, data;
+          switch (view) {
+            case "daily":
+              labels = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+              data = [30, 45, 60, 35, 25, 50, 40];
+              break;
+            case "weekly":
+              labels = ["Week 1", "Week 2", "Week 3", "Week 4"];
+              data = [150, 200, 175, 225];
+              break;
+            case "monthly":
+              labels = ["Jan", "Feb", "Mar", "Apr", "May", "Jun"];
+              data = [500, 600, 750, 800, 900, 1000];
+              break;
+          }
+
+          trendsChart.data.labels = labels;
+          trendsChart.data.datasets[0].data = data;
+          trendsChart.update();
+        }
+
+        function updateDistributionChart(view) {
+          let labels, data, colors;
+          switch (view) {
+            case "category":
+              labels = ["Electronics", "Furniture", "Office Supplies"];
+              data = [50, 30, 20];
+              colors = ["#2e7d32", "#4caf50", "#8bc34a"];
+              break;
+            case "status":
+              labels = ["In Stock", "Low Stock", "Out of Stock"];
+              data = [70, 20, 10];
+              colors = ["#4caf50", "#ff9800", "#f44336"];
+              break;
+          }
+
+          distributionChart.data.labels = labels;
+          distributionChart.data.datasets[0].data = data;
+          distributionChart.data.datasets[0].backgroundColor = colors;
+          distributionChart.update();
+        }
       });
     </script>
   </body>

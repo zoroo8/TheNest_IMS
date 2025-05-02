@@ -7,7 +7,7 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
-@WebServlet("/Dashboard")
+@WebServlet("/admin/dashboard")
 public class DashboardController extends HttpServlet {
     private static final long serialVersionUID = 1L;
     
@@ -18,12 +18,11 @@ public class DashboardController extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) 
             throws ServletException, IOException {
-        request.getRequestDispatcher("/WEB-INF/pages/Dashboard.jsp").forward(request, response);
+        request.getRequestDispatcher("/WEB-INF/pages/admin/Dashboard.jsp").forward(request, response);
     }
     
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) 
             throws ServletException, IOException {
-        response.sendRedirect("dashboard");
     }
 }

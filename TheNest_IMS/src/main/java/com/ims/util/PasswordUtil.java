@@ -88,41 +88,35 @@ public class PasswordUtil {
 	}
 
 	public static String decrypt(String encryptedPassword, String username) {
-	    System.out.println("\n=== DECRYPTION DEBUG ===");
-	    System.out.println("Encrypted length: " + encryptedPassword.length());
-	    System.out.println("Using username/key: '" + username + "'");
-	    
-	    try {
-	        byte[] decode = Base64.getDecoder().decode(encryptedPassword.getBytes(UTF_8));
-	        System.out.println("Base64 decoded length: " + decode.length);
-	        
-	        ByteBuffer bb = ByteBuffer.wrap(decode);
-	        
-	        byte[] iv = new byte[IV_LENGTH_BYTE];
-	        bb.get(iv);
-	        System.out.println("IV extracted: " + Base64.getEncoder().encodeToString(iv));
-	        
-	        byte[] salt = new byte[SALT_LENGTH_BYTE];
-	        bb.get(salt);
-	        System.out.println("Salt extracted: " + Base64.getEncoder().encodeToString(salt));
-	        
-	        byte[] cipherText = new byte[bb.remaining()];
-	        bb.get(cipherText);
-	        
-	        SecretKey aesKeyFromPassword = getAESKeyFromPassword(username.toCharArray(), salt);
-	        System.out.println("Key generation " + (aesKeyFromPassword != null ? "successful" : "failed"));
-	        
-	        Cipher cipher = Cipher.getInstance(ENCRYPT_ALGO);
-	        cipher.init(Cipher.DECRYPT_MODE, aesKeyFromPassword, new GCMParameterSpec(TAG_LENGTH_BIT, iv));
-	        
-	        byte[] plainText = cipher.doFinal(cipherText);
-	        return new String(plainText, UTF_8);
-	    } catch (Exception ex) {
-	        System.err.println("Decryption failed at step:");
-	        ex.printStackTrace();
-	        return null;
-	    }
+		try {
+			byte[] decode = Base64.getDecoder().decode(encryptedPassword.getBytes(UTF_8));
+
+			// get back the iv and salt from the cipher text
+			ByteBuffer bb = ByteBuffer.wrap(decode);
+
+			byte[] iv = new byte[IV_LENGTH_BYTE];
+			bb.get(iv);
+
+			byte[] salt = new byte[SALT_LENGTH_BYTE];
+			bb.get(salt);
+
+			byte[] cipherText = new byte[bb.remaining()];
+			bb.get(cipherText);
+
+			// get back the aes key from the same password and salt
+			SecretKey aesKeyFromPassword = PasswordUtil.getAESKeyFromPassword(username.toCharArray(), salt);
+
+			Cipher cipher = Cipher.getInstance(ENCRYPT_ALGO);
+
+			cipher.init(Cipher.DECRYPT_MODE, aesKeyFromPassword, new GCMParameterSpec(TAG_LENGTH_BIT, iv));
+
+			byte[] plainText = cipher.doFinal(cipherText);
+
+			return new String(plainText, UTF_8);
+		} catch (Exception ex) {
+			return null;
+		}
+
 	}
-	
 
 }

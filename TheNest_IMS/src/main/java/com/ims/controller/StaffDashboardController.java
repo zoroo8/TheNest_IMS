@@ -7,7 +7,7 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
-@WebServlet("/staff-dashboard")
+@WebServlet("/staff/dashboard")
 public class StaffDashboardController extends HttpServlet {
     private static final long serialVersionUID = 1L;
     
@@ -18,13 +18,12 @@ public class StaffDashboardController extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) 
             throws ServletException, IOException {
-        String jspPath = "/WEB-INF/pages/StaffDashboard.jsp";
+        String jspPath = "/WEB-INF/pages/staff/StaffDashboard.jsp";
         request.getRequestDispatcher(jspPath).forward(request, response);
     }
     
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) 
             throws ServletException, IOException {
-        response.sendRedirect("staff-dashboard");
     }
 }

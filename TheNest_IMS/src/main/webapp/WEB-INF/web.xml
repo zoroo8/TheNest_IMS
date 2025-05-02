@@ -7,8 +7,7 @@
     <display-name>The Nest Inventory Management System</display-name>
     
     <welcome-file-list>
-        <welcome-file>Home</welcome-file>
-        <welcome-file>Login</welcome-file>
+        <welcome-file>home</welcome-file>
     </welcome-file-list>
 
     <servlet-mapping>

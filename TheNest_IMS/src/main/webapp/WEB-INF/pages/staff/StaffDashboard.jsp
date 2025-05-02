@@ -75,7 +75,7 @@ pageEncoding="UTF-8"%>
           <i class="bi bi-person"></i>
           <span>My Profile</span>
         </a>
-        <a href="${pageContext.request.contextPath}/logout" class="menu-item">
+        <a href="${pageContext.request.contextPath}/Logout" class="menu-item">
           <i class="bi bi-box-arrow-right"></i>
           <span>Logout</span>
         </a>

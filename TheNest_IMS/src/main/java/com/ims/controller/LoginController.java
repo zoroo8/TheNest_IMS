@@ -25,13 +25,17 @@ public class LoginController extends HttpServlet {
             UserModel user = loginService.authenticate(email, password);
             
             if (user != null) {
+                // Store the user in the session
                 SessionUtil.setAttribute(request, "currentUser", user);
+                SessionUtil.setAttribute(request, "role", user.getRole()); // Store role
                 
+                // Remember user if "remember me" is checked
                 if (rememberMe != null && rememberMe.equals("on")) {
                     CookiesUtil.addCookie(response, "rememberedUser", 
-                        String.valueOf(user.getId()), 30 * 24 * 60 * 60);
+                        String.valueOf(user.getId()), 30 * 24 * 60 * 60); // 30 days
                 }
                 
+                // Redirect based on user role
                 String redirectPage = request.getContextPath() + "/" + determineRedirectPage(user.getRole());
                 response.sendRedirect(redirectPage);
             } else {
@@ -52,9 +56,9 @@ public class LoginController extends HttpServlet {
     private String determineRedirectPage(String role) {
         switch(role.toUpperCase()) {
             case "ADMIN":
-                return "Dashboard";
+                return "admin/dashboard";
             default: // STAFF
-                return "staff-dashboard";
+                return "staff/dashboard";
         }
     }
 }

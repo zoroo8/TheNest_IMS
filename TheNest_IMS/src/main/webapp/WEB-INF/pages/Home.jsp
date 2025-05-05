@@ -1,5 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 pageEncoding="UTF-8"%>
+
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -460,7 +461,7 @@ pageEncoding="UTF-8"%>
             <li><a href="#about">About</a></li>
             <li><a href="#contact">Contact</a></li>
           </ul>
-          <a href="login" class="login-btn"
+          <a href="${pageContext.request.contextPath}/Login" class="login-btn"
             >Login <i class="bi bi-box-arrow-in-right"></i
           ></a>
         </nav>

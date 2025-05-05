@@ -39,7 +39,61 @@ pageEncoding="UTF-8"%>
     />
   </head>
   <body>
-    <jsp:include page="components/Sidebar.jsp" />
+    <!-- Sidebar -->
+    <div class="sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-logo">
+          <img
+            src="${pageContext.request.contextPath}/assets/images/nest-logo.png"
+            alt="The Nest Logo"
+          />
+          <span class="sidebar-logo-text">The Nest</span>
+        </div>
+        <div class="user-info">
+          Welcome, <strong>Admin User</strong>
+          <div class="user-role">Administrator</div>
+        </div>
+      </div>
+      <div class="sidebar-menu">
+        <a href="dashboard" class="menu-item">
+          <i class="bi bi-speedometer2"></i>
+          <span>Dashboard</span>
+        </a>
+        <a href="inventory" class="menu-item">
+          <i class="bi bi-box-seam"></i>
+          <span>Inventory</span>
+        </a>
+        <a href="stock-requests" class="menu-item">
+          <i class="bi bi-list-check"></i>
+          <span>Stock Requests</span>
+        </a>
+        <a href="stock-history" class="menu-item active">
+          <i class="bi bi-clock-history"></i>
+          <span>Stock History</span>
+        </a>
+        <a href="suppliers" class="menu-item">
+          <i class="bi bi-truck"></i>
+          <span>Suppliers</span>
+        </a>
+        <a href="users" class="menu-item">
+          <i class="bi bi-people"></i>
+          <span>Users</span>
+        </a>
+        <a href="reports" class="menu-item">
+          <i class="bi bi-graph-up"></i>
+          <span>Reports</span>
+        </a>
+        <div class="menu-divider"></div>
+        <a href="settings" class="menu-item">
+          <i class="bi bi-gear"></i>
+          <span>Settings</span>
+        </a>
+        <a href="logout" class="menu-item">
+          <i class="bi bi-box-arrow-right"></i>
+          <span>Logout</span>
+        </a>
+      </div>
+    </div>
 
     <!-- Main Content -->
     <div class="main-content">

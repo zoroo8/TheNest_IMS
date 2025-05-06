@@ -1,6 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 pageEncoding="UTF-8"%> <%@ taglib prefix="c"
-uri="http://java.sun.com/jsp/jstl/core" %>
+uri="http://java.sun.com/jsp/jstl/core" %> <%@ taglib prefix="fn"
+uri="http://java.sun.com/jsp/jstl/functions" %>
 
 <!-- Sidebar Styles -->
 <style>
@@ -229,7 +230,7 @@ uri="http://java.sun.com/jsp/jstl/core" %>
 
   .menu-item:hover {
     background-color: var(--light-color);
-    color: var(--primary-color);
+    color: var (--primary-color);
   }
 
   .menu-item.active {
@@ -279,21 +280,15 @@ uri="http://java.sun.com/jsp/jstl/core" %>
     </div>
     <div class="user-info">
       Welcome,
-      <strong
-        >${sessionScope.user.name != null ? sessionScope.user.name : 'Admin
-        User'}</strong
-      >
-      <div class="user-role">
-        ${sessionScope.user.role != null ? sessionScope.user.role :
-        'Administrator'}
-      </div>
+      <strong>${sessionScope.user.name}</strong>
+      <div class="user-role">${sessionScope.user.role}</div>
     </div>
   </div>
   <!-- Updated Sidebar Menu -->
   <div class="sidebar-menu">
     <a
       href="${pageContext.request.contextPath}/dashboard"
-      class="menu-item ${pageContext.request.servletPath.contains('/dashboard') ? 'active' : ''}"
+      class="menu-item ${fn:contains(pageContext.request.servletPath, '/dashboard') ? 'active' : ''}"
     >
       <i class="bi bi-speedometer2"></i>
       <span>Dashboard</span>
@@ -303,28 +298,28 @@ uri="http://java.sun.com/jsp/jstl/core" %>
     <div class="menu-divider"></div>
     <a
       href="${pageContext.request.contextPath}/inventory"
-      class="menu-item ${pageContext.request.servletPath.contains('/inventory') ? 'active' : ''}"
+      class="menu-item ${fn:contains(pageContext.request.servletPath, '/inventory') ? 'active' : ''}"
     >
       <i class="bi bi-clipboard-data"></i>
       <span>Current Stock</span>
     </a>
     <a
       href="${pageContext.request.contextPath}/low-stock"
-      class="menu-item ${pageContext.request.servletPath.contains('/low-stock') ? 'active' : ''}"
+      class="menu-item ${fn:contains(pageContext.request.servletPath, '/low-stock') ? 'active' : ''}"
     >
       <i class="bi bi-exclamation-triangle"></i>
       <span>Low Stock</span>
     </a>
     <a
       href="${pageContext.request.contextPath}/stock-movement"
-      class="menu-item ${pageContext.request.servletPath.contains('/stock-movement') ? 'active' : ''}"
+      class="menu-item ${fn:contains(pageContext.request.servletPath, '/stock-movement') ? 'active' : ''}"
     >
       <i class="bi bi-arrow-left-right"></i>
       <span>Stock Movement</span>
     </a>
     <a
       href="${pageContext.request.contextPath}/stock-history"
-      class="menu-item ${pageContext.request.servletPath.contains('/stock-history') ? 'active' : ''}"
+      class="menu-item ${fn:contains(pageContext.request.servletPath, '/stock-history') ? 'active' : ''}"
     >
       <i class="bi bi-clock-history"></i>
       <span>Stock History</span>
@@ -334,14 +329,14 @@ uri="http://java.sun.com/jsp/jstl/core" %>
     <div class="menu-divider"></div>
     <a
       href="${pageContext.request.contextPath}/products"
-      class="menu-item ${pageContext.request.servletPath.contains('/products') ? 'active' : ''}"
+      class="menu-item ${fn:contains(pageContext.request.servletPath, '/products') ? 'active' : ''}"
     >
       <i class="bi bi-boxes"></i>
       <span>Products</span>
     </a>
     <a
       href="${pageContext.request.contextPath}/categories"
-      class="menu-item ${pageContext.request.servletPath.contains('/categories') ? 'active' : ''}"
+      class="menu-item ${fn:contains(pageContext.request.servletPath, '/categories') ? 'active' : ''}"
     >
       <i class="bi bi-tags"></i>
       <span>Categories</span>
@@ -351,21 +346,21 @@ uri="http://java.sun.com/jsp/jstl/core" %>
     <div class="menu-divider"></div>
     <a
       href="${pageContext.request.contextPath}/stock-requests"
-      class="menu-item ${pageContext.request.servletPath.contains('/stock-requests') ? 'active' : ''}"
+      class="menu-item ${fn:contains(pageContext.request.servletPath, '/stock-requests') ? 'active' : ''}"
     >
       <i class="bi bi-megaphone"></i>
       <span>Stock Requests</span>
     </a>
     <a
       href="${pageContext.request.contextPath}/request-history"
-      class="menu-item ${pageContext.request.servletPath.contains('/request-history') ? 'active' : ''}"
+      class="menu-item ${fn:contains(pageContext.request.servletPath, '/request-history') ? 'active' : ''}"
     >
       <i class="bi bi-archive"></i>
       <span>Request History</span>
     </a>
     <a
       href="${pageContext.request.contextPath}/dispatch-request"
-      class="menu-item ${pageContext.request.servletPath.contains('/dispatch-request') ? 'active' : ''}"
+      class="menu-item ${fn:contains(pageContext.request.servletPath, '/dispatch-request') ? 'active' : ''}"
     >
       <i class="bi bi-truck"></i>
       <span>Dispatch Request</span>
@@ -375,14 +370,14 @@ uri="http://java.sun.com/jsp/jstl/core" %>
     <div class="menu-divider"></div>
     <a
       href="${pageContext.request.contextPath}/users"
-      class="menu-item ${pageContext.request.servletPath.contains('/users') ? 'active' : ''}"
+      class="menu-item ${fn:contains(pageContext.request.servletPath, '/users') ? 'active' : ''}"
     >
       <i class="bi bi-people"></i>
       <span>Users</span>
     </a>
     <a
       href="${pageContext.request.contextPath}/manual-stock-adjustment"
-      class="menu-item ${pageContext.request.servletPath.contains('/manual-stock-adjustment') ? 'active' : ''}"
+      class="menu-item ${fn:contains(pageContext.request.servletPath, '/manual-stock-adjustment') ? 'active' : ''}"
     >
       <i class="bi bi-sliders"></i>
       <span>Manual Adjustments</span>
@@ -392,7 +387,7 @@ uri="http://java.sun.com/jsp/jstl/core" %>
     <div class="menu-divider"></div>
     <a
       href="${pageContext.request.contextPath}/profile"
-      class="menu-item ${pageContext.request.servletPath.contains('/profile') ? 'active' : ''}"
+      class="menu-item ${fn:contains(pageContext.request.servletPath, '/profile') ? 'active' : ''}"
     >
       <i class="bi bi-person"></i>
       <span>Profile</span>

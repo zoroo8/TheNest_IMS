@@ -280,8 +280,8 @@ uri="http://java.sun.com/jsp/jstl/functions" %>
     </div>
     <div class="user-info">
       Welcome,
-      <strong>${sessionScope.user.name}</strong>
-      <div class="user-role">${sessionScope.user.role}</div>
+      <strong>${sessionScope.currentUser.firstName}</strong>
+      <div class="user-role">${sessionScope.currentUser.role}</div>
     </div>
   </div>
   <!-- Updated Sidebar Menu -->

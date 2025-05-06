@@ -29,46 +29,50 @@ public class RoleBasedAuthenticationFilter implements Filter {
         // Filter initialization, if required.
     }
 
-    @Override
+   @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
             throws IOException, ServletException {
         // Cast the request and response to HttpServletRequest and HttpServletResponse
         HttpServletRequest req = (HttpServletRequest) request;
         HttpServletResponse res = (HttpServletResponse) response;
 
-        // Get the requested URI
+        // Get the requested URI and context path
         String uri = req.getRequestURI();
+        String contextPath = req.getContextPath(); // Get context path for accurate checks
 
         Object currentUser = SessionUtil.getAttribute(req, "currentUser");
         String userRole = (String) SessionUtil.getAttribute(req, "role");
         boolean isLoggedIn = currentUser != null && userRole != null;
 
-
-        // If the user is not logged in, redirect to the login page
-        if (!isLoggedIn) {
-            if (uri.endsWith(LOGIN)) {
+ if (!isLoggedIn) {
+            
+            if (uri.endsWith(LOGIN)) { 
                 chain.doFilter(request, response);
             } else {
-                res.sendRedirect(req.getContextPath() + LOGIN);
+                res.sendRedirect(contextPath + LOGIN);
             }
         } else {
-            // If the user is logged in, check the role for accessing the page
-            if (uri.contains("/admin/")) {
-                if ("admin".equals(userRole)) {
-                    // Allow access to admin pages
+        
+            if (uri.startsWith(contextPath + "/admin/")) { 
+               
+                if ("admin".equalsIgnoreCase(userRole)) { 
+              
                     chain.doFilter(request, response);
                 } else {
-                    res.sendRedirect(req.getContextPath() + HOME);
+                  
+                    res.sendRedirect(contextPath + HOME); 
                 }
-            } else if (uri.contains("/staff/")) {
-                if ("staff".equals(userRole)) {
-                    // Allow access to staff pages
+            } else if (uri.startsWith(contextPath + "/staff/")) { 
+                 
+                if ("staff".equalsIgnoreCase(userRole)) {
+                   
                     chain.doFilter(request, response);
                 } else {
-                    res.sendRedirect(req.getContextPath() + HOME);
+                     
+                    res.sendRedirect(contextPath + HOME);
                 }
             } else {
-                // For other URLs, pass the request along the filter chain
+                
                 chain.doFilter(request, response);
             }
         }

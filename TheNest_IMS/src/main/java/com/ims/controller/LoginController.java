@@ -43,6 +43,7 @@ public class LoginController extends HttpServlet {
                 request.getRequestDispatcher("/WEB-INF/pages/Login.jsp").forward(request, response);
             }
         } catch (Exception e) {
+            e.printStackTrace(); 
             request.setAttribute("error", "Login failed. Please try again.");
             request.getRequestDispatcher("/WEB-INF/pages/Login.jsp").forward(request, response);
         }

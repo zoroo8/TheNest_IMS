@@ -24,6 +24,6 @@ public class ProductsController extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        response.sendRedirect("products");
+        response.sendRedirect(request.getContextPath() + "/products"); // Use contextPath
     }
 }

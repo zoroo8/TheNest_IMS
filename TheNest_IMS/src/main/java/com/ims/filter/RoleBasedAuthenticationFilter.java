@@ -16,13 +16,15 @@ import com.ims.util.SessionUtil;
 @WebFilter(asyncSupported = true, urlPatterns = { 
     "/admin/*", 
     "/staff/*"
+    // Add other paths that require login but are not role-specific if needed
+    // e.g., "/profile", "/inventory", etc. if all authenticated users can access them
+    // but for now, we are focusing on role-specific prefixes.
 })
 public class RoleBasedAuthenticationFilter implements Filter {
 
-    private static final String LOGIN = "/Login";
-    private static final String HOME = "/home";
-    private static final String ADMIN_DASHBOARD = "/admin/dashboard";
-    private static final String STAFF_DASHBOARD = "/staff/dashboard";
+    private static final String LOGIN_PATH = "/Login";
+    private static final String ADMIN_DASHBOARD_PATH = "/admin/dashboard";
+    private static final String STAFF_DASHBOARD_PATH = "/staff/dashboard";
 
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
@@ -32,47 +34,40 @@ public class RoleBasedAuthenticationFilter implements Filter {
    @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
             throws IOException, ServletException {
-        // Cast the request and response to HttpServletRequest and HttpServletResponse
         HttpServletRequest req = (HttpServletRequest) request;
         HttpServletResponse res = (HttpServletResponse) response;
-
-        // Get the requested URI and context path
+        String contextPath = req.getContextPath();
         String uri = req.getRequestURI();
-        String contextPath = req.getContextPath(); // Get context path for accurate checks
 
         Object currentUser = SessionUtil.getAttribute(req, "currentUser");
         String userRole = (String) SessionUtil.getAttribute(req, "role");
         boolean isLoggedIn = currentUser != null && userRole != null;
 
- if (!isLoggedIn) {
-            
-            if (uri.endsWith(LOGIN)) { 
+        if (!isLoggedIn) {
+            if (uri.equals(contextPath + LOGIN_PATH) || uri.startsWith(contextPath + "/resources/") || uri.startsWith(contextPath + "/assets/")) {
                 chain.doFilter(request, response);
             } else {
-                res.sendRedirect(contextPath + LOGIN);
+                res.sendRedirect(contextPath + LOGIN_PATH);
             }
         } else {
-        
-            if (uri.startsWith(contextPath + "/admin/")) { 
-               
-                if ("admin".equalsIgnoreCase(userRole)) { 
-              
+            // User is logged in, check role-based access
+            if (uri.startsWith(contextPath + "/admin/")) {
+                if ("ADMIN".equalsIgnoreCase(userRole)) {
                     chain.doFilter(request, response);
                 } else {
-                  
-                    res.sendRedirect(contextPath + HOME); 
+                    // Admin trying to access staff page or staff trying to access admin page
+                    res.sendRedirect(contextPath + STAFF_DASHBOARD_PATH + "?error=unauthorized");
                 }
-            } else if (uri.startsWith(contextPath + "/staff/")) { 
-                 
-                if ("staff".equalsIgnoreCase(userRole)) {
-                   
+            } else if (uri.startsWith(contextPath + "/staff/")) {
+                if ("STAFF".equalsIgnoreCase(userRole)) {
                     chain.doFilter(request, response);
                 } else {
-                     
-                    res.sendRedirect(contextPath + HOME);
+                     // Admin trying to access staff page or staff trying to access admin page
+                    res.sendRedirect(contextPath + ADMIN_DASHBOARD_PATH + "?error=unauthorized");
                 }
             } else {
-                
+                // For paths not starting with /admin/ or /staff/ but caught by filter (if urlPatterns expanded)
+                // Or if a logged-in user accesses a non-protected common page (filter won't catch this unless pattern matches)
                 chain.doFilter(request, response);
             }
         }

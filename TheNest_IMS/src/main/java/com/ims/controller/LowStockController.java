@@ -7,24 +7,24 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
-@WebServlet("/admin/users")
-public class UsersController extends HttpServlet {
+@WebServlet("/low-stock")
+public class LowStockController extends HttpServlet {
     private static final long serialVersionUID = 1L;
 
-    public UsersController() {
+    public LowStockController() {
         super();
     }
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        request.getRequestDispatcher("/WEB-INF/pages/Users.jsp").forward(request, response);
+        request.getRequestDispatcher("/WEB-INF/pages/LowStock.jsp").forward(request, response);
     }
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        // Handle form submissions for adding/editing users if necessary
+        // Handle form submissions related to low stock if necessary
         doGet(request, response); // For now, just forward to GET
     }
 }

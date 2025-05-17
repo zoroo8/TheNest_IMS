@@ -13,27 +13,7 @@
 	</classpathentry>
 	<classpathentry kind="con" path="org.eclipse.jst.j2ee.internal.web.container"/>
 	<classpathentry kind="con" path="org.eclipse.jst.j2ee.internal.module.container"/>
-	<classpathentry kind="lib" path="C:/Users/Acer/OneDrive - islingtoncollege.edu.np/Documents/Y2/Y2 Semester/Y2 S2/Advanced Programming and Technology/mysql-connector-j-9.2.0/mysql-connector-j-9.2.0.jar">
-		<attributes>
-			<attribute name="module" value="true"/>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="lib" path="C:/Users/Acer/OneDrive - islingtoncollege.edu.np/Documents/Y2/Y2 Coursework/Y2 S2/Advanced Programming and Technology/TheNest_IMS/TheNest_IMS/src/main/webapp/WEB-INF/lib/jakarta.servlet.jsp.jstl-3.0.0.jar">
-		<attributes>
-			<attribute name="module" value="true"/>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="lib" path="C:/Users/Acer/OneDrive - islingtoncollege.edu.np/Documents/Y2/Y2 Coursework/Y2 S2/Advanced Programming and Technology/TheNest_IMS/TheNest_IMS/src/main/webapp/WEB-INF/lib/jakarta.servlet.jsp.jstl-api-3.0.0.jar">
-		<attributes>
-			<attribute name="module" value="true"/>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="lib" path="C:/Users/Acer/OneDrive - islingtoncollege.edu.np/Documents/Y2/Y2 Coursework/Y2 S2/Advanced Programming and Technology/TheNest_IMS/TheNest_IMS/src/main/webapp/WEB-INF/lib/jakarta.servlet.jsp-api-3.1.1.jar">
-		<attributes>
-			<attribute name="module" value="true"/>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="lib" path="C:/Users/Acer/OneDrive - islingtoncollege.edu.np/Documents/Y2/Y2 Coursework/Y2 S2/Advanced Programming and Technology/TheNest_IMS/TheNest_IMS/src/main/webapp/WEB-INF/lib/jakarta.servlet-api-6.0.0.jar">
+	<classpathentry kind="lib" path="D:/College/AdvancedProgramming/Coursework/Development/TheNest_IMS/TheNest_IMS/src/main/webapp/WEB-INF/lib">
 		<attributes>
 			<attribute name="module" value="true"/>
 		</attributes>

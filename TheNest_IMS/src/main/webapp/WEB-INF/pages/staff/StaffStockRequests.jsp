@@ -27,46 +27,7 @@ pageEncoding="UTF-8"%>
     />
   </head>
   <body>
-    <!-- Sidebar -->
-    <div class="sidebar">
-      <div class="sidebar-header">
-        <div class="sidebar-logo">
-          <img
-            src="${pageContext.request.contextPath}/assets/images/nest-logo.png"
-            alt="The Nest Logo"
-          />
-          <span class="sidebar-logo-text">The Nest</span>
-        </div>
-        <div class="user-info">
-          Welcome, <strong>John Doe</strong>
-          <div class="user-role">Staff</div>
-        </div>
-      </div>
-      <div class="sidebar-menu">
-        <a href="staff-dashboard" class="menu-item">
-          <i class="material-icons">dashboard</i>
-          <span>Dashboard</span>
-        </a>
-        <a href="staff-inventory" class="menu-item">
-          <i class="material-icons">inventory_2</i>
-          <span>Inventory</span>
-        </a>
-        <a href="staff-stock-requests" class="menu-item active">
-          <i class="material-icons">assignment</i>
-          <span>My Requests</span>
-        </a>
-        <div class="menu-divider"></div>
-        <a href="staff-profile" class="menu-item">
-          <i class="material-icons">person</i>
-          <span>My Profile</span>
-        </a>
-        <a href="logout" class="menu-item">
-          <i class="material-icons">logout</i>
-          <span>Logout</span>
-        </a>
-      </div>
-    </div>
-
+    <jsp:include page="components/Sidebar.jsp" />
     <!-- Main Content -->
     <div class="main-content">
       <div class="page-header">

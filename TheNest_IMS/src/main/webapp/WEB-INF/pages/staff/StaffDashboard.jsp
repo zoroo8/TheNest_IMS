@@ -26,7 +26,7 @@ pageEncoding="UTF-8"%>
     />
   </head>
   <body>
-    <jsp:include page="components/Sidebar.jsp" />
+    <jsp:include page="../components/Sidebar.jsp" />
 
     <!-- Main Content -->
     <div class="main-content">

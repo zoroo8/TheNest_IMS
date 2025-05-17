@@ -1,31 +1,29 @@
 package com.ims.controller;
 
 import java.io.IOException;
-
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
-@WebServlet(asyncSupported = true, urlPatterns= {"/home","/"})
-public class HomeController extends HttpServlet {
+@WebServlet("/profile")
+public class ProfileController extends HttpServlet {
     private static final long serialVersionUID = 1L;
     
-    public HomeController() {
+    public ProfileController() {
         super();
     }
     
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) 
             throws ServletException, IOException {
-        request.getRequestDispatcher("/WEB-INF/pages/Home.jsp").forward(request, response);
+        request.getRequestDispatcher("/WEB-INF/pages/Profile.jsp").forward(request, response);
     }
     
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) 
             throws ServletException, IOException {
-        doGet(request, response);
+        response.sendRedirect("profile");
     }
 }
-

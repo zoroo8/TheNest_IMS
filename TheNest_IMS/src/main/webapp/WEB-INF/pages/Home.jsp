@@ -460,7 +460,7 @@ pageEncoding="UTF-8"%>
             <li><a href="#about">About</a></li>
             <li><a href="#contact">Contact</a></li>
           </ul>
-          <a href="login" class="login-btn"
+          <a href="/TheNest_IMS/Login" class="login-btn"
             >Login <i class="bi bi-box-arrow-in-right"></i
           ></a>
         </nav>
@@ -479,7 +479,7 @@ pageEncoding="UTF-8"%>
             system.
           </p>
           <div class="hero-btns">
-            <a href="login" class="login-btn">Get Started</a>
+            <a href="/TheNest_IMS/Login" class="login-btn">Get Started</a>
             <a href="#features" class="btn-secondary">Learn More</a>
           </div>
         </div>
@@ -606,7 +606,7 @@ pageEncoding="UTF-8"%>
             Join thousands of businesses that have transformed their inventory
             management with The Nest.
           </p>
-          <a href="login" class="btn-light">Get Started Today</a>
+          <a href="/TheNest_IMS/Login" class="btn-light">Get Started Today</a>
         </div>
       </div>
     </section>
@@ -636,7 +636,7 @@ pageEncoding="UTF-8"%>
               <li><a href="#features">Features</a></li>
               <li><a href="#about">About Us</a></li>
               <li><a href="#contact">Contact</a></li>
-              <li><a href="login">Login</a></li>
+              <li><a href="/Login">Login</a></li>
             </ul>
           </div>
           <div class="footer-links">

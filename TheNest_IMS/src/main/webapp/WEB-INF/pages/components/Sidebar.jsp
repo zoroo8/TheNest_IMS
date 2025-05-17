@@ -1,6 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 pageEncoding="UTF-8"%> <%@ taglib prefix="c"
-uri="http://java.sun.com/jsp/jstl/core" %>
+uri="http://java.sun.com/jsp/jstl/core" %> <%@ taglib prefix="fn"
+uri="http://java.sun.com/jsp/jstl/functions" %>
 
 <!-- Sidebar Styles -->
 <style>
@@ -204,7 +205,7 @@ uri="http://java.sun.com/jsp/jstl/core" %>
   .user-role {
     display: inline-block;
     background-color: var(--light-color);
-    color: var(--primary-color);
+    color: var (--primary-color);
     padding: 4px 10px;
     border-radius: 4px;
     font-size: 0.75rem;
@@ -229,7 +230,7 @@ uri="http://java.sun.com/jsp/jstl/core" %>
 
   .menu-item:hover {
     background-color: var(--light-color);
-    color: var(--primary-color);
+    color: var (--primary-color);
   }
 
   .menu-item.active {
@@ -279,69 +280,80 @@ uri="http://java.sun.com/jsp/jstl/core" %>
     </div>
     <div class="user-info">
       Welcome,
-      <strong
-        >${sessionScope.user.name != null ? sessionScope.user.name : 'Admin
-        User'}</strong
-      >
-      <div class="user-role">
-        ${sessionScope.user.role != null ? sessionScope.user.role :
-        'Administrator'}
-      </div>
+      <strong>${sessionScope.currentUser.firstName}</strong>
+      <div class="user-role">${sessionScope.currentUser.role}</div>
     </div>
   </div>
   <!-- Updated Sidebar Menu -->
   <div class="sidebar-menu">
-    <a
-      href="${pageContext.request.contextPath}/dashboard"
-      class="menu-item ${pageContext.request.servletPath.contains('/dashboard') ? 'active' : ''}"
-    >
-      <i class="bi bi-speedometer2"></i>
-      <span>Dashboard</span>
-    </a>
+    <%-- Dashboard Link --%>
+    <c:choose>
+      <c:when test="${sessionScope.currentUser.role eq 'ADMIN'}">
+        <a
+          href="${pageContext.request.contextPath}/admin/dashboard"
+          class="menu-item ${fn:contains(pageContext.request.servletPath, '/admin/dashboard') ? 'active' : ''}"
+        >
+          <i class="bi bi-speedometer2"></i>
+          <span>Dashboard</span>
+        </a>
+      </c:when>
+      <c:otherwise>
+        <a
+          href="${pageContext.request.contextPath}/staff/dashboard"
+          class="menu-item ${fn:contains(pageContext.request.servletPath, '/staff/dashboard') ? 'active' : ''}"
+        >
+          <i class="bi bi-speedometer2"></i>
+          <span>Dashboard</span>
+        </a>
+      </c:otherwise>
+    </c:choose>
 
     <!-- Inventory Management Section -->
     <div class="menu-divider"></div>
     <a
       href="${pageContext.request.contextPath}/inventory"
-      class="menu-item ${pageContext.request.servletPath.contains('/inventory') ? 'active' : ''}"
+      class="menu-item ${fn:contains(pageContext.request.servletPath, '/inventory') ? 'active' : ''}"
     >
       <i class="bi bi-clipboard-data"></i>
       <span>Current Stock</span>
     </a>
     <a
       href="${pageContext.request.contextPath}/low-stock"
-      class="menu-item ${pageContext.request.servletPath.contains('/low-stock') ? 'active' : ''}"
+      class="menu-item ${fn:contains(pageContext.request.servletPath, '/low-stock') ? 'active' : ''}"
     >
       <i class="bi bi-exclamation-triangle"></i>
       <span>Low Stock</span>
     </a>
-    <a
-      href="${pageContext.request.contextPath}/stock-movement"
-      class="menu-item ${pageContext.request.servletPath.contains('/stock-movement') ? 'active' : ''}"
-    >
-      <i class="bi bi-arrow-left-right"></i>
-      <span>Stock Movement</span>
-    </a>
-    <a
-      href="${pageContext.request.contextPath}/stock-history"
-      class="menu-item ${pageContext.request.servletPath.contains('/stock-history') ? 'active' : ''}"
-    >
-      <i class="bi bi-clock-history"></i>
-      <span>Stock History</span>
-    </a>
+
+    <c:if test="${sessionScope.currentUser.role eq 'ADMIN'}">
+      <a
+        href="${pageContext.request.contextPath}/stock-movement"
+        class="menu-item ${fn:contains(pageContext.request.servletPath, '/stock-movement') ? 'active' : ''}"
+      >
+        <i class="bi bi-arrow-left-right"></i>
+        <span>Stock Movement</span>
+      </a>
+      <a
+        href="${pageContext.request.contextPath}/admin/stock-history"
+        class="menu-item ${fn:contains(pageContext.request.servletPath, '/admin/stock-history') ? 'active' : ''}"
+      >
+        <i class="bi bi-clock-history"></i>
+        <span>Stock History</span>
+      </a>
+    </c:if>
 
     <!-- Product Management Section -->
     <div class="menu-divider"></div>
     <a
       href="${pageContext.request.contextPath}/products"
-      class="menu-item ${pageContext.request.servletPath.contains('/products') ? 'active' : ''}"
+      class="menu-item ${fn:contains(pageContext.request.servletPath, '/products') ? 'active' : ''}"
     >
       <i class="bi bi-boxes"></i>
       <span>Products</span>
     </a>
     <a
       href="${pageContext.request.contextPath}/categories"
-      class="menu-item ${pageContext.request.servletPath.contains('/categories') ? 'active' : ''}"
+      class="menu-item ${fn:contains(pageContext.request.servletPath, '/categories') ? 'active' : ''}"
     >
       <i class="bi bi-tags"></i>
       <span>Categories</span>
@@ -349,62 +361,84 @@ uri="http://java.sun.com/jsp/jstl/core" %>
 
     <!-- Requests Section -->
     <div class="menu-divider"></div>
-    <a
-      href="${pageContext.request.contextPath}/stock-requests"
-      class="menu-item ${pageContext.request.servletPath.contains('/stock-requests') ? 'active' : ''}"
-    >
-      <i class="bi bi-megaphone"></i>
-      <span>Stock Requests</span>
-    </a>
+    <c:choose>
+      <c:when test="${sessionScope.currentUser.role eq 'ADMIN'}">
+        <a
+          href="${pageContext.request.contextPath}/stock-requests"
+          class="menu-item ${fn:contains(pageContext.request.servletPath, '/stock-requests') ? 'active' : ''}"
+        >
+          <i class="bi bi-megaphone"></i>
+          <span>Stock Requests</span>
+        </a>
+      </c:when>
+      <c:otherwise>
+        <%-- Staff --%>
+        <a
+          href="${pageContext.request.contextPath}/staff/my-requests"
+          class="menu-item ${fn:contains(pageContext.request.servletPath, '/staff/my-requests') ? 'active' : ''}"
+        >
+          <i class="bi bi-list-check"></i>
+          <span>My Requests</span>
+        </a>
+      </c:otherwise>
+    </c:choose>
+
     <a
       href="${pageContext.request.contextPath}/request-history"
-      class="menu-item ${pageContext.request.servletPath.contains('/request-history') ? 'active' : ''}"
+      class="menu-item ${fn:contains(pageContext.request.servletPath, '/request-history') ? 'active' : ''}"
     >
       <i class="bi bi-archive"></i>
       <span>Request History</span>
     </a>
-    <a
-      href="${pageContext.request.contextPath}/dispatch-request"
-      class="menu-item ${pageContext.request.servletPath.contains('/dispatch-request') ? 'active' : ''}"
-    >
-      <i class="bi bi-truck"></i>
-      <span>Dispatch Request</span>
-    </a>
 
-    <!-- System Management Section -->
-    <div class="menu-divider"></div>
-    <a
-      href="${pageContext.request.contextPath}/users"
-      class="menu-item ${pageContext.request.servletPath.contains('/users') ? 'active' : ''}"
-    >
-      <i class="bi bi-people"></i>
-      <span>Users</span>
-    </a>
-    <a
-      href="${pageContext.request.contextPath}/manual-stock-adjustment"
-      class="menu-item ${pageContext.request.servletPath.contains('/manual-stock-adjustment') ? 'active' : ''}"
-    >
-      <i class="bi bi-sliders"></i>
-      <span>Manual Adjustments</span>
-    </a>
+    <c:if test="${sessionScope.currentUser.role eq 'ADMIN'}">
+      <a
+        href="${pageContext.request.contextPath}/admin/dispatch-request"
+        class="menu-item ${fn:contains(pageContext.request.servletPath, '/admin/dispatch-request') ? 'active' : ''}"
+      >
+        <i class="bi bi-truck"></i>
+        <span>Dispatch Request</span>
+      </a>
+
+      <!-- System Management Section -->
+      <div class="menu-divider"></div>
+      <a
+        href="${pageContext.request.contextPath}/users"
+        class="menu-item ${fn:contains(pageContext.request.servletPath, '/users') ? 'active' : ''}"
+      >
+        <i class="bi bi-people"></i>
+        <span>Users</span>
+      </a>
+      <a
+        href="${pageContext.request.contextPath}/admin/manual-stock-adjustment"
+        class="menu-item ${fn:contains(pageContext.request.servletPath, '/admin/manual-stock-adjustment') ? 'active' : ''}"
+      >
+        <i class="bi bi-sliders"></i>
+        <span>Manual Adjustments</span>
+      </a>
+    </c:if>
 
     <!-- User Section -->
     <div class="menu-divider"></div>
     <a
       href="${pageContext.request.contextPath}/profile"
-      class="menu-item ${pageContext.request.servletPath.contains('/profile') ? 'active' : ''}"
+      class="menu-item ${fn:contains(pageContext.request.servletPath, '/profile') ? 'active' : ''}"
     >
       <i class="bi bi-person"></i>
       <span>Profile</span>
     </a>
-    <a href="#" class="menu-item" id="logoutLink">
+    <a
+      href="${pageContext.request.contextPath}/Logout"
+      class="menu-item"
+      id="logoutLink"
+    >
       <i class="bi bi-box-arrow-right"></i>
       <span>Logout</span>
     </a>
   </div>
 
-  <!-- Include Logout Modal -->
-  <jsp:include page="LogoutModal.jsp" />
+  <!-- Include Logout Modal if you have one, ensure its script uses contextPath for logout URL -->
+  <%-- <jsp:include page="LogoutModal.jsp" /> --%>
 
   <!-- Sidebar Toggle Button -->
   <button class="sidebar-toggle" id="sidebarToggle">

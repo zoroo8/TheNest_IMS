@@ -27,7 +27,7 @@ public class LoginController extends HttpServlet {
             if (user != null) {
                 // Store the user in the session
                 SessionUtil.setAttribute(request, "currentUser", user);
-                SessionUtil.setAttribute(request, "role", user.getRole()); // Store role
+                SessionUtil.setAttribute(request, "role", user.getRole());
                 
                 // Remember user if "remember me" is checked
                 if (rememberMe != null && rememberMe.equals("on")) {

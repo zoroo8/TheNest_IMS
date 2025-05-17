@@ -7,7 +7,7 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
-@WebServlet("/dispatch-request")
+@WebServlet("/admin/dispatch-request")
 public class DispatchRequestController extends HttpServlet {
     private static final long serialVersionUID = 1L;
     
@@ -24,6 +24,5 @@ public class DispatchRequestController extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) 
             throws ServletException, IOException {
-        response.sendRedirect("dispatch-request");
     }
 }

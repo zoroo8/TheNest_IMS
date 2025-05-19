@@ -7,23 +7,23 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
-@WebServlet("/staff/my-requests")
-public class StaffStockRequestsController extends HttpServlet {
+@WebServlet("/admin/dashboard")
+public class DashboardController extends HttpServlet {
     private static final long serialVersionUID = 1L;
     
-    public StaffStockRequestsController() {
+    public DashboardController() {
         super();
     }
     
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) 
             throws ServletException, IOException {
-        request.getRequestDispatcher("/WEB-INF/pages/StaffStockRequests.jsp").forward(request, response);
+        request.getRequestDispatcher("/WEB-INF/pages/admin/Dashboard.jsp").forward(request, response);
     }
     
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) 
             throws ServletException, IOException {
-        response.sendRedirect("/staff/my-requests");
+        response.sendRedirect("/admin/dashboard");
     }
 }

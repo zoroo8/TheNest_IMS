@@ -25,23 +25,24 @@ public class LoginController extends HttpServlet {
             UserModel user = loginService.authenticate(email, password);
             
             if (user != null) {
-                // Store the user in the session
                 SessionUtil.setAttribute(request, "currentUser", user);
                 SessionUtil.setAttribute(request, "role", user.getRole());
-                
-                // Remember user if "remember me" is checked
-                if (rememberMe != null && rememberMe.equals("on")) {
+
+                if ("on".equals(rememberMe)) {
                     CookiesUtil.addCookie(response, "rememberedUser", 
-                        String.valueOf(user.getId()), 30 * 24 * 60 * 60); // 30 days
+                        String.valueOf(String.valueOf(user.getUserId())), 30 * 24 * 60 * 60); // 30 days
                 }
-                
-                // Redirect based on user role
+
+                // Redirect based on role
                 String redirectPage = request.getContextPath() + "/" + determineRedirectPage(user.getRole());
                 response.sendRedirect(redirectPage);
+
             } else {
+                // Wrong credentials
                 request.setAttribute("error", "Invalid email or password");
                 request.getRequestDispatcher("/WEB-INF/pages/Login.jsp").forward(request, response);
             }
+
         } catch (Exception e) {
             request.setAttribute("error", "Login failed. Please try again.");
             request.getRequestDispatcher("/WEB-INF/pages/Login.jsp").forward(request, response);
@@ -52,13 +53,15 @@ public class LoginController extends HttpServlet {
             throws ServletException, IOException {
         request.getRequestDispatcher("/WEB-INF/pages/Login.jsp").forward(request, response);
     }
-    
+
     private String determineRedirectPage(String role) {
-        switch(role.toUpperCase()) {
+        switch (role.toUpperCase()) {
             case "ADMIN":
                 return "admin/dashboard";
-            default: // STAFF
+            case "STAFF":
                 return "staff/dashboard";
+            default:
+                return "Error";
         }
     }
 }

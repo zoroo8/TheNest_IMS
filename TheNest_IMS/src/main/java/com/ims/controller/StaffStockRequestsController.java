@@ -7,23 +7,23 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
-@WebServlet("/admin/manual-stock-adjustment")
-public class ManualStockAdjustmentController extends HttpServlet {
+@WebServlet("/staff/my-requests")
+public class StaffStockRequestsController extends HttpServlet {
     private static final long serialVersionUID = 1L;
     
-    public ManualStockAdjustmentController() {
+    public StaffStockRequestsController() {
         super();
     }
     
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) 
             throws ServletException, IOException {
-        request.getRequestDispatcher("/WEB-INF/pages/ManualStockAdjustment.jsp").forward(request, response);
+        request.getRequestDispatcher("/WEB-INF/pages/staff/StaffStockRequests.jsp").forward(request, response);
     }
     
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) 
             throws ServletException, IOException {
-        response.sendRedirect("/admin/manual-stock-adjustment");
+        response.sendRedirect("/staff/my-requests");
     }
 }

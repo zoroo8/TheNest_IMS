@@ -1,5 +1,14 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 pageEncoding="UTF-8"%>
+<% 
+    com.ims.model.UserModel user = (com.ims.model.UserModel) session.getAttribute("currentUser"); 
+    if (user != null) {
+%>
+    User ID: <%= user.getUserId() %>
+<% 
+    }
+%>
+
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -430,8 +439,8 @@ pageEncoding="UTF-8"%>
         <button class="modal-close" id="closeFormModal">&times;</button>
       </div>
       <div class="modal-body">
-        <form id="userForm">
-          <input type="hidden" id="userId" value="" />
+        <form id="userForm" action="${pageContext.request.contextPath}/users" method="post" enctype="multipart/form-data">
+          <input type="hidden" id="userId" name="userId" value="" />
 
           <div class="form-section">
             <h4>Personal Information</h4>
@@ -445,6 +454,7 @@ pageEncoding="UTF-8"%>
                     type="text"
                     class="form-control"
                     id="firstName"
+                    name="firstName"
                     required
                   />
                 </div>
@@ -458,6 +468,7 @@ pageEncoding="UTF-8"%>
                     type="text"
                     class="form-control"
                     id="lastName"
+                    name="lastName"
                     required
                   />
                 </div>
@@ -474,6 +485,7 @@ pageEncoding="UTF-8"%>
                     type="tel"
                     class="form-control"
                     id="phoneNumber"
+                    name="phoneNumber"
                     required
                   />
                 </div>
@@ -486,7 +498,8 @@ pageEncoding="UTF-8"%>
                   <input
                     type="date"
                     class="form-control"
-                    id="dateOfBirth"
+                    id="dob"
+                    name="dob"
                     required
                   />
                 </div>
@@ -499,7 +512,7 @@ pageEncoding="UTF-8"%>
                   <label for="gender"
                     >Gender <span class="required">*</span></label
                   >
-                  <select class="form-control" id="gender" required>
+                  <select class="form-control" name="gender" id="gender" required>
                     <option value="">Select Gender</option>
                     <option value="male">Male</option>
                     <option value="female">Female</option>
@@ -517,6 +530,7 @@ pageEncoding="UTF-8"%>
                     type="email"
                     class="form-control"
                     id="email"
+                    name="email"
                     required
                   />
                 </div>
@@ -530,6 +544,7 @@ pageEncoding="UTF-8"%>
               <textarea
                 class="form-control"
                 id="address"
+                name="address"
                 rows="3"
                 required
               ></textarea>
@@ -542,7 +557,7 @@ pageEncoding="UTF-8"%>
               <div class="col-md-6">
                 <div class="form-group">
                   <label for="role">Role <span class="required">*</span></label>
-                  <select class="form-control" id="role" required>
+                  <select class="form-control" name="role" id="role" required>
                     <option value="">Select Role</option>
                     <option value="admin">Administrator</option>
                     <option value="staff">Staff</option>
@@ -554,7 +569,7 @@ pageEncoding="UTF-8"%>
                   <label for="department"
                     >Department <span class="required">*</span></label
                   >
-                  <select class="form-control" id="department" required>
+                  <select class="form-control" id="department" name="department" required>
                     <option value="">Select Department</option>
                     <option value="IT">IT Department</option>
                     <option value="Finance">Finance</option>
@@ -577,6 +592,7 @@ pageEncoding="UTF-8"%>
                     type="file"
                     class="form-control-file"
                     id="profilePicture"
+                    name="profilePicture"
                     accept="image/*"
                   />
                   <button
@@ -601,6 +617,7 @@ pageEncoding="UTF-8"%>
                       type="password"
                       class="form-control"
                       id="password"
+                      name="password"
                       required
                     />
                     <button type="button" class="password-toggle">
@@ -619,6 +636,7 @@ pageEncoding="UTF-8"%>
                       type="password"
                       class="form-control"
                       id="confirmPassword"
+                      name="confirmPassword"
                       required
                     />
                     <button type="button" class="password-toggle">
@@ -629,20 +647,14 @@ pageEncoding="UTF-8"%>
               </div>
             </div>
 
-            <div class="form-group">
-              <div class="checkbox-group">
-                <input type="checkbox" id="activeStatus" checked />
-                <label for="activeStatus">Active Account</label>
-              </div>
-            </div>
           </div>
-        </form>
-      </div>
-      <div class="modal-footer">
-        <button class="btn btn-outline" id="cancelFormBtn">Cancel</button>
-        <button class="btn btn-primary" id="saveUserBtn">
+          <div class="modal-footer">
+        <button type="button" class="btn btn-outline" id="cancelFormBtn">Cancel</button>
+        <button type="submit" class="btn btn-primary" id="saveUserBtn">
           <i class="bi bi-save"></i> Save User
         </button>
+      </div>
+        </form>
       </div>
     </div>
 
@@ -789,26 +801,26 @@ pageEncoding="UTF-8"%>
             modalBackdrop.style.display = "none";
           });
 
-        // Save user
         document
-          .getElementById("saveUserBtn")
-          .addEventListener("click", function () {
-            const form = document.getElementById("userForm");
-            if (form.checkValidity()) {
-              const userId = document.getElementById("userId").value;
-              const isNewUser = !userId;
-              if (isNewUser) {
-                alert("New user has been created successfully!");
-              } else {
-                alert(`User ${userId} has been updated successfully!`);
-              }
-
-              userFormModal.style.display = "none";
-              modalBackdrop.style.display = "none";
+        .getElementById("saveUserBtn")
+        .addEventListener("click", function () {
+          const form = document.getElementById("userForm");
+          if (form.checkValidity()) {
+            const userId = document.getElementById("userId").value;
+            const isNewUser = !userId;
+            if (isNewUser) {
+              alert("New user has been created successfully!");
             } else {
-              form.reportValidity();
+              alert(`User ${userId} has been updated successfully!`);
             }
-          });
+
+            userFormModal.style.display = "none";
+            modalBackdrop.style.display = "none";
+          } else {
+            form.reportValidity();
+          }
+        });
+
 
         // Toggle password visibility
         const passwordToggles = document.querySelectorAll(".password-toggle");

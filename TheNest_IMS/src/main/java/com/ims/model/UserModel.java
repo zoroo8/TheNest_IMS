@@ -1,35 +1,57 @@
 package com.ims.model;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+
 public class UserModel {
-	private int id;
-	private String firstName;
+    private int userId;
+    private String firstName;
     private String lastName;
+    private String phoneNumber;
+    private LocalDate dob;
+    private String gender;
     private String email;
-    private String role;
-    private String password;
     private String address;
-    private String dob;
-    private String last_login;
-	
-    public UserModel(int id, String firstName, String lastName, String email, String role, String password,
-            String address, String dob, String last_login) {
-		super();
-		this.id = id;
+    private String role;
+    private String department;
+    private String profilePicture;
+    private String password;
+    private LocalDateTime createdAt;
+    private LocalDateTime lastLogin;
+
+    // Constructor without userId, createdAt, lastLogin
+    public UserModel(String firstName, String lastName, String phoneNumber, LocalDate dob, String gender,
+            String email, String address, String role, String department, String profilePicture,
+            String password) {
 		this.firstName = firstName;
 		this.lastName = lastName;
-		this.email = email;
-		this.role = role;
-		this.password = password;
-		this.address = address;
+		this.phoneNumber = phoneNumber;
 		this.dob = dob;
-		this.last_login = last_login;
+		this.gender = gender;
+		this.email = email;
+		this.address = address;
+		this.role = role;
+		this.department = department;
+		this.profilePicture = profilePicture;
+		this.password = password;
+		}
+    
+    public UserModel(int userId, String firstName, String lastName, String email, String role) {
+        this.userId = userId;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.email = email;
+        this.role = role;
+    }
+
+	public int getUserId() {
+		return userId;
 	}
-	public int getId() {
-		return id;
+
+	public void setUserId(int userId) {
+		this.userId = userId;
 	}
-	public void setId(int id) {
-		this.id = id;
-	}
+	
 	public String getFirstName() {
 		return firstName;
 	}
@@ -66,18 +88,62 @@ public class UserModel {
 	public void setAddress(String address) {
 		this.address = address;
 	}
-	public String getDob() {
+
+	public String getPhoneNumber() {
+		return phoneNumber;
+	}
+
+	public void setPhoneNumber(String phoneNumber) {
+		this.phoneNumber = phoneNumber;
+	}
+
+	public LocalDate getDob() {
 		return dob;
 	}
-	public void setDob(String dob) {
+
+	public void setDob(LocalDate dob) {
 		this.dob = dob;
 	}
-	public String getLast_login() {
-		return last_login;
+
+	public String getGender() {
+		return gender;
 	}
-	public void setLast_login(String last_login) {
-		this.last_login = last_login;
+
+	public void setGender(String gender) {
+		this.gender = gender;
 	}
-    
+
+	public String getDepartment() {
+		return department;
+	}
+
+	public void setDepartment(String department) {
+		this.department = department;
+	}
+
+	public String getProfilePicture() {
+		return profilePicture;
+	}
+
+	public void setProfilePicture(String profilePicture) {
+		this.profilePicture = profilePicture;
+	}
+
+	public LocalDateTime getCreatedAt() {
+		return createdAt;
+	}
+
+	public void setCreatedAt(LocalDateTime createdAt) {
+		this.createdAt = createdAt;
+	}
+
+	public LocalDateTime getLastLogin() {
+		return lastLogin;
+	}
+
+	public void setLastLogin(LocalDateTime lastLogin) {
+		this.lastLogin = lastLogin;
+	}
+	
     
 }

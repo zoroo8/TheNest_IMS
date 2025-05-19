@@ -1,5 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 pageEncoding="UTF-8"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -42,8 +43,13 @@ pageEncoding="UTF-8"%>
           <h2>The Nest</h2>
           <p class="subtitle">Inventory Management System</p>
         </div>
-
-        <form action="AuthController" method="post">
+		<c:if test="${not empty error}">
+		  <div class="alert alert-danger" style="color: red; margin-bottom: 1rem;">
+		    ${error}
+		  </div>
+		</c:if>
+				
+        <form action="${pageContext.request.contextPath}/Login" method="post">
           <div class="form-group">
             <label for="email" class="form-label">Email address</label>
             <div class="input-group">

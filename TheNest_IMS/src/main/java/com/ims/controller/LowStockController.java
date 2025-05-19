@@ -8,7 +8,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 @WebServlet("/low-stock")
-public class CurrentStockLevelsController extends HttpServlet {
+public class LowStockController extends HttpServlet {
     private static final long serialVersionUID = 1L;
     
     public LowStockController() {

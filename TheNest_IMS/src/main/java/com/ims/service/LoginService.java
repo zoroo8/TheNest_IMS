@@ -13,28 +13,27 @@ public class LoginService {
         
         try (Connection conn = DbConfig.getDBConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
-            
+        	
+        	email = email.trim().toLowerCase();
             stmt.setString(1, email);
             ResultSet rs = stmt.executeQuery();
             
             if (rs.next()) {
                 String encryptedPassword = rs.getString("password");
-                String decryptedPassword = PasswordUtil.decrypt(encryptedPassword, email.trim().toLowerCase());
+                String decryptedPassword = PasswordUtil.decrypt(encryptedPassword, email);
                 
                 if (decryptedPassword != null && decryptedPassword.equals(password)) {
                     updateLastLogin(rs.getInt("user_id"));
                     return new UserModel(
-                        rs.getInt("user_id"),
-                        rs.getString("first_name"),
-                        rs.getString("last_name"), 
-                        rs.getString("email"),
-                        rs.getString("role"),
-                        null,
-                        null,
-                        null,
-                        null
-                    );
+                    	    rs.getInt("user_id"),
+                    	    rs.getString("first_name"),
+                    	    rs.getString("last_name"),
+                    	    rs.getString("email"),
+                    	    rs.getString("role")
+                    	);
+
                 }
+
             }
             return null;
         }

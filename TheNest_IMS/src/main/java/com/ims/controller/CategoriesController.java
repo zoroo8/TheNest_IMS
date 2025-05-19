@@ -11,7 +11,7 @@ import jakarta.servlet.http.HttpServletResponse;
 public class CategoriesController extends HttpServlet {
     private static final long serialVersionUID = 1L;
     
-    public CurrentStockLevelsController() {
+    public CategoriesController() {
         super();
     }
     

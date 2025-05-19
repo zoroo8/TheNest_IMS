@@ -1,6 +1,9 @@
 package com.ims.filter;
 
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
+
 import jakarta.servlet.Filter;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.FilterConfig;
@@ -13,69 +16,92 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import com.ims.util.SessionUtil;
 
-@WebFilter(asyncSupported = true, urlPatterns = { 
-    "/admin/*", 
-    "/staff/*"
-})
+@WebFilter("/*")
 public class RoleBasedAuthenticationFilter implements Filter {
 
     private static final String LOGIN = "/Login";
-    private static final String HOME = "/home";
-    private static final String ADMIN_DASHBOARD = "/admin/dashboard";
-    private static final String STAFF_DASHBOARD = "/staff/dashboard";
+    private static final String HOME = "/";
+    private static final String ERROR = "/Error";
+
+    // Publicly accessible URIs
+    private static final List<String> PUBLIC_URIS = Arrays.asList(
+        LOGIN, HOME, ERROR, "/css", "/js", "/images", "/assets"
+    );
 
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
-        // Filter initialization, if required.
+        // Optional initialization
     }
 
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
             throws IOException, ServletException {
-        // Cast the request and response to HttpServletRequest and HttpServletResponse
+        
         HttpServletRequest req = (HttpServletRequest) request;
         HttpServletResponse res = (HttpServletResponse) response;
-
-        // Get the requested URI
         String uri = req.getRequestURI();
+        String contextPath = req.getContextPath();
 
         Object currentUser = SessionUtil.getAttribute(req, "currentUser");
         String userRole = (String) SessionUtil.getAttribute(req, "role");
         boolean isLoggedIn = currentUser != null && userRole != null;
 
-
-        // If the user is not logged in, redirect to the login page
-        if (!isLoggedIn) {
-            if (uri.endsWith(LOGIN)) {
-                chain.doFilter(request, response);
-            } else {
-                res.sendRedirect(req.getContextPath() + LOGIN);
-            }
-        } else {
-            // If the user is logged in, check the role for accessing the page
-            if (uri.contains("/admin/")) {
-                if ("admin".equals(userRole)) {
-                    // Allow access to admin pages
-                    chain.doFilter(request, response);
-                } else {
-                    res.sendRedirect(req.getContextPath() + HOME);
-                }
-            } else if (uri.contains("/staff/")) {
-                if ("staff".equals(userRole)) {
-                    // Allow access to staff pages
-                    chain.doFilter(request, response);
-                } else {
-                    res.sendRedirect(req.getContextPath() + HOME);
-                }
-            } else {
-                // For other URLs, pass the request along the filter chain
-                chain.doFilter(request, response);
-            }
+        // Allow access to public URIs
+        if (isPublic(uri)) {
+            chain.doFilter(request, response);
+            return;
         }
+
+        // Redirect to login if not logged in
+        if (!isLoggedIn) {
+            res.sendRedirect(contextPath + LOGIN);
+            return;
+        }
+
+        // Redirect to error if URL doesn't match role
+        if (uri.equals("/dashboard") && !"admin".equalsIgnoreCase(userRole)) {
+            res.sendRedirect(contextPath + ERROR);
+            return;
+        }
+
+        if (uri.equals("/staffdashboard") && !"staff".equalsIgnoreCase(userRole)) {
+            res.sendRedirect(contextPath + ERROR);
+            return;
+        }
+
+        if (uri.equals("/users") && !"admin".equalsIgnoreCase(userRole)) {
+            res.sendRedirect(contextPath + ERROR);
+            return;
+        }
+
+        if (uri.equals("/stock-requests") && !"admin".equalsIgnoreCase(userRole)) {
+            res.sendRedirect(contextPath + ERROR);
+            return;
+        }
+
+        if (uri.equals("/staff/my-requests") && !"staff".equalsIgnoreCase(userRole)) {
+            res.sendRedirect(contextPath + ERROR);
+            return;
+        }
+
+        // Pages accessible by both roles
+        List<String> commonPages = Arrays.asList("/products", "/categories");
+
+        if (commonPages.contains(uri)) {
+            chain.doFilter(request, response);
+            return;
+        }
+
+        // Unknown route fallback
+        res.sendRedirect(contextPath + ERROR);
+    }
+
+    private boolean isPublic(String uri) {
+        return PUBLIC_URIS.stream().anyMatch(uri::startsWith);
     }
 
     @Override
     public void destroy() {
-        // Cleanup if needed
+        // Optional cleanup
     }
 }

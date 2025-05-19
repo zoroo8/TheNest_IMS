@@ -18,7 +18,7 @@ public class RequestHistoryController extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) 
             throws ServletException, IOException {
-        request.getRequestDispatcher("/WEB-INF/pages/CurrentStockLevels.jsp").forward(request, response);
+        request.getRequestDispatcher("/WEB-INF/pages/RequestHistory.jsp").forward(request, response);
     }
     
     @Override

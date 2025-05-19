@@ -56,7 +56,7 @@ pageEncoding="UTF-8"%>
           <button class="btn btn-outline me-2">
             <i class="bi bi-share"></i> Share
           </button>
-          <button class="btn btn-primary">
+          <button class="btn btn-export">
             <i class="bi bi-download"></i> Export
           </button>
         </div>
@@ -353,7 +353,7 @@ pageEncoding="UTF-8"%>
         });
 
         // Export Button Functionality
-        const exportBtn = document.querySelector(".btn-primary");
+        const exportBtn = document.querySelector(".btn-export");
         exportBtn.addEventListener("click", () => {
           if (confirm("Do you want to export the dashboard data?")) {
             exportBtn.classList.add("loading");

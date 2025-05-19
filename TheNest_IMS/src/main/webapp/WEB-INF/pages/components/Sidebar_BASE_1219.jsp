@@ -1,8 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
-pageEncoding="UTF-8"%>
-<%@ taglib prefix="c"
-uri="http://java.sun.com/jsp/jstl/core" %> 
-<%@ taglib prefix="fn"
+pageEncoding="UTF-8"%> <%@ taglib prefix="c"
+uri="http://java.sun.com/jsp/jstl/core" %> <%@ taglib prefix="fn"
 uri="http://java.sun.com/jsp/jstl/functions" %>
 
 <!-- Sidebar Styles -->
@@ -290,7 +288,7 @@ uri="http://java.sun.com/jsp/jstl/functions" %>
   <div class="sidebar-menu">
     <%-- Dashboard Link --%>
     <c:choose>
-      <c:when test="${sessionScope.currentUser.role eq 'admin'}">
+      <c:when test="${sessionScope.currentUser.role eq 'ADMIN'}">
         <a
           href="${pageContext.request.contextPath}/admin/dashboard"
           class="menu-item ${fn:contains(pageContext.request.servletPath, '/admin/dashboard') ? 'active' : ''}"
@@ -327,7 +325,7 @@ uri="http://java.sun.com/jsp/jstl/functions" %>
       <span>Low Stock</span>
     </a>
 
-    <c:if test="${sessionScope.currentUser.role eq 'admin'}">
+    <c:if test="${sessionScope.currentUser.role eq 'ADMIN'}">
       <a
         href="${pageContext.request.contextPath}/stock-movement"
         class="menu-item ${fn:contains(pageContext.request.servletPath, '/stock-movement') ? 'active' : ''}"
@@ -364,10 +362,10 @@ uri="http://java.sun.com/jsp/jstl/functions" %>
     <!-- Requests Section -->
     <div class="menu-divider"></div>
     <c:choose>
-      <c:when test="${sessionScope.currentUser.role eq 'admin'}">
+      <c:when test="${sessionScope.currentUser.role eq 'ADMIN'}">
         <a
-          href="${pageContext.request.contextPath}/admin/stock-requests"
-          class="menu-item ${fn:contains(pageContext.request.servletPath, '/admin/stock-requests') ? 'active' : ''}"
+          href="${pageContext.request.contextPath}/stock-requests"
+          class="menu-item ${fn:contains(pageContext.request.servletPath, '/stock-requests') ? 'active' : ''}"
         >
           <i class="bi bi-megaphone"></i>
           <span>Stock Requests</span>
@@ -393,7 +391,7 @@ uri="http://java.sun.com/jsp/jstl/functions" %>
       <span>Request History</span>
     </a>
 
-    <c:if test="${sessionScope.currentUser.role eq 'admin'}">
+    <c:if test="${sessionScope.currentUser.role eq 'ADMIN'}">
       <a
         href="${pageContext.request.contextPath}/admin/dispatch-request"
         class="menu-item ${fn:contains(pageContext.request.servletPath, '/admin/dispatch-request') ? 'active' : ''}"
@@ -429,7 +427,7 @@ uri="http://java.sun.com/jsp/jstl/functions" %>
       <i class="bi bi-person"></i>
       <span>Profile</span>
     </a>
-     <a
+    <a
       href="${pageContext.request.contextPath}/Logout"
       class="menu-item"
       id="logoutLink"
@@ -440,7 +438,7 @@ uri="http://java.sun.com/jsp/jstl/functions" %>
   </div>
 
   <!-- Include Logout Modal if you have one, ensure its script uses contextPath for logout URL -->
-<jsp:include page="LogoutModal.jsp" />
+  <%-- <jsp:include page="LogoutModal.jsp" /> --%>
 
   <!-- Sidebar Toggle Button -->
   <button class="sidebar-toggle" id="sidebarToggle">

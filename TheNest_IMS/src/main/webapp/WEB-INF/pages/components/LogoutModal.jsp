@@ -134,7 +134,7 @@ pageEncoding="UTF-8"%>
 
     // Confirm logout
     confirmBtn.addEventListener("click", function () {
-      window.location.href = "${pageContext.request.contextPath}/logout";
+      window.location.href = "${pageContext.request.contextPath}/Logout";
     });
   });
 </script>

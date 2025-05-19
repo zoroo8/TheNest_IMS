@@ -1,8 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
-pageEncoding="UTF-8"%>
-<%@ taglib prefix="c"
-uri="http://java.sun.com/jsp/jstl/core" %> 
-<%@ taglib prefix="fn"
+pageEncoding="UTF-8"%> <%@ taglib prefix="c"
+uri="http://java.sun.com/jsp/jstl/core" %> <%@ taglib prefix="fn"
 uri="http://java.sun.com/jsp/jstl/functions" %>
 
 <!-- Sidebar Styles -->
@@ -366,8 +364,8 @@ uri="http://java.sun.com/jsp/jstl/functions" %>
     <c:choose>
       <c:when test="${sessionScope.currentUser.role eq 'admin'}">
         <a
-          href="${pageContext.request.contextPath}/admin/stock-requests"
-          class="menu-item ${fn:contains(pageContext.request.servletPath, '/admin/stock-requests') ? 'active' : ''}"
+          href="${pageContext.request.contextPath}/stock-requests"
+          class="menu-item ${fn:contains(pageContext.request.servletPath, '/stock-requests') ? 'active' : ''}"
         >
           <i class="bi bi-megaphone"></i>
           <span>Stock Requests</span>
@@ -429,18 +427,14 @@ uri="http://java.sun.com/jsp/jstl/functions" %>
       <i class="bi bi-person"></i>
       <span>Profile</span>
     </a>
-     <a
-      href="${pageContext.request.contextPath}/Logout"
-      class="menu-item"
-      id="logoutLink"
-    >
-      <i class="bi bi-box-arrow-right"></i>
-      <span>Logout</span>
-    </a>
+    <a 
+    href="${pageContext.request.contextPath}/Logout" class="logout-link">
+  	<i class="bi bi-box-arrow-right"></i> Logout
+	</a>
   </div>
 
   <!-- Include Logout Modal if you have one, ensure its script uses contextPath for logout URL -->
-<jsp:include page="LogoutModal.jsp" />
+  <%-- <jsp:include page="LogoutModal.jsp" /> --%>
 
   <!-- Sidebar Toggle Button -->
   <button class="sidebar-toggle" id="sidebarToggle">

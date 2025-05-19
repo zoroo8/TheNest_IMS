@@ -72,8 +72,7 @@ public class UsersController extends HttpServlet {
             profilePictureFileName = System.currentTimeMillis() + "_" + filePart.getSubmittedFileName();
 
             // Define where to save the uploaded file, e.g. webapp/images/profiles/
-            String uploadPath = "D:\\College\\AdvancedProgramming\\Coursework\\Development\\TheNest_IMS\\TheNest_IMS\\src\\main\\webapp\\uploads\\profiles\\";
-
+            String uploadPath = "C:\\Users\\Acer\\OneDrive - islingtoncollege.edu.np\\Documents\\Y2\\Y2 Coursework\\Y2 S2\\Advanced Programming and Technology\\TheNest_IMS\\TheNest_IMS\\src\\main\\webapp\\uploads\\profiles\\";
 
             java.io.File uploadDir = new java.io.File(uploadPath);
             if (!uploadDir.exists()) {

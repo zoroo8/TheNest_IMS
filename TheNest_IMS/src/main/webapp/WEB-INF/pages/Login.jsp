@@ -60,6 +60,7 @@ pageEncoding="UTF-8"%>
                 id="email"
                 name="email"
                 placeholder="Enter your email"
+                value="${param.email}"
                 required
               />
             </div>
@@ -83,9 +84,6 @@ pageEncoding="UTF-8"%>
               ></i>
             </div>
           </div>
-
-          <!-- Hidden input for default role -->
-          <input type="hidden" name="role" value="STAFF" />
 
           <div class="form-check">
             <input

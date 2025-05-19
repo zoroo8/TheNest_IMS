@@ -427,14 +427,10 @@ uri="http://java.sun.com/jsp/jstl/functions" %>
       <i class="bi bi-person"></i>
       <span>Profile</span>
     </a>
-    <a
-      href="${pageContext.request.contextPath}/Logout"
-      class="menu-item"
-      id="logoutLink"
-    >
-      <i class="bi bi-box-arrow-right"></i>
-      <span>Logout</span>
-    </a>
+    <a 
+    href="${pageContext.request.contextPath}/Logout" class="logout-link">
+  	<i class="bi bi-box-arrow-right"></i> Logout
+	</a>
   </div>
 
   <!-- Include Logout Modal if you have one, ensure its script uses contextPath for logout URL -->

@@ -1,5 +1,7 @@
 package com.ims.model;
 
+import java.sql.Date;
+import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
@@ -43,6 +45,12 @@ public class UserModel {
         this.email = email;
         this.role = role;
     }
+
+	public UserModel(int int1, String string, String string2, String string3, String string4, String string5, Date date,
+			String string6, String string7, String string8, String string9, String string10, Timestamp timestamp,
+			Timestamp timestamp2) {
+		// TODO Auto-generated constructor stub
+	}
 
 	public int getUserId() {
 		return userId;

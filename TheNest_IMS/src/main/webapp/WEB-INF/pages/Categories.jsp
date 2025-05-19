@@ -353,7 +353,7 @@ pageEncoding="UTF-8"%>
         <button class="modal-close" id="closeModal">&times;</button>
       </div>
       <div class="modal-body">
-        <form id="categoryForm">
+        <form id="categoryForm" method="post" action="categories">
           <input type="hidden" id="categoryId" name="categoryId" value="" />
 
           <div class="form-group">
@@ -410,14 +410,15 @@ pageEncoding="UTF-8"%>
               rows="3"
             ></textarea>
           </div>
+           <div class="modal-footer">
+	        <button class="btn btn-outline" id="cancelBtn">Cancel</button>
+	        <button class="btn btn-primary" id="saveCategoryBtn" type="submit">
+	          Save Category
+	        </button>
+	      </div>
         </form>
       </div>
-      <div class="modal-footer">
-        <button class="btn btn-outline" id="cancelBtn">Cancel</button>
-        <button class="btn btn-primary" id="saveCategoryBtn">
-          Save Category
-        </button>
-      </div>
+     
     </div>
 
     <!-- Delete Confirmation Modal -->

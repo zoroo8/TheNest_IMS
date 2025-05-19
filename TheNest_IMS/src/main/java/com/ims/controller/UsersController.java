@@ -25,13 +25,12 @@ public class UsersController extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse res)
             throws ServletException, IOException {
-        redirectionUtil.redirectToPage(req, res, "/WEB-INF/pages/Users.jsp");
+        redirectionUtil.redirectToPage(req, res, "/WEB-INF/pages/admin/Users.jsp");
     }
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        // Extract form params
         String firstName = request.getParameter("firstName");
         String lastName = request.getParameter("lastName");
         String phoneNumber = request.getParameter("phoneNumber");
@@ -47,12 +46,12 @@ public class UsersController extends HttpServlet {
         // Validate required fields
         if (firstName == null || lastName == null || dobStr == null || email == null || password == null || confirmPassword == null ||
                 firstName.isEmpty() || lastName.isEmpty() || dobStr.isEmpty() || email.isEmpty() || password.isEmpty() || confirmPassword.isEmpty()) {
-            redirectionUtil.setMsgAndRedirect(request, response, "errorMessage", "Please fill all required fields.", "/WEB-INF/pages/Users.jsp");
+            redirectionUtil.setMsgAndRedirect(request, response, "errorMessage", "Please fill all required fields.", "/WEB-INF/pages/admin/Users.jsp");
             return;
         }
 
         if (!password.equals(confirmPassword)) {
-            redirectionUtil.setMsgAndRedirect(request, response, "errorMessage", "Passwords do not match.", "/WEB-INF/pages/Users.jsp");
+            redirectionUtil.setMsgAndRedirect(request, response, "errorMessage", "Passwords do not match.", "/WEB-INF/pages/admin/Users.jsp");
             return;
         }
 
@@ -60,7 +59,7 @@ public class UsersController extends HttpServlet {
         try {
             dob = LocalDate.parse(dobStr);
         } catch (DateTimeParseException e) {
-            redirectionUtil.setMsgAndRedirect(request, response, "errorMessage", "Invalid date of birth format.", "/WEB-INF/pages/Users.jsp");
+            redirectionUtil.setMsgAndRedirect(request, response, "errorMessage", "Invalid date of birth format.", "/WEB-INF/pages/admin/Users.jsp");
             return;
         }
 
@@ -73,7 +72,6 @@ public class UsersController extends HttpServlet {
 
             // Define where to save the uploaded file, e.g. webapp/images/profiles/
             String uploadPath = "C:\\Users\\Acer\\OneDrive - islingtoncollege.edu.np\\Documents\\Y2\\Y2 Coursework\\Y2 S2\\Advanced Programming and Technology\\TheNest_IMS\\TheNest_IMS\\src\\main\\webapp\\uploads\\profiles\\";
-
             java.io.File uploadDir = new java.io.File(uploadPath);
             if (!uploadDir.exists()) {
                 uploadDir.mkdirs();
@@ -88,13 +86,13 @@ public class UsersController extends HttpServlet {
         try {
             boolean registered = regService.registerUser(user);
             if (registered) {
-                redirectionUtil.setMsgAndRedirect(request, response, "successMessage", "User registered successfully!", "/WEB-INF/pages/Users.jsp");
+                redirectionUtil.setMsgAndRedirect(request, response, "successMessage", "User registered successfully!", "/WEB-INF/pages/admin/Users.jsp");
             } else {
-                redirectionUtil.setMsgAndRedirect(request, response, "errorMessage", "User registration failed.", "/WEB-INF/pages/Users.jsp");
+                redirectionUtil.setMsgAndRedirect(request, response, "errorMessage", "User registration failed.", "/WEB-INF/pages/admin/Users.jsp");
             }
         } catch (SQLException | ClassNotFoundException e) {
             e.printStackTrace();
-            redirectionUtil.setMsgAndRedirect(request, response, "errorMessage", "Internal server error.", "/WEB-INF/pages/Users.jsp");
+            redirectionUtil.setMsgAndRedirect(request, response, "errorMessage", "Internal server error.", "/WEB-INF/pages/admin/Users.jsp");
         }
     }
 }

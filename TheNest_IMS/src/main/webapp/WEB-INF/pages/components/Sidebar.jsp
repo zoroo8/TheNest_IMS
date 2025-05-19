@@ -351,13 +351,15 @@ uri="http://java.sun.com/jsp/jstl/functions" %>
       <i class="bi bi-boxes"></i>
       <span>Products</span>
     </a>
-    <a
-      href="${pageContext.request.contextPath}/categories"
-      class="menu-item ${fn:contains(pageContext.request.servletPath, '/categories') ? 'active' : ''}"
+    <c:if test="${sessionScope.currentUser.role eq 'admin'}"
+      ><a
+        href="${pageContext.request.contextPath}/categories"
+        class="menu-item ${fn:contains(pageContext.request.servletPath, '/categories') ? 'active' : ''}"
+      >
+        <i class="bi bi-tags"></i>
+        <span>Categories</span>
+      </a></c:if
     >
-      <i class="bi bi-tags"></i>
-      <span>Categories</span>
-    </a>
 
     <!-- Requests Section -->
     <div class="menu-divider"></div>
@@ -410,6 +412,13 @@ uri="http://java.sun.com/jsp/jstl/functions" %>
         <span>Users</span>
       </a>
       <a
+        href="${pageContext.request.contextPath}/suppliers"
+        class="menu-item ${fn:contains(pageContext.request.servletPath, '/suppliers') ? 'active' : ''}"
+      >
+        <i class="bi bi-truck"></i>
+        <span>Suppliers</span>
+      </a>
+      <a
         href="${pageContext.request.contextPath}/admin/manual-stock-adjustment"
         class="menu-item ${fn:contains(pageContext.request.servletPath, '/admin/manual-stock-adjustment') ? 'active' : ''}"
       >
@@ -427,7 +436,7 @@ uri="http://java.sun.com/jsp/jstl/functions" %>
       <i class="bi bi-person"></i>
       <span>Profile</span>
     </a>
-     <a
+    <a
       href="${pageContext.request.contextPath}/Logout"
       class="menu-item"
       id="logoutLink"
@@ -438,7 +447,7 @@ uri="http://java.sun.com/jsp/jstl/functions" %>
   </div>
 
   <!-- Include Logout Modal if you have one, ensure its script uses contextPath for logout URL -->
-<jsp:include page="LogoutModal.jsp" />
+  <jsp:include page="LogoutModal.jsp" />
 
   <!-- Sidebar Toggle Button -->
   <button class="sidebar-toggle" id="sidebarToggle">

@@ -30,7 +30,7 @@ public class CategoriesController extends HttpServlet {
         try {
             List<CategoryModel> categories = categoryService.getAllCategories();
             request.setAttribute("categories", categories);
-            request.getRequestDispatcher("WEB-INF/pages/Categories.jsp").forward(request, response);
+            request.getRequestDispatcher("WEB-INF/pages/admin/Categories.jsp").forward(request, response);
         } catch (Exception e) {
             e.printStackTrace();
             response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Unable to fetch categories.");

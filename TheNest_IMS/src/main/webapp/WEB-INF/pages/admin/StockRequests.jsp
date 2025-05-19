@@ -30,7 +30,7 @@ pageEncoding="UTF-8"%>
     />
   </head>
   <body>
-    <jsp:include page="${pageContext.request.contextPath}/components/Sidebar.jsp" />
+    <jsp:include page="${pageContext.request.contextPath}../components/Sidebar.jsp" />
 
     <!-- Main Content -->
     <div class="main-content">

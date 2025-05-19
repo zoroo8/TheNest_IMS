@@ -288,7 +288,7 @@ uri="http://java.sun.com/jsp/jstl/functions" %>
   <div class="sidebar-menu">
     <%-- Dashboard Link --%>
     <c:choose>
-      <c:when test="${sessionScope.currentUser.role eq 'ADMIN'}">
+      <c:when test="${sessionScope.currentUser.role eq 'admin'}">
         <a
           href="${pageContext.request.contextPath}/admin/dashboard"
           class="menu-item ${fn:contains(pageContext.request.servletPath, '/admin/dashboard') ? 'active' : ''}"
@@ -325,7 +325,7 @@ uri="http://java.sun.com/jsp/jstl/functions" %>
       <span>Low Stock</span>
     </a>
 
-    <c:if test="${sessionScope.currentUser.role eq 'ADMIN'}">
+    <c:if test="${sessionScope.currentUser.role eq 'admin'}">
       <a
         href="${pageContext.request.contextPath}/stock-movement"
         class="menu-item ${fn:contains(pageContext.request.servletPath, '/stock-movement') ? 'active' : ''}"
@@ -362,7 +362,7 @@ uri="http://java.sun.com/jsp/jstl/functions" %>
     <!-- Requests Section -->
     <div class="menu-divider"></div>
     <c:choose>
-      <c:when test="${sessionScope.currentUser.role eq 'ADMIN'}">
+      <c:when test="${sessionScope.currentUser.role eq 'admin'}">
         <a
           href="${pageContext.request.contextPath}/stock-requests"
           class="menu-item ${fn:contains(pageContext.request.servletPath, '/stock-requests') ? 'active' : ''}"
@@ -391,7 +391,7 @@ uri="http://java.sun.com/jsp/jstl/functions" %>
       <span>Request History</span>
     </a>
 
-    <c:if test="${sessionScope.currentUser.role eq 'ADMIN'}">
+    <c:if test="${sessionScope.currentUser.role eq 'admin'}">
       <a
         href="${pageContext.request.contextPath}/admin/dispatch-request"
         class="menu-item ${fn:contains(pageContext.request.servletPath, '/admin/dispatch-request') ? 'active' : ''}"

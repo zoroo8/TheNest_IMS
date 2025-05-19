@@ -1,5 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
-pageEncoding="UTF-8"%>
+pageEncoding="UTF-8"%> <% com.ims.model.UserModel user =
+(com.ims.model.UserModel) session.getAttribute("currentUser"); if (user != null)
+{ %> User ID: <%= user.getUserId() %> <% } %>
 
 <!DOCTYPE html>
 <html lang="en">

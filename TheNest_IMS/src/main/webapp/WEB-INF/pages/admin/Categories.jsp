@@ -30,7 +30,7 @@ pageEncoding="UTF-8"%>
     />
   </head>
   <body>
-    <jsp:include page="components/Sidebar.jsp" />
+    <jsp:include page="../components/Sidebar.jsp" />
 
     <!-- Main Content -->
     <div class="main-content">
@@ -410,15 +410,14 @@ pageEncoding="UTF-8"%>
               rows="3"
             ></textarea>
           </div>
-           <div class="modal-footer">
-	        <button class="btn btn-outline" id="cancelBtn">Cancel</button>
-	        <button class="btn btn-primary" id="saveCategoryBtn" type="submit">
-	          Save Category
-	        </button>
-	      </div>
+          <div class="modal-footer">
+            <button class="btn btn-outline" id="cancelBtn">Cancel</button>
+            <button class="btn btn-primary" id="saveCategoryBtn" type="submit">
+              Save Category
+            </button>
+          </div>
         </form>
       </div>
-     
     </div>
 
     <!-- Delete Confirmation Modal -->

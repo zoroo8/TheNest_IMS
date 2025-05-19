@@ -1,13 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
-pageEncoding="UTF-8"%>
-<% 
-    com.ims.model.UserModel user = (com.ims.model.UserModel) session.getAttribute("currentUser"); 
-    if (user != null) {
-%>
-    User ID: <%= user.getUserId() %>
-<% 
-    }
-%>
+pageEncoding="UTF-8"%> <% com.ims.model.UserModel user =
+(com.ims.model.UserModel) session.getAttribute("currentUser"); if (user != null)
+{ %> User ID: <%= user.getUserId() %> <% } %>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -39,7 +33,7 @@ pageEncoding="UTF-8"%>
     />
   </head>
   <body>
-    <jsp:include page="components/Sidebar.jsp" />
+    <jsp:include page="../components/Sidebar.jsp" />
 
     <!-- Main Content -->
     <div class="main-content">
@@ -439,7 +433,12 @@ pageEncoding="UTF-8"%>
         <button class="modal-close" id="closeFormModal">&times;</button>
       </div>
       <div class="modal-body">
-        <form id="userForm" action="${pageContext.request.contextPath}/users" method="post" enctype="multipart/form-data">
+        <form
+          id="userForm"
+          action="${pageContext.request.contextPath}/users"
+          method="post"
+          enctype="multipart/form-data"
+        >
           <input type="hidden" id="userId" name="userId" value="" />
 
           <div class="form-section">
@@ -512,7 +511,12 @@ pageEncoding="UTF-8"%>
                   <label for="gender"
                     >Gender <span class="required">*</span></label
                   >
-                  <select class="form-control" name="gender" id="gender" required>
+                  <select
+                    class="form-control"
+                    name="gender"
+                    id="gender"
+                    required
+                  >
                     <option value="">Select Gender</option>
                     <option value="male">Male</option>
                     <option value="female">Female</option>
@@ -569,7 +573,12 @@ pageEncoding="UTF-8"%>
                   <label for="department"
                     >Department <span class="required">*</span></label
                   >
-                  <select class="form-control" id="department" name="department" required>
+                  <select
+                    class="form-control"
+                    id="department"
+                    name="department"
+                    required
+                  >
                     <option value="">Select Department</option>
                     <option value="IT">IT Department</option>
                     <option value="Finance">Finance</option>
@@ -646,14 +655,15 @@ pageEncoding="UTF-8"%>
                 </div>
               </div>
             </div>
-
           </div>
           <div class="modal-footer">
-        <button type="button" class="btn btn-outline" id="cancelFormBtn">Cancel</button>
-        <button type="submit" class="btn btn-primary" id="saveUserBtn">
-          <i class="bi bi-save"></i> Save User
-        </button>
-      </div>
+            <button type="button" class="btn btn-outline" id="cancelFormBtn">
+              Cancel
+            </button>
+            <button type="submit" class="btn btn-primary" id="saveUserBtn">
+              <i class="bi bi-save"></i> Save User
+            </button>
+          </div>
         </form>
       </div>
     </div>
@@ -802,25 +812,24 @@ pageEncoding="UTF-8"%>
           });
 
         document
-        .getElementById("saveUserBtn")
-        .addEventListener("click", function () {
-          const form = document.getElementById("userForm");
-          if (form.checkValidity()) {
-            const userId = document.getElementById("userId").value;
-            const isNewUser = !userId;
-            if (isNewUser) {
-              alert("New user has been created successfully!");
+          .getElementById("saveUserBtn")
+          .addEventListener("click", function () {
+            const form = document.getElementById("userForm");
+            if (form.checkValidity()) {
+              const userId = document.getElementById("userId").value;
+              const isNewUser = !userId;
+              if (isNewUser) {
+                alert("New user has been created successfully!");
+              } else {
+                alert(`User ${userId} has been updated successfully!`);
+              }
+
+              userFormModal.style.display = "none";
+              modalBackdrop.style.display = "none";
             } else {
-              alert(`User ${userId} has been updated successfully!`);
+              form.reportValidity();
             }
-
-            userFormModal.style.display = "none";
-            modalBackdrop.style.display = "none";
-          } else {
-            form.reportValidity();
-          }
-        });
-
+          });
 
         // Toggle password visibility
         const passwordToggles = document.querySelectorAll(".password-toggle");

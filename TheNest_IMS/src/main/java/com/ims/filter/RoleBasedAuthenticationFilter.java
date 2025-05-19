@@ -74,6 +74,11 @@ public class RoleBasedAuthenticationFilter implements Filter {
             return;
         }
 
+         if (uri.equals("/categories") && !"admin".equalsIgnoreCase(userRole)) {
+            res.sendRedirect(contextPath + ERROR);
+            return;
+        }
+
         if (uri.equals("/stock-requests") && !"admin".equalsIgnoreCase(userRole)) {
             res.sendRedirect(contextPath + ERROR);
             return;
@@ -85,7 +90,7 @@ public class RoleBasedAuthenticationFilter implements Filter {
         }
 
         // Pages accessible by both roles
-        List<String> commonPages = Arrays.asList("/products", "/categories");
+        List<String> commonPages = Arrays.asList("/products");
 
         if (commonPages.contains(uri)) {
             chain.doFilter(request, response);

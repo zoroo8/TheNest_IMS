@@ -1,5 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
-pageEncoding="UTF-8"%>
+pageEncoding="UTF-8"%> <%@ taglib prefix="c"
+uri="http://java.sun.com/jsp/jstl/core" %>
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -34,6 +35,24 @@ pageEncoding="UTF-8"%>
 
     <!-- Main Content -->
     <div class="main-content">
+      <!-- Display success message if available -->
+      <c:if test="${not empty sessionScope.successMessage}">
+  <div class="alert alert-success" id="successAlert">
+    <i class="bi bi-check-circle" style="margin-right: 10px; font-size: 1.1rem;"></i>
+    ${sessionScope.successMessage}
+    <button type="button" class="dismiss-btn" onclick="dismissAlert(this.parentElement)"></button>
+    <c:remove var="successMessage" scope="session" />
+  </div>
+</c:if>
+
+<c:if test="${not empty sessionScope.errorMessage}">
+  <div class="alert alert-danger" id="errorAlert">
+    <i class="bi bi-exclamation-circle" style="margin-right: 10px; font-size: 1.1rem;"></i>
+    ${sessionScope.errorMessage}
+    <c:remove var="errorMessage" scope="session" />
+  </div>
+</c:if>
+
       <div class="page-header">
         <h1 class="page-title">Manage Categories</h1>
         <button class="btn btn-primary" id="addCategoryBtn">
@@ -47,22 +66,25 @@ pageEncoding="UTF-8"%>
           <div class="stat-icon category-icon-stat">
             <i class="bi bi-tags"></i>
           </div>
-          <div class="stat-value">6</div>
+          <div class="stat-value">${stats.totalCategories}</div>
           <div class="stat-label">Total Categories</div>
         </div>
         <div class="stat-card">
           <div class="stat-icon product-icon">
             <i class="bi bi-box-seam"></i>
           </div>
-          <div class="stat-value">145</div>
+          <div class="stat-value">${stats.totalProducts}</div>
           <div class="stat-label">Total Products</div>
         </div>
         <div class="stat-card">
           <div class="stat-icon recent-icon">
-            <i class="bi bi-clock-history"></i>
+            <i class="bi bi-star-fill"></i>
           </div>
-          <div class="stat-value">30</div>
-          <div class="stat-label">Recently Added</div>
+          <div class="stat-value">
+            ${stats.topCategoryProductCount}
+            <small>${stats.topCategoryName}</small>
+          </div>
+          <div class="stat-label">Top Category</div>
         </div>
       </div>
 
@@ -97,253 +119,137 @@ pageEncoding="UTF-8"%>
 
       <!-- Categories Grid -->
       <div class="categories-grid">
-        <!-- Category Card - Beverages -->
-        <div class="category-card">
-          <div class="category-card-header">
-            <h3 class="category-card-title">Beverages</h3>
-            <div class="category-icon">
-              <i class="bi bi-cup-hot"></i>
+        <c:choose>
+          <c:when test="${empty categories}">
+            <div class="empty-state">
+              <div class="empty-state-icon"><i class="bi bi-tags"></i></div>
+              <h3 class="empty-state-title">No Categories Found</h3>
+              <p class="empty-state-message">
+                There are no categories in the system yet. Click the "Add New
+                Category" button to create one.
+              </p>
             </div>
-          </div>
-          <div class="category-card-body">
-            <div class="category-product-count">32</div>
-            <div class="category-info">
-              <span class="category-label">Products</span>
-              <span class="category-value">32 items</span>
-            </div>
-            <div class="category-info">
-              <span class="category-label">Last Updated</span>
-              <span class="category-value">2 days ago</span>
-            </div>
-            <div class="category-progress">
-              <div class="progress-bar normal" style="width: 60%"></div>
-            </div>
-            <div class="category-info">
-              <span class="category-label">Status</span>
-              <span class="badge badge-category normal">Active</span>
-            </div>
-          </div>
-          <div class="category-card-footer">
-            <a href="#" class="view-products" data-id="1">
-              <i class="bi bi-eye"></i> View Products
-            </a>
-            <a href="#" class="edit-category" data-id="1">
-              <i class="bi bi-pencil"></i> Edit
-            </a>
-          </div>
-        </div>
-
-        <!-- Category Card - Groceries -->
-        <div class="category-card">
-          <div class="category-card-header">
-            <h3 class="category-card-title">Groceries</h3>
-            <div class="category-icon">
-              <i class="bi bi-basket"></i>
-            </div>
-          </div>
-          <div class="category-card-body">
-            <div class="category-product-count">45</div>
-            <div class="category-info">
-              <span class="category-label">Products</span>
-              <span class="category-value">45 items</span>
-            </div>
-            <div class="category-info">
-              <span class="category-label">Last Updated</span>
-              <span class="category-value">1 day ago</span>
-            </div>
-            <div class="category-progress">
-              <div class="progress-bar high" style="width: 80%"></div>
-            </div>
-            <div class="category-info">
-              <span class="category-label">Status</span>
-              <span class="badge badge-category high">Active</span>
-            </div>
-          </div>
-          <div class="category-card-footer">
-            <a href="#" class="view-products" data-id="2">
-              <i class="bi bi-eye"></i> View Products
-            </a>
-            <a href="#" class="edit-category" data-id="2">
-              <i class="bi bi-pencil"></i> Edit
-            </a>
-          </div>
-        </div>
-
-        <!-- Category Card - Furnitures -->
-        <div class="category-card">
-          <div class="category-card-header">
-            <h3 class="category-card-title">Furnitures</h3>
-            <div class="category-icon">
-              <i class="bi bi-lamp"></i>
-            </div>
-          </div>
-          <div class="category-card-body">
-            <div class="category-product-count">18</div>
-            <div class="category-info">
-              <span class="category-label">Products</span>
-              <span class="category-value">18 items</span>
-            </div>
-            <div class="category-info">
-              <span class="category-label">Last Updated</span>
-              <span class="category-value">5 days ago</span>
-            </div>
-            <div class="category-progress">
-              <div class="progress-bar normal" style="width: 40%"></div>
-            </div>
-            <div class="category-info">
-              <span class="category-label">Status</span>
-              <span class="badge badge-category normal">Active</span>
-            </div>
-          </div>
-          <div class="category-card-footer">
-            <a href="#" class="view-products" data-id="3">
-              <i class="bi bi-eye"></i> View Products
-            </a>
-            <a href="#" class="edit-category" data-id="3">
-              <i class="bi bi-pencil"></i> Edit
-            </a>
-          </div>
-        </div>
-
-        <!-- Continue with other category cards in the same format -->
-        <!-- Category Card - Clothing -->
-        <div class="category-card">
-          <div class="category-card-header">
-            <h3 class="category-card-title">Clothing</h3>
-            <div class="category-icon">
-              <i class="bi bi-tshirt"></i>
-            </div>
-          </div>
-          <div class="category-card-body">
-            <div class="category-product-count">27</div>
-            <div class="category-info">
-              <span class="category-label">Products</span>
-              <span class="category-value">27 items</span>
-            </div>
-            <div class="category-info">
-              <span class="category-label">Last Updated</span>
-              <span class="category-value">3 days ago</span>
-            </div>
-            <div class="category-progress">
-              <div class="progress-bar normal" style="width: 50%"></div>
-            </div>
-            <div class="category-info">
-              <span class="category-label">Status</span>
-              <span class="badge badge-category normal">Active</span>
-            </div>
-          </div>
-          <div class="category-card-footer">
-            <a href="#" class="view-products" data-id="4">
-              <i class="bi bi-eye"></i> View Products
-            </a>
-            <a href="#" class="edit-category" data-id="4">
-              <i class="bi bi-pencil"></i> Edit
-            </a>
-          </div>
-        </div>
-
-        <!-- Category Card - Electronics -->
-        <div class="category-card">
-          <div class="category-card-header">
-            <h3 class="category-card-title">Electronics</h3>
-            <div class="category-icon">
-              <i class="bi bi-cpu"></i>
-            </div>
-          </div>
-          <div class="category-card-body">
-            <div class="category-product-count">23</div>
-            <div class="category-info">
-              <span class="category-label">Products</span>
-              <span class="category-value">23 items</span>
-            </div>
-            <div class="category-info">
-              <span class="category-label">Last Updated</span>
-              <span class="category-value">1 week ago</span>
-            </div>
-            <div class="category-progress">
-              <div class="progress-bar normal" style="width: 45%"></div>
-            </div>
-            <div class="category-info">
-              <span class="category-label">Status</span>
-              <span class="badge badge-category normal">Active</span>
-            </div>
-          </div>
-          <div class="category-card-footer">
-            <a href="#" class="view-products" data-id="5">
-              <i class="bi bi-eye"></i> View Products
-            </a>
-            <a href="#" class="edit-category" data-id="5">
-              <i class="bi bi-pencil"></i> Edit
-            </a>
-          </div>
-        </div>
-
-        <!-- Category Card - Fragile -->
-        <div class="category-card">
-          <div class="category-card-header">
-            <h3 class="category-card-title">Fragile</h3>
-            <div class="category-icon">
-              <i class="bi bi-cup"></i>
-            </div>
-          </div>
-          <div class="category-card-body">
-            <div class="category-product-count">0</div>
-            <div class="category-info">
-              <span class="category-label">Products</span>
-              <span class="category-value">0 items</span>
-            </div>
-            <div class="category-info">
-              <span class="category-label">Last Updated</span>
-              <span class="category-value">Never</span>
-            </div>
-            <div class="category-progress">
-              <div class="progress-bar low" style="width: 0%"></div>
-            </div>
-            <div class="category-info">
-              <span class="category-label">Status</span>
-              <span class="badge badge-category low">Empty</span>
-            </div>
-          </div>
-          <div class="category-card-footer">
-            <a href="#" class="view-products" data-id="6">
-              <i class="bi bi-eye"></i> View Products
-            </a>
-            <a href="#" class="edit-category" data-id="6">
-              <i class="bi bi-pencil"></i> Edit
-            </a>
-          </div>
-        </div>
-      </div>
-
-      <!-- Pagination -->
-      <div class="pagination-container">
-        <ul class="pagination">
-          <li class="page-item">
-            <a href="#" class="page-link" aria-label="First">
-              <span aria-hidden="true">&laquo;&laquo; First</span>
-            </a>
-          </li>
-          <li class="page-item">
-            <a href="#" class="page-link" aria-label="Previous">
-              <span aria-hidden="true">&laquo; Previous</span>
-            </a>
-          </li>
-          <li class="page-item active"><a href="#" class="page-link">1</a></li>
-          <li class="page-item"><a href="#" class="page-link">2</a></li>
-          <li class="page-item"><a href="#" class="page-link">3</a></li>
-          <li class="page-item">
-            <a href="#" class="page-link" aria-label="Next">
-              <span aria-hidden="true">Next &raquo;</span>
-            </a>
-          </li>
-          <li class="page-item">
-            <a href="#" class="page-link" aria-label="Last">
-              <span aria-hidden="true">Last &raquo;&raquo;</span>
-            </a>
-          </li>
-        </ul>
+          </c:when>
+          <c:otherwise>
+            <c:forEach var="category" items="${categories}">
+              <div class="category-card"
+    <c:choose>
+      <c:when test="${category.productCount >= 30}">data-products="high"</c:when>
+      <c:when test="${category.productCount >= 10}">data-products="medium"</c:when>
+      <c:when test="${category.productCount >= 1}">data-products="low"</c:when>
+      <c:otherwise>data-products="none"</c:otherwise>
+    </c:choose>
+  >
+    <div class="category-card-header">
+      <h3 class="category-card-title category-name">
+        ${category.name}
+      </h3>
+      <div class="category-icon">
+        <i class="bi ${category.icon}"></i>
       </div>
     </div>
+    <div class="category-card-body">
+      <div class="category-product-count" style="display: none">
+        ${category.productCount}
+      </div>
+
+      <div class="category-info">
+        <span class="category-label">Products</span>
+        <span class="category-value">${category.productCount} items</span>
+      </div>
+      <c:if test="${not empty category.description}">
+    <div class="category-description">
+      <p>${category.description}</p>
+    </div>
+  </c:if>
+    </div>
+    <div class="category-card-footer">
+      <a
+        href="${pageContext.request.contextPath}/products?category=${category.id}"
+        class="view-products"
+        data-id="${category.id}"
+      >
+        <i class="bi bi-eye"></i> View Products
+      </a>
+      <a href="#" class="edit-category" data-id="${category.id}">
+        <i class="bi bi-pencil"></i> Edit
+      </a>
+      <a
+        href="#"
+        class="delete-category"
+        data-id="${category.id}"
+      >
+        <i class="bi bi-trash"></i> Delete
+      </a>
+    </div>
+  </div>
+ </c:forEach>
+</c:otherwise>
+</c:choose>
+</div>
+
+<!-- Pagination -->
+<c:if test="${totalPages > 1}">
+  <div class="pagination-info">
+    <c:set var="start" value="${(currentPage-1) * pageSize + 1}"/>
+    <c:set var="end" value="${(currentPage * pageSize < stats.totalCategories) ? currentPage * pageSize : stats.totalCategories}"/>
+    Showing ${start} to ${end} of ${stats.totalCategories} categories
+  </div>
+  <div class="pagination-container">
+    <ul class="pagination">
+      <!-- First Page -->
+      <li class="page-item ${currentPage == 1 ? 'disabled' : ''}">
+        <a href="${pageContext.request.contextPath}/categories?page=1" 
+           class="page-link" 
+           aria-label="First"
+           ${currentPage == 1 ? 'tabindex="-1"' : ''}>
+          <span aria-hidden="true">&laquo;&laquo; First</span>
+        </a>
+      </li>
+
+      <!-- Previous Page -->
+      <li class="page-item ${currentPage == 1 ? 'disabled' : ''}">
+        <a href="${pageContext.request.contextPath}/categories?page=${currentPage - 1}" 
+           class="page-link" 
+           aria-label="Previous"
+           ${currentPage == 1 ? 'tabindex="-1"' : ''}>
+          <span aria-hidden="true">&laquo; Previous</span>
+        </a>
+      </li>
+
+      <!-- Page Numbers -->
+      <c:set var="beginPage" value="${(currentPage - 2 < 1) ? 1 : currentPage - 2}"/>
+      <c:set var="endPage" value="${(currentPage + 2 > totalPages) ? totalPages : currentPage + 2}"/>
+      <c:forEach var="i" begin="${beginPage}" end="${endPage}">
+        <li class="page-item ${i == currentPage ? 'active' : ''}">
+          <a href="${pageContext.request.contextPath}/categories?page=${i}" class="page-link">
+            ${i}
+          </a>
+        </li>
+      </c:forEach>
+
+      <!-- Next Page -->
+      <li class="page-item ${currentPage == totalPages ? 'disabled' : ''}">
+        <a href="${pageContext.request.contextPath}/categories?page=${currentPage + 1}" 
+           class="page-link" 
+           aria-label="Next"
+           ${currentPage == totalPages ? 'tabindex="-1"' : ''}>
+          <span aria-hidden="true">Next &raquo;</span>
+        </a>
+      </li>
+
+      <!-- Last Page -->
+      <li class="page-item ${currentPage == totalPages ? 'disabled' : ''}">
+        <a href="${pageContext.request.contextPath}/categories?page=${totalPages}" 
+           class="page-link" 
+           aria-label="Last"
+           ${currentPage == totalPages ? 'tabindex="-1"' : ''}>
+          <span aria-hidden="true">Last &raquo;&raquo;</span>
+        </a>
+      </li>
+    </ul>
+  </div>
+</c:if>
 
     <!-- Add/Edit Category Modal -->
     <div class="modal-backdrop" id="modalBackdrop"></div>
@@ -431,23 +337,111 @@ pageEncoding="UTF-8"%>
         <p class="text-danger">
           <strong>Category: <span id="deleteCategoryName"></span></strong>
         </p>
+        <p>All associated products will no longer have this category.</p>
       </div>
       <div class="modal-footer">
-        <button class="btn btn-outline" id="cancelDeleteBtn">Cancel</button>
-        <button class="btn btn-danger" id="confirmDeleteBtn">
-          Confirm Deletion
-        </button>
+        <form
+          id="deleteCategoryForm"
+          method="post"
+          action="${pageContext.request.contextPath}/categories"
+        >
+          <input type="hidden" name="action" value="delete" />
+          <input
+            type="hidden"
+            id="categoryIdToDelete"
+            name="categoryIdToDelete"
+            value=""
+          />
+          <button type="button" class="btn btn-outline" id="cancelBtn">Cancel</button>
+          <button type="submit" class="btn btn-danger" id="confirmDeleteBtn">
+            Confirm Deletion
+          </button>
+        </form>
       </div>
     </div>
 
-    <!-- JavaScript -->
+    <!-- CSS for alert messages -->
+    <style>
+      .alert {
+        padding: 12px 20px;
+        margin-bottom: 20px;
+        border-radius: var(--border-radius);
+        position: relative;
+        display: flex;
+        align-items: center;
+        animation: fadeIn 0.3s ease-out;
+      }
+
+      .alert-success {
+        background-color: rgba(76, 175, 80, 0.1);
+        color: var(--success-color);
+        border-left: 4px solid var(--success-color);
+      }
+
+      .alert-danger {
+        background-color: rgba(66, 66, 66, 0.1);
+        color: var(--danger-color);
+        border-left: 4px solid var(--danger-color);
+      }
+
+      .alert .dismiss-btn {
+        position: absolute;
+        right: 10px;
+        top: 10px;
+        background: transparent;
+        border: none;
+        cursor: pointer;
+        font-size: 1rem;
+        opacity: 0.6;
+        transition: opacity 0.2s;
+      }
+
+      .alert .dismiss-btn:hover {
+        opacity: 1;
+      }
+
+      @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(-10px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+
+      @keyframes fadeOut {
+        from { opacity: 1; transform: translateY(0); }
+        to { opacity: 0; transform: translateY(-10px); }
+      }
+
+      .alert.fade-out {
+        animation: fadeOut 0.3s ease-out forwards;
+      }
+    </style>
+
+    <!-- JavaScript for functionality -->
     <script>
       document.addEventListener("DOMContentLoaded", function () {
-        // Elements
+        function dismissAlert(alertElement) {
+            if (alertElement) {
+            alertElement.classList.add('fade-out');
+            setTimeout(() => {
+               if (alertElement.parentNode) {
+                  alertElement.parentNode.removeChild(alertElement);
+                }
+              }, 300);
+            }
+          }
+
+  const alerts = document.querySelectorAll('.alert');
+      if (alerts.length > 0) {
+        alerts.forEach(alert => {
+          setTimeout(() => {
+            dismissAlert(alert);
+          }, 3000);
+       });
+      }
         const searchInput = document.getElementById("searchCategories");
         const categoryCards = document.querySelectorAll(".category-card");
+        const filterProductCount =
+          document.getElementById("filterProductCount");
 
-        // Modal elements
         const modalBackdrop = document.getElementById("modalBackdrop");
         const categoryModal = document.getElementById("categoryModal");
         const deleteModal = document.getElementById("deleteModal");
@@ -457,36 +451,64 @@ pageEncoding="UTF-8"%>
         const saveCategoryBtn = document.getElementById("saveCategoryBtn");
         const cancelBtn = document.getElementById("cancelBtn");
         const cancelDeleteBtn = document.getElementById("cancelDeleteBtn");
-        const confirmDeleteBtn = document.getElementById("confirmDeleteBtn");
 
-        // Action buttons
-        const viewButtons = document.querySelectorAll(".view-btn");
-        const editButtons = document.querySelectorAll(".edit-btn");
-        const deleteButtons = document.querySelectorAll(".delete-btn");
-
-        // Form elements
         const categoryForm = document.getElementById("categoryForm");
+        if (categoryForm) {
+  categoryForm.addEventListener("submit", function(e) {
+
+    categoryName.value = categoryName.value.trim();
+    categoryDescription.value = categoryDescription.value.trim();
+  });
+}
         const categoryId = document.getElementById("categoryId");
         const categoryName = document.getElementById("categoryName");
         const categoryIcon = document.getElementById("categoryIcon");
         const categoryDescription = document.getElementById(
           "categoryDescription"
         );
-
-        // Delete elements
+        const deleteCategoryForm =
+          document.getElementById("deleteCategoryForm");
+        const categoryIdToDelete =
+          document.getElementById("categoryIdToDelete");
         const deleteCategoryName =
           document.getElementById("deleteCategoryName");
 
-        // Search functionality
         function filterCategories() {
           const searchTerm = searchInput.value.toLowerCase();
+          const productCountFilter = filterProductCount.value;
+
           let visibleCount = 0;
 
           categoryCards.forEach((card) => {
             const name = card
               .querySelector(".category-name")
               .textContent.toLowerCase();
-            if (name.includes(searchTerm)) {
+            const productCount = parseInt(
+              card.querySelector(".category-product-count").textContent
+            );
+
+            let showBySearch = name.includes(searchTerm);
+            let showByCount = true;
+
+            if (productCountFilter !== "all") {
+              if (productCountFilter === "high" && productCount < 30) {
+                showByCount = false;
+              } else if (
+                productCountFilter === "medium" &&
+                (productCount < 10 || productCount > 30)
+              ) {
+                showByCount = false;
+              } else if (
+                productCountFilter === "low" &&
+                (productCount === 0 || productCount >= 10)
+              ) {
+                showByCount = false;
+              } else if (productCountFilter === "none" && productCount > 0) {
+                showByCount = false;
+              }
+            }
+
+            if (showBySearch && showByCount) {
               card.style.display = "";
               visibleCount++;
             } else {
@@ -494,23 +516,46 @@ pageEncoding="UTF-8"%>
             }
           });
 
-          // Show empty state if no results
-          const emptyState = document.querySelector(".empty-state");
-          if (emptyState) {
-            if (visibleCount === 0) {
-              emptyState.style.display = "block";
+          if (visibleCount === 0 && categoryCards.length > 0) {
+            let emptyState = document.querySelector(".empty-state");
+            if (!emptyState) {
+              emptyState = document.createElement("div");
+              emptyState.className = "empty-state";
+              emptyState.innerHTML = `
+              <div class="empty-state-icon"><i class="bi bi-search"></i></div>
+              <h3 class="empty-state-title">No Categories Found</h3>
+              <p class="empty-state-message">No categories match your search criteria. Try changing your filters.</p>
+            `;
+              document
+                .querySelector(".categories-grid")
+                .appendChild(emptyState);
             } else {
+              emptyState.style.display = "block";
+            }
+          } else {
+            const emptyState = document.querySelector(".empty-state");
+            if (emptyState) {
               emptyState.style.display = "none";
             }
           }
         }
 
-        // Add event listener for search
         if (searchInput) {
           searchInput.addEventListener("input", filterCategories);
         }
 
-        // Modal functionality
+        if (filterProductCount) {
+          filterProductCount.addEventListener("change", filterCategories);
+        }
+
+        document
+          .getElementById("resetFilters")
+          .addEventListener("click", function () {
+            searchInput.value = "";
+            filterProductCount.value = "all";
+            filterCategories();
+          });
+
         function openModal(modal) {
           modalBackdrop.style.display = "block";
           modal.style.display = "block";
@@ -524,163 +569,122 @@ pageEncoding="UTF-8"%>
           document.body.style.overflow = "";
         }
 
-        // Add Category button
         if (addCategoryBtn) {
           addCategoryBtn.addEventListener("click", function () {
             document.getElementById("modalTitle").textContent = "Add Category";
             categoryForm.reset();
             categoryId.value = "";
+            updateIconPreview();
             openModal(categoryModal);
           });
         }
 
-        // View Category buttons
-        viewButtons.forEach((button) => {
-          button.addEventListener("click", function () {
-            const categoryId = this.getAttribute("data-id");
-            const categoryName =
+document.querySelectorAll(".edit-category").forEach((button) => {
+  button.addEventListener("click", function (e) {
+    e.preventDefault();
+    const id = this.getAttribute("data-id");
+    const card = this.closest(".category-card");
+    const name = card.querySelector(".category-name").textContent.trim();
+    const iconElement = card.querySelector(".category-icon i");
+    const iconClass = iconElement ? iconElement.className : "";
+
+    const descriptionElement = card.querySelector(".category-description p");
+    const descriptionFromCard = descriptionElement ? descriptionElement.textContent.trim() : null;
+
+    document.getElementById("modalTitle").textContent = "Edit Category";
+    categoryId.value = id;
+    categoryName.value = name;
+
+    if (iconClass) {
+      const iconValue = iconClass
+        .split(" ")
+        .find((cls) => cls.startsWith("bi-"));
+      if (iconValue) {
+        categoryIcon.value = iconValue;
+      }
+    }
+
+    if (descriptionFromCard) {
+      categoryDescription.value = descriptionFromCard;
+      updateIconPreview();
+      openModal(categoryModal);
+    } else {
+
+      categoryDescription.value = "Loading...";
+
+      fetch(
+        "${pageContext.request.contextPath}/categories?action=getCategory&id=" +
+          id
+      )
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error('Network response was not ok');
+          }
+          return response.json();
+        })
+        .then((data) => {
+
+          categoryDescription.value = data.description ? data.description.trim() : "";
+        })
+        .catch((error) => {
+          console.error("Error fetching category details:", error);
+
+          categoryDescription.value = "";
+          alert("Could not load category description. Please try again.");
+        });
+
+      updateIconPreview();
+      openModal(categoryModal);
+    }
+  });
+});
+
+        document.querySelectorAll(".delete-category").forEach((button) => {
+          button.addEventListener("click", function (e) {
+            e.preventDefault();
+            const id = this.getAttribute("data-id");
+            const name =
               this.closest(".category-card").querySelector(
                 ".category-name"
               ).textContent;
-            window.location.href = `products?category=${categoryId}`;
-          });
-        });
 
-        // Edit Category buttons
-        editButtons.forEach((button) => {
-          button.addEventListener("click", function () {
-            const categoryId = this.getAttribute("data-id");
-            const card = this.closest(".category-card");
-            const categoryName =
-              card.querySelector(".category-name").textContent;
-            const iconClass = card.querySelector(".category-icon i").className;
-            const iconValue = iconClass.replace("bi ", "");
+            deleteCategoryName.textContent = name;
+            categoryIdToDelete.value = id;
 
-            document.getElementById("modalTitle").textContent = "Edit Category";
-            document.getElementById("categoryId").value = categoryId;
-            document.getElementById("categoryName").value = categoryName;
-            document.getElementById("categoryIcon").value = iconValue;
-            document.getElementById(
-              "categoryDescription"
-            ).value = `Description for ${categoryName} category`;
-
-            openModal(categoryModal);
-          });
-        });
-
-        // Delete Category buttons
-        deleteButtons.forEach((button) => {
-          button.addEventListener("click", function () {
-            const categoryId = this.getAttribute("data-id");
-            const categoryName =
-              this.closest(".category-card").querySelector(
-                ".category-name"
-              ).textContent;
-
-            deleteCategoryName.textContent = categoryName;
             openModal(deleteModal);
-
-            confirmDeleteBtn.setAttribute("data-id", categoryId);
           });
         });
 
-        // Close modal buttons
-        if (closeModal) {
-          closeModal.addEventListener("click", closeAllModals);
-        }
-
-        if (closeDeleteModal) {
+        if (closeModal) closeModal.addEventListener("click", closeAllModals);
+        if (closeDeleteModal)
           closeDeleteModal.addEventListener("click", closeAllModals);
-        }
-
-        if (cancelBtn) {
-          cancelBtn.addEventListener("click", closeAllModals);
-        }
-
-        if (cancelDeleteBtn) {
+          if (cancelBtn) {
+  cancelBtn.addEventListener("click", function(e) {
+    e.preventDefault(); 
+    closeAllModals();
+  });
+}
+        if (cancelDeleteBtn)
           cancelDeleteBtn.addEventListener("click", closeAllModals);
-        }
 
-        // Save category button
-        if (saveCategoryBtn) {
-          saveCategoryBtn.addEventListener("click", function () {
-            if (categoryForm.checkValidity()) {
-              const formData = {
-                id: categoryId.value,
-                name: categoryName.value,
-                icon: categoryIcon.value,
-                description: categoryDescription.value,
-              };
-
-              console.log("Saving category:", formData);
-
-              const isNewCategory = !formData.id;
-              const successMessage = isNewCategory
-                ? `Category "${formData.name}" created successfully!`
-                : `Category "${formData.name}" updated successfully!`;
-
-              alert(successMessage);
-
-              setTimeout(() => {
-                window.location.reload();
-              }, 500);
-
-              closeAllModals();
-            } else {
-              categoryForm.reportValidity();
-            }
-          });
-        }
-
-        // Confirm delete button
-        if (confirmDeleteBtn) {
-          confirmDeleteBtn.addEventListener("click", function () {
-            const categoryId = this.getAttribute("data-id");
-
-            console.log("Deleting category ID:", categoryId);
-
-            alert(`Category deleted successfully!`);
-            setTimeout(() => {
-              window.location.reload();
-            }, 500);
-
-            closeAllModals();
-          });
+        function updateIconPreview() {
+          const selectedIcon = categoryIcon.value;
+          const iconPreview = document.querySelector(".icon-preview i");
+          if (iconPreview) {
+            iconPreview.className = "bi " + selectedIcon;
+          }
         }
 
         if (categoryIcon) {
-          categoryIcon.addEventListener("change", function () {
-            const selectedIcon = this.value;
-            const iconPreview = document.querySelector(".icon-preview i");
-            if (iconPreview) {
-              iconPreview.className = "";
-              iconPreview.classList.add("bi", selectedIcon);
-            }
-          });
+          categoryIcon.addEventListener("change", updateIconPreview);
 
-          // Initialize preview with the first option
-          const initialIcon = categoryIcon.value;
-          const iconPreview = document.querySelector(".icon-preview i");
-          if (iconPreview) {
-            iconPreview.className = "";
-            iconPreview.classList.add("bi", initialIcon);
-          }
+          updateIconPreview();
         }
 
-        // Add keyboard shortcuts
         document.addEventListener("keydown", function (e) {
-          // Escape key closes modals
+
           if (e.key === "Escape") {
             closeAllModals();
-          }
-
-          // Ctrl+Enter in modal saves the form
-          if (
-            e.ctrlKey &&
-            e.key === "Enter" &&
-            categoryModal.style.display === "block"
-          ) {
-            saveCategoryBtn.click();
           }
         });
       });

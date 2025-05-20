@@ -1,5 +1,5 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8"
-pageEncoding="UTF-8"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -371,7 +371,16 @@ pageEncoding="UTF-8"%>
         <button class="modal-close" id="closeModal">&times;</button>
       </div>
       <div class="modal-body">
-        <form id="productForm">
+      
+      <c:if test="${param.success == '1'}">
+	    <div class="alert alert-success">Product added successfully!</div>
+	  </c:if>
+	
+	  <c:if test="${param.error == '1'}">
+	    <div class="alert alert-danger">Something went wrong. Please try again.</div>
+	  </c:if>
+      
+        <form id="productForm" action="<%=request.getContextPath()%>/products" method="post">
           <input type="hidden" id="productId" name="productId" value="" />
 
           <div class="form-group">
@@ -387,19 +396,12 @@ pageEncoding="UTF-8"%>
 
           <div class="form-group">
             <label for="productCategory" class="form-label">Category</label>
-            <select
-              class="form-control"
-              id="productCategory"
-              name="productCategory"
-              required
-            >
-              <option value="">Select Category</option>
-              <option value="groceries">Groceries</option>
-              <option value="furnitures">Furnitures</option>
-              <option value="beverages">Beverages</option>
-              <option value="clothing">Clothing</option>
-              <option value="electronics">Electronics</option>
-            </select>
+            <select class="form-control" id="productCategory" name="productCategory" required>
+			  <option value="">Select Category</option>
+			  <c:forEach var="cat" items="${categories}">
+			    <option value="${cat.id}">${cat.name}</option>
+			  </c:forEach>
+			</select>
           </div>
 
           <div class="form-group">
@@ -429,17 +431,13 @@ pageEncoding="UTF-8"%>
 
           <div class="form-group">
             <label for="productSupplier" class="form-label">Supplier</label>
-            <select
-              class="form-control"
-              id="productSupplier"
-              name="productSupplier"
-              required
-            >
-              <option value="">Select Supplier</option>
-              <option value="supplier1">Supplier 1</option>
-              <option value="supplier2">Supplier 2</option>
-              <option value="supplier3">Supplier 3</option>
-            </select>
+            <select class="form-control" id="productSupplier" name="productSupplier" required>
+			  <option value="">Select Supplier</option>
+			  <c:forEach var="sup" items="${suppliers}">
+			    <option value="${sup.supplierId}">${sup.supplierName}</option>
+			</c:forEach>
+
+			</select>
           </div>
 
           <div class="form-group">
@@ -453,13 +451,13 @@ pageEncoding="UTF-8"%>
               rows="3"
             ></textarea>
           </div>
+          <div class="modal-footer">
+	        <button type="button" class="btn btn-outline" id="cancelBtn">Cancel</button>
+	        <button type= "submit" class="btn btn-primary" name="saveProductBtn" id="saveProductBtn">
+	          Save Product
+	        </button>
+     	 </div>
         </form>
-      </div>
-      <div class="modal-footer">
-        <button class="btn btn-outline" id="cancelBtn">Cancel</button>
-        <button class="btn btn-primary" id="saveProductBtn">
-          Save Product
-        </button>
       </div>
     </div>
 
@@ -918,6 +916,7 @@ pageEncoding="UTF-8"%>
           saveProductBtn.addEventListener("click", function () {
             // Validate form
             if (productForm.checkValidity()) {
+            	
               // Get form data
               const formData = {
                 id: productId.value,

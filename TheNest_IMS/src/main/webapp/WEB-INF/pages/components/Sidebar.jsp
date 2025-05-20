@@ -311,11 +311,11 @@ uri="http://java.sun.com/jsp/jstl/functions" %>
     <!-- Inventory Management Section -->
     <div class="menu-divider"></div>
     <a
-      href="${pageContext.request.contextPath}/inventory"
-      class="menu-item ${fn:contains(pageContext.request.servletPath, '/inventory') ? 'active' : ''}"
+      href="${pageContext.request.contextPath}/import"
+      class="menu-item ${fn:contains(pageContext.request.servletPath, '/import') ? 'active' : ''}"
     >
-      <i class="bi bi-clipboard-data"></i>
-      <span>Current Stock</span>
+      <i class="bi bi-box"></i>
+      <span>Import</span>
     </a>
     <a
       href="${pageContext.request.contextPath}/low-stock"

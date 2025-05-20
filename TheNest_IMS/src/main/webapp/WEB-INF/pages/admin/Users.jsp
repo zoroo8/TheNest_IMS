@@ -1,12 +1,7 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
-<%
-  com.ims.model.UserModel user = (com.ims.model.UserModel) session.getAttribute("currentUser");
-  if (user != null) {
-%>
-    User ID: <%= user.getUserId() %>
-<%
-  }
-%>
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+pageEncoding="UTF-8"%> <%@ taglib prefix="c"
+uri="http://java.sun.com/jsp/jstl/core" %> <%@ taglib prefix="fmt"
+uri="http://java.sun.com/jsp/jstl/fmt" %>
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -35,12 +30,160 @@
       rel="stylesheet"
       href="${pageContext.request.contextPath}/resources/css/Users.css"
     />
+    <link
+      rel="stylesheet"
+      href="${pageContext.request.contextPath}/resources/css/Categories.css"
+    />
+
+    <style>
+      .input-group {
+        position: relative;
+        width: 100%;
+      }
+
+      .input-icon {
+        position: absolute;
+        left: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #757575;
+        z-index: 1;
+        pointer-events: none;
+      }
+
+      .input-with-icon {
+        padding-left: 45px;
+        width: 100%;
+        text-indent: 20px;
+      }
+
+      .alert {
+        padding: 12px 20px;
+        margin-bottom: 20px;
+        border-radius: var(--border-radius);
+        position: relative;
+        display: flex;
+        align-items: center;
+        animation: fadeIn 0.3s ease-out;
+      }
+      .alert-success {
+        background-color: rgba(76, 175, 80, 0.1);
+        color: var(--success-color);
+        border-left: 4px solid var(--success-color);
+      }
+      .alert-danger {
+        background-color: rgba(244, 67, 54, 0.1);
+        color: var(--danger-color); /* Adjusted for better visibility */
+        border-left: 4px solid var(--danger-color);
+      }
+      .alert .dismiss-btn {
+        position: absolute;
+        right: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        background: transparent;
+        border: none;
+        cursor: pointer;
+        font-size: 1.2rem;
+        opacity: 0.6;
+        padding: 5px;
+        line-height: 1;
+      }
+      .alert .dismiss-btn:hover {
+        opacity: 1;
+      }
+      .alert .dismiss-btn::before {
+        content: "\00D7"; /* Times symbol */
+      }
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(-10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+      @keyframes fadeOut {
+        from {
+          opacity: 1;
+          transform: translateY(0);
+        }
+        to {
+          opacity: 0;
+          transform: translateY(-10px);
+        }
+      }
+      .alert.fade-out {
+        animation: fadeOut 0.3s ease-out forwards;
+      }
+
+      .profile-img-sm {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        margin-right: 10px;
+        object-fit: cover;
+      }
+      .user-info-cell {
+        display: flex;
+        align-items: center;
+      }
+      .user-name {
+        font-weight: 500;
+      }
+      .user-email-small {
+        font-size: 0.85em;
+        color: #777;
+      }
+      .action-buttons .btn-icon {
+        margin: 0 3px;
+        padding: 5px 8px;
+        font-size: 0.9rem;
+      }
+      .badge {
+        text-transform: capitalize;
+      }
+    </style>
   </head>
   <body>
     <jsp:include page="../components/Sidebar.jsp" />
 
     <!-- Main Content -->
     <div class="main-content">
+      <!-- Display success/error messages -->
+      <c:if test="${not empty sessionScope.successMessage}">
+        <div class="alert alert-success" id="successAlert">
+          <i
+            class="bi bi-check-circle"
+            style="margin-right: 10px; font-size: 1.1rem"
+          ></i>
+          ${sessionScope.successMessage}
+          <button
+            type="button"
+            class="dismiss-btn"
+            onclick="dismissAlert(this.parentElement)"
+          ></button>
+          <c:remove var="successMessage" scope="session" />
+        </div>
+      </c:if>
+      <c:if test="${not empty sessionScope.errorMessage}">
+        <div class="alert alert-danger" id="errorAlert">
+          <i
+            class="bi bi-exclamation-circle"
+            style="margin-right: 10px; font-size: 1.1rem"
+          ></i>
+          ${sessionScope.errorMessage}
+          <button
+            type="button"
+            class="dismiss-btn"
+            onclick="dismissAlert(this.parentElement)"
+          ></button>
+          <c:remove var="errorMessage" scope="session" />
+        </div>
+      </c:if>
+
       <div class="page-header">
         <h1 class="page-title">Users Management</h1>
         <button class="btn btn-primary" id="newUserBtn">
@@ -54,66 +197,61 @@
           <div class="stat-icon admin-icon">
             <i class="bi bi-shield-lock"></i>
           </div>
-          <div class="stat-value">5</div>
+          <div class="stat-value">${stats.adminUsers}</div>
           <div class="stat-label">Admin Users</div>
         </div>
         <div class="stat-card">
           <div class="stat-icon staff-icon">
             <i class="bi bi-person-badge"></i>
           </div>
-          <div class="stat-value">18</div>
+          <div class="stat-value">${stats.staffUsers}</div>
           <div class="stat-label">Staff Users</div>
         </div>
+        <%-- Removed Active Users Stat Card --%>
         <div class="stat-card">
-          <div class="stat-icon active-icon">
-            <i class="bi bi-person-check"></i>
+          <div class="stat-icon total-users-icon">
+            <i class="bi bi-people-fill"></i>
           </div>
-          <div class="stat-value">22</div>
-          <div class="stat-label">Active Users</div>
+          <div class="stat-value">${stats.totalUsers}</div>
+          <div class="stat-label">Total Users</div>
         </div>
       </div>
 
-      <!-- View Toggle -->
-      <div class="view-toggle">
-        <button class="view-toggle-btn active" data-view="all">
-          All Users
-        </button>
-        <button class="view-toggle-btn" data-view="admin">Admins</button>
-        <button class="view-toggle-btn" data-view="staff">Staff</button>
-        <button class="view-toggle-btn" data-view="active">Active</button>
-        <button class="view-toggle-btn" data-view="inactive">Inactive</button>
-      </div>
-
-      <!-- Search and Filters -->
-      <div class="search-filters">
-        <div class="row">
-          <div class="col-md-4">
-            <div class="input-group">
-              <i class="bi bi-search input-icon"></i>
-              <input
-                type="text"
-                class="form-control input-with-icon"
-                placeholder="Search users..."
-                id="searchUsers"
-              />
+      <%-- Search and Filters --%>
+      <div class="search-filters card">
+        <div class="card-body" style="padding: 15px">
+          <div class="row">
+            <div class="col-md-6">
+              <%-- Adjusted col width --%>
+              <div class="input-group">
+                <i class="bi bi-search input-icon"></i>
+                <input
+                  type="text"
+                  class="form-control input-with-icon"
+                  placeholder="Search users by name, email..."
+                  id="searchUsers"
+                />
+              </div>
             </div>
-          </div>
-          <div class="col-md-3">
-            <select class="form-control" id="filterRole">
-              <option value="all" selected>All Roles</option>
-              <option value="admin">Admin</option>
-              <option value="staff">Staff</option>
-            </select>
-          </div>
-          <div class="col-md-3">
-            <select class="form-control" id="filterStatus">
-              <option value="all" selected>All Status</option>
-              <option value="active">Active</option>
-              <option value="inactive">Inactive</option>
-            </select>
-          </div>
-          <div class="col-md-2">
-            <button class="btn btn-outline" id="resetFilters">Reset</button>
+            <div class="col-md-4">
+              <%-- Adjusted col width --%>
+              <select class="form-control" id="filterRole">
+                <option value="all" selected>All Roles</option>
+                <option value="admin">Admin</option>
+                <option value="staff">Staff</option>
+              </select>
+            </div>
+            <%-- Removed Status Filter Dropdown --%>
+            <div class="col-md-2">
+              <%-- Adjusted col width --%>
+              <button
+                class="btn btn-outline"
+                id="resetFilters"
+                style="width: 100%"
+              >
+                Reset
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -122,310 +260,203 @@
       <div class="card">
         <div class="card-header">
           <h2 class="card-title">All Users</h2>
-          <span class="badge badge-primary">Total: 23 Users</span>
+          <span
+            class="badge badge-primary"
+            style="background-color: var(--primary-color); color: white"
+            >Total: ${stats.totalUsers} Users</span
+          >
         </div>
         <div class="card-body">
           <div class="table-container">
             <table>
               <thead>
                 <tr>
-                  <th>User ID</th>
-                  <th>Name</th>
-                  <th>Email</th>
+                  <th>User</th>
+                  <th>Contact</th>
                   <th>Role</th>
                   <th>Department</th>
-                  <th>Status</th>
+                  <%-- Removed Status Header --%>
                   <th>Last Login</th>
                   <th>Actions</th>
                 </tr>
               </thead>
-              <tbody>
-                <tr class="role-admin">
-                  <td>USR-001</td>
-                  <td>
-                    <div class="user-info-cell">
-                      <div class="user-avatar">
-                        <img
-                          src="${pageContext.request.contextPath}/assets/images/avatars/admin1.jpg"
-                          alt="Admin User"
-                        />
-                      </div>
-                      <div>John Doe</div>
-                    </div>
-                  </td>
-                  <td>john.doe@thenest.com</td>
-                  <td><span class="badge badge-admin">Admin</span></td>
-                  <td>IT Department</td>
-                  <td><span class="badge badge-success">Active</span></td>
-                  <td>Today, 09:45 AM</td>
-                  <td>
-                    <div class="action-buttons">
-                      <button class="action-btn view-btn" data-id="USR-001">
-                        <i class="bi bi-eye"></i>
-                      </button>
-                      <button class="action-btn edit-btn" data-id="USR-001">
-                        <i class="bi bi-pencil"></i>
-                      </button>
-                      <button class="action-btn delete-btn" data-id="USR-001">
-                        <i class="bi bi-trash"></i>
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-                <tr class="role-admin">
-                  <td>USR-002</td>
-                  <td>
-                    <div class="user-info-cell">
-                      <div class="user-avatar">
-                        <img
-                          src="${pageContext.request.contextPath}/assets/images/avatars/admin2.jpg"
-                          alt="Admin User"
-                        />
-                      </div>
-                      <div>Jane Smith</div>
-                    </div>
-                  </td>
-                  <td>jane.smith@thenest.com</td>
-                  <td><span class="badge badge-admin">Admin</span></td>
-                  <td>Finance</td>
-                  <td><span class="badge badge-success">Active</span></td>
-                  <td>Yesterday, 16:30 PM</td>
-                  <td>
-                    <div class="action-buttons">
-                      <button class="action-btn view-btn" data-id="USR-002">
-                        <i class="bi bi-eye"></i>
-                      </button>
-                      <button class="action-btn edit-btn" data-id="USR-002">
-                        <i class="bi bi-pencil"></i>
-                      </button>
-                      <button class="action-btn delete-btn" data-id="USR-002">
-                        <i class="bi bi-trash"></i>
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-                <tr class="role-staff">
-                  <td>USR-003</td>
-                  <td>
-                    <div class="user-info-cell">
-                      <div class="user-avatar">
-                        <img
-                          src="${pageContext.request.contextPath}/assets/images/avatars/staff1.jpg"
-                          alt="Staff User"
-                        />
-                      </div>
-                      <div>Robert Johnson</div>
-                    </div>
-                  </td>
-                  <td>robert.johnson@thenest.com</td>
-                  <td><span class="badge badge-staff">Staff</span></td>
-                  <td>Operations</td>
-                  <td><span class="badge badge-success">Active</span></td>
-                  <td>Today, 11:20 AM</td>
-                  <td>
-                    <div class="action-buttons">
-                      <button class="action-btn view-btn" data-id="USR-003">
-                        <i class="bi bi-eye"></i>
-                      </button>
-                      <button class="action-btn edit-btn" data-id="USR-003">
-                        <i class="bi bi-pencil"></i>
-                      </button>
-                      <button class="action-btn delete-btn" data-id="USR-003">
-                        <i class="bi bi-trash"></i>
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-                <tr class="role-staff">
-                  <td>USR-004</td>
-                  <td>
-                    <div class="user-info-cell">
-                      <div class="user-avatar">
-                        <img
-                          src="${pageContext.request.contextPath}/assets/images/avatars/staff2.jpg"
-                          alt="Staff User"
-                        />
-                      </div>
-                      <div>Emily Wilson</div>
-                    </div>
-                  </td>
-                  <td>emily.wilson@thenest.com</td>
-                  <td><span class="badge badge-staff">Staff</span></td>
-                  <td>HR</td>
-                  <td><span class="badge badge-danger">Inactive</span></td>
-                  <td>3 days ago</td>
-                  <td>
-                    <div class="action-buttons">
-                      <button class="action-btn view-btn" data-id="USR-004">
-                        <i class="bi bi-eye"></i>
-                      </button>
-                      <button class="action-btn edit-btn" data-id="USR-004">
-                        <i class="bi bi-pencil"></i>
-                      </button>
-                      <button class="action-btn delete-btn" data-id="USR-004">
-                        <i class="bi bi-trash"></i>
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-                <tr class="role-staff">
-                  <td>USR-005</td>
-                  <td>
-                    <div class="user-info-cell">
-                      <div class="user-avatar">
-                        <img
-                          src="${pageContext.request.contextPath}/assets/images/avatars/staff3.jpg"
-                          alt="Staff User"
-                        />
-                      </div>
-                      <div>Michael Brown</div>
-                    </div>
-                  </td>
-                  <td>michael.brown@thenest.com</td>
-                  <td><span class="badge badge-staff">Staff</span></td>
-                  <td>Marketing</td>
-                  <td><span class="badge badge-success">Active</span></td>
-                  <td>Today, 08:15 AM</td>
-                  <td>
-                    <div class="action-buttons">
-                      <button class="action-btn view-btn" data-id="USR-005">
-                        <i class="bi bi-eye"></i>
-                      </button>
-                      <button class="action-btn edit-btn" data-id="USR-005">
-                        <i class="bi bi-pencil"></i>
-                      </button>
-                      <button class="action-btn delete-btn" data-id="USR-005">
-                        <i class="bi bi-trash"></i>
-                      </button>
-                    </div>
-                  </td>
-                </tr>
+              <tbody id="usersTableBody">
+                <c:choose>
+                  <c:when test="${empty users}">
+                    <tr>
+                      <td colspan="6" style="text-align: center; padding: 20px">
+                        <%-- Adjusted colspan --%>
+                        <div class="empty-state">
+                          <div class="empty-state-icon">
+                            <i class="bi bi-people"></i>
+                          </div>
+                          <h3 class="empty-state-title">No Users Found</h3>
+                          <p class="empty-state-message">
+                            There are no users matching your criteria or no
+                            users in the system yet.
+                          </p>
+                        </div>
+                      </td>
+                    </tr>
+                  </c:when>
+                  <c:otherwise>
+                    <c:forEach var="user" items="${users}">
+                      <tr
+                        data-user-id="${user.userId}"
+                        data-role="${user.role}"
+                      >
+                        <td>
+                          <div class="user-info-cell">
+                            <img
+                              src="${pageContext.request.contextPath}/${not empty user.profilePicture ? user.profilePicture : 'assets/images/avatars/default-avatar.png'}"
+                              alt="${user.firstName}"
+                              class="profile-img-sm"
+                              onerror="this.onerror=null;this.src='${pageContext.request.contextPath}/assets/images/avatars/default-avatar.png';"
+                            />
+                            <div>
+                              <span class="user-name"
+                                >${user.firstName} ${user.lastName}</span
+                              >
+                              <div class="user-email-small">${user.email}</div>
+                            </div>
+                          </div>
+                        </td>
+                        <td>${user.phoneNumber}</td>
+                        <td>
+                          <span
+                            class="badge badge-${user.role == 'admin' ? 'admin' : 'staff'}"
+                            >${user.role}</span
+                          >
+                        </td>
+                        <td>${user.department}</td>
+                        <%-- Removed Status Column Cell --%>
+                        <td>${user.lastLoginFormatted}</td>
+                        <td>
+                          <div class="action-buttons">
+                            <button
+                              class="btn btn-outline btn-sm btn-icon view-btn"
+                              data-id="${user.userId}"
+                              title="View Details"
+                            >
+                              <i class="bi bi-eye"></i>
+                            </button>
+                            <button
+                              class="btn btn-primary btn-sm btn-icon edit-btn"
+                              data-id="${user.userId}"
+                              title="Edit User"
+                            >
+                              <i class="bi bi-pencil"></i>
+                            </button>
+                            <button
+                              class="btn btn-danger btn-sm btn-icon delete-btn"
+                              data-id="${user.userId}"
+                              data-name="${user.firstName} ${user.lastName}"
+                              title="Delete User"
+                            >
+                              <i class="bi bi-trash"></i>
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    </c:forEach>
+                  </c:otherwise>
+                </c:choose>
               </tbody>
             </table>
           </div>
         </div>
-        <div class="card-footer">
-          <ul class="pagination">
-            <li class="page-item">
-              <a href="#" class="page-link"
-                ><i class="bi bi-chevron-double-left"></i
-              ></a>
-            </li>
-            <li class="page-item">
-              <a href="#" class="page-link"
-                ><i class="bi bi-chevron-left"></i
-              ></a>
-            </li>
-            <li class="page-item active">
-              <a href="#" class="page-link">1</a>
-            </li>
-            <li class="page-item">
-              <a href="#" class="page-link">2</a>
-            </li>
-            <li class="page-item">
-              <a href="#" class="page-link">3</a>
-            </li>
-            <li class="page-item">
-              <a href="#" class="page-link"
-                ><i class="bi bi-chevron-right"></i
-              ></a>
-            </li>
-            <li class="page-item">
-              <a href="#" class="page-link"
-                ><i class="bi bi-chevron-double-right"></i
-              ></a>
-            </li>
-          </ul>
-        </div>
+        <div class="card-footer"></div>
       </div>
+      <%-- Pagination --%>
+<c:if test="${totalPages > 1}">
+  <div class="pagination-info text-center">
+    <c:set var="start" value="${(currentPage - 1) * pageSize + 1}" />
+    <c:set var="end" value="${(currentPage * pageSize < stats.totalUsers) ? currentPage * pageSize : stats.totalUsers}" />
+    Showing ${start} to ${end} of ${stats.totalUsers} users
+  </div>
+  <div class="pagination-container">
+    <ul class="pagination">
+      <%-- First Page --%>
+      <li class="page-item ${currentPage == 1 ? 'disabled' : ''}">
+        <a href="${pageContext.request.contextPath}/users?page=1"
+           class="page-link"
+           aria-label="First"
+           ${currentPage == 1 ? 'tabindex="-1"' : ''}>
+          <span aria-hidden="true">&laquo;&laquo; First</span>
+        </a>
+      </li>
+
+      <%-- Previous Page --%>
+      <li class="page-item ${currentPage == 1 ? 'disabled' : ''}">
+        <a href="${pageContext.request.contextPath}/users?page=${currentPage - 1}"
+           class="page-link"
+           aria-label="Previous"
+           ${currentPage == 1 ? 'tabindex="-1"' : ''}>
+          <span aria-hidden="true">&laquo; Previous</span>
+        </a>
+      </li>
+
+      <%-- Page Numbers --%>
+      <c:set var="beginPage" value="${(currentPage - 2 < 1) ? 1 : currentPage - 2}" />
+      <c:set var="endPage" value="${(currentPage + 2 > totalPages) ? totalPages : currentPage + 2}" />
+      <c:forEach var="i" begin="${beginPage}" end="${endPage}">
+        <li class="page-item ${i == currentPage ? 'active' : ''}">
+          <a href="${pageContext.request.contextPath}/users?page=${i}" class="page-link">
+            ${i}
+          </a>
+        </li>
+      </c:forEach>
+
+      <%-- Next Page --%>
+      <li class="page-item ${currentPage == totalPages ? 'disabled' : ''}">
+        <a href="${pageContext.request.contextPath}/users?page=${currentPage + 1}"
+           class="page-link"
+           aria-label="Next"
+           ${currentPage == totalPages ? 'tabindex="-1"' : ''}>
+          <span aria-hidden="true">Next &raquo;</span>
+        </a>
+      </li>
+
+      <%-- Last Page --%>
+      <li class="page-item ${currentPage == totalPages ? 'disabled' : ''}">
+        <a href="${pageContext.request.contextPath}/users?page=${totalPages}"
+           class="page-link"
+           aria-label="Last"
+           ${currentPage == totalPages ? 'tabindex="-1"' : ''}>
+          <span aria-hidden="true">Last &raquo;&raquo;</span>
+        </a>
+      </li>
+    </ul>
+  </div>
+</c:if>
     </div>
 
     <!-- Modal Backdrop -->
     <div class="modal-backdrop" id="modalBackdrop"></div>
 
-    <!-- View User Modal -->
+    <!-- View User Modal (Content to be populated by JS) -->
     <div class="modal" id="viewUserModal">
       <div class="modal-header">
         <h3 class="modal-title">User Details</h3>
-        <button class="modal-close" id="closeViewModal">&times;</button>
+        <button class="modal-close" id="closeViewModalBtn">&times;</button>
       </div>
-      <div class="modal-body">
-        <div class="user-profile-header">
-          <div class="user-avatar-large">
-            <img
-              src="${pageContext.request.contextPath}/assets/images/avatars/admin1.jpg"
-              alt="User Avatar"
-            />
-          </div>
-          <div class="user-profile-info">
-            <h3>John Doe</h3>
-            <span class="badge badge-admin">Administrator</span>
-            <p>IT Department</p>
-          </div>
-        </div>
-
-        <div class="info-group">
-          <h4>Personal Information</h4>
-          <div class="info-row">
-            <div class="info-label">User ID:</div>
-            <div class="info-value">USR-001</div>
-          </div>
-          <div class="info-row">
-            <div class="info-label">Full Name:</div>
-            <div class="info-value">John Doe</div>
-          </div>
-          <div class="info-row">
-            <div class="info-label">Email:</div>
-            <div class="info-value">john.doe@thenest.com</div>
-          </div>
-          <div class="info-row">
-            <div class="info-label">Phone Number:</div>
-            <div class="info-value">+44 7123 456789</div>
-          </div>
-          <div class="info-row">
-            <div class="info-label">Date of Birth:</div>
-            <div class="info-value">15 April 1985</div>
-          </div>
-          <div class="info-row">
-            <div class="info-label">Gender:</div>
-            <div class="info-value">Male</div>
-          </div>
-          <div class="info-row">
-            <div class="info-label">Address:</div>
-            <div class="info-value">123 Main Street, London, UK</div>
-          </div>
-        </div>
-
-        <div class="info-group">
-          <h4>Account Information</h4>
-          <div class="info-row">
-            <div class="info-label">Role:</div>
-            <div class="info-value">Administrator</div>
-          </div>
-          <div class="info-row">
-            <div class="info-label">Department:</div>
-            <div class="info-value">IT Department</div>
-          </div>
-          <div class="info-row">
-            <div class="info-label">Status:</div>
-            <div class="info-value">
-              <span class="badge badge-success">Active</span>
-            </div>
-          </div>
-          <div class="info-row">
-            <div class="info-label">Created On:</div>
-            <div class="info-value">10 January 2023</div>
-          </div>
-          <div class="info-row">
-            <div class="info-label">Last Login:</div>
-            <div class="info-value">Today, 09:45 AM</div>
-          </div>
-        </div>
+      <div class="modal-body" id="viewUserModalBody">
+        <p>Loading user details...</p>
       </div>
       <div class="modal-footer">
-        <button class="btn btn-outline" id="closeViewModalBtn">Close</button>
-        <button class="btn btn-primary edit-btn" data-id="USR-001">
-          <i class="bi bi-pencil"></i> Edit User
+        <button
+          type="button"
+          class="btn btn-outline"
+          id="closeViewModalFooterBtn"
+        >
+          Close
+        </button>
+        <button
+          type="button"
+          class="btn btn-primary edit-from-view-btn"
+          data-id=""
+        >
+          Edit User
         </button>
       </div>
     </div>
@@ -434,127 +465,96 @@
     <div class="modal large-modal" id="userFormModal">
       <div class="modal-header">
         <h3 class="modal-title" id="userFormTitle">Add New User</h3>
-        <button class="modal-close" id="closeFormModal">&times;</button>
+        <button class="modal-close" id="closeFormModalBtn">&times;</button>
       </div>
       <div class="modal-body">
         <form
           id="userForm"
-          action="${pageContext.request.contextPath}/users"
           method="post"
+          action="${pageContext.request.contextPath}/users"
           enctype="multipart/form-data"
         >
+          <input type="hidden" id="formAction" name="action" value="add" />
           <input type="hidden" id="userId" name="userId" value="" />
 
           <div class="form-section">
             <h4>Personal Information</h4>
+            <%-- ... Personal Info fields ... --%>
             <div class="row">
-              <div class="col-md-6">
-                <div class="form-group">
-                  <label for="firstName"
-                    >First Name <span class="required">*</span></label
-                  >
-                  <input
-                    type="text"
-                    class="form-control"
-                    id="firstName"
-                    name="firstName"
-                    required
-                  />
-                </div>
+              <div class="col-md-6 form-group">
+                <label for="firstName"
+                  >First Name <span class="required">*</span></label
+                ><input
+                  type="text"
+                  class="form-control"
+                  id="firstName"
+                  name="firstName"
+                  required
+                />
               </div>
-              <div class="col-md-6">
-                <div class="form-group">
-                  <label for="lastName"
-                    >Last Name <span class="required">*</span></label
-                  >
-                  <input
-                    type="text"
-                    class="form-control"
-                    id="lastName"
-                    name="lastName"
-                    required
-                  />
-                </div>
+              <div class="col-md-6 form-group">
+                <label for="lastName"
+                  >Last Name <span class="required">*</span></label
+                ><input
+                  type="text"
+                  class="form-control"
+                  id="lastName"
+                  name="lastName"
+                  required
+                />
               </div>
             </div>
-
             <div class="row">
-              <div class="col-md-6">
-                <div class="form-group">
-                  <label for="phoneNumber"
-                    >Phone Number <span class="required">*</span></label
-                  >
-                  <input
-                    type="tel"
-                    class="form-control"
-                    id="phoneNumber"
-                    name="phoneNumber"
-                    required
-                  />
-                </div>
+              <div class="col-md-6 form-group">
+                <label for="phoneNumber">Phone Number</label
+                ><input
+                  type="tel"
+                  class="form-control"
+                  id="phoneNumber"
+                  name="phoneNumber"
+                />
               </div>
-              <div class="col-md-6">
-                <div class="form-group">
-                  <label for="dateOfBirth"
-                    >Date of Birth <span class="required">*</span></label
-                  >
-                  <input
-                    type="date"
-                    class="form-control"
-                    id="dob"
-                    name="dob"
-                    required
-                  />
-                </div>
+              <div class="col-md-6 form-group">
+                <label for="dob"
+                  >Date of Birth <span class="required">*</span></label
+                ><input
+                  type="date"
+                  class="form-control"
+                  id="dob"
+                  name="dob"
+                  required
+                />
               </div>
             </div>
-
             <div class="row">
-              <div class="col-md-6">
-                <div class="form-group">
-                  <label for="gender"
-                    >Gender <span class="required">*</span></label
-                  >
-                  <select
-                    class="form-control"
-                    name="gender"
-                    id="gender"
-                    required
-                  >
-                    <option value="">Select Gender</option>
-                    <option value="male">Male</option>
-                    <option value="female">Female</option>
-                    <option value="other">Other</option>
-                    <option value="prefer-not-to-say">Prefer not to say</option>
-                  </select>
-                </div>
+              <div class="col-md-6 form-group">
+                <label for="gender">Gender</label>
+                <select class="form-control" id="gender" name="gender">
+                  <option value="">Select Gender</option>
+                  <option value="male">Male</option>
+                  <option value="female">Female</option>
+                  <option value="other">Other</option>
+                </select>
               </div>
-              <div class="col-md-6">
-                <div class="form-group">
-                  <label for="email"
-                    >Email Address <span class="required">*</span></label
-                  >
-                  <input
-                    type="email"
-                    class="form-control"
-                    id="email"
-                    name="email"
-                    required
-                  />
-                </div>
+              <div class="col-md-6 form-group">
+                <label for="email"
+                  >Email Address <span class="required">*</span></label
+                ><input
+                  type="email"
+                  class="form-control"
+                  id="email"
+                  name="email"
+                  required
+                />
               </div>
             </div>
-
             <div class="form-group">
-              <label for="address"
-                >Address <span class="required">*</span></label
-              >
-              <textarea
+              <label for="address">Address</label
+              ><textarea
                 class="form-control"
                 id="address"
                 name="address"
-                rows="3"
-                required
+                rows="2"
               ></textarea>
             </div>
           </div>
@@ -562,101 +562,86 @@
           <div class="form-section">
             <h4>Account Information</h4>
             <div class="row">
-              <div class="col-md-6">
-                <div class="form-group">
-                  <label for="role">Role <span class="required">*</span></label>
-                  <select class="form-control" name="role" id="role" required>
-                    <option value="">Select Role</option>
-                    <option value="admin">Administrator</option>
-                    <option value="staff">Staff</option>
-                  </select>
-                </div>
+              <div class="col-md-6 form-group">
+                <label for="role">Role <span class="required">*</span></label>
+                <select class="form-control" id="role" name="role" required>
+                  <option value="">Select Role</option>
+                  <option value="staff">Staff</option>
+                  <option value="admin">Admin</option>
+                </select>
               </div>
-              <div class="col-md-6">
-                <div class="form-group">
-                  <label for="department"
-                    >Department <span class="required">*</span></label
-                  >
-                  <select
-                    class="form-control"
-                    id="department"
-                    name="department"
-                    required
-                  >
-                    <option value="">Select Department</option>
-                    <option value="IT">IT Department</option>
-                    <option value="Finance">Finance</option>
-                    <option value="HR">HR</option>
-                    <option value="Marketing">Marketing</option>
-                    <option value="Operations">Operations</option>
-                  </select>
-                </div>
+              <div class="col-md-6 form-group">
+                <label for="department"
+                  >Department <span class="required">*</span></label
+                >
+                <input
+                  type="text"
+                  class="form-control"
+                  id="department"
+                  name="department"
+                  required
+                />
               </div>
             </div>
+            <%-- Removed Status Select Field from form --%>
 
             <div class="form-group">
               <label for="profilePicture">Profile Picture</label>
               <div class="file-upload-container">
                 <div class="file-upload-preview" id="profilePreview">
-                  <i class="bi bi-person-circle"></i>
+                  <i class="bi bi-person-circle"></i
+                  ><img
+                    id="imgPreview"
+                    src="#"
+                    alt="Preview"
+                    style="display: none; max-width: 100%; max-height: 100%"
+                  />
                 </div>
                 <div class="file-upload-controls">
                   <input
                     type="file"
-                    class="form-control-file"
+                    class="form-control"
                     id="profilePicture"
                     name="profilePicture"
                     accept="image/*"
+                    onchange="previewImage(event)"
                   />
-                  <button
-                    type="button"
-                    class="btn btn-outline btn-sm"
-                    id="uploadProfileBtn"
-                  >
-                    <i class="bi bi-upload"></i> Upload Photo
-                  </button>
                 </div>
               </div>
             </div>
 
             <div class="row password-fields">
-              <div class="col-md-6">
-                <div class="form-group">
-                  <label for="password"
-                    >Password <span class="required">*</span></label
-                  >
-                  <div class="password-input-group">
-                    <input
-                      type="password"
-                      class="form-control"
-                      id="password"
-                      name="password"
-                      required
-                    />
-                    <button type="button" class="password-toggle">
-                      <i class="bi bi-eye"></i>
-                    </button>
-                  </div>
-                </div>
+              <%-- JS will show/hide this for edit --%>
+              <div class="col-md-6 form-group">
+                <label for="password"
+                  >Password
+                  <span class="required" id="passwordRequiredSpan"
+                    >*</span
+                  ></label
+                >
+                <input
+                  type="password"
+                  class="form-control"
+                  id="password"
+                  name="password"
+                />
+                <small class="form-text text-muted" id="passwordHelp"
+                  >Leave blank if not changing (for edit).</small
+                >
               </div>
-              <div class="col-md-6">
-                <div class="form-group">
-                  <label for="confirmPassword"
-                    >Confirm Password <span class="required">*</span></label
-                  >
-                  <div class="password-input-group">
-                    <input
-                      type="password"
-                      class="form-control"
-                      id="confirmPassword"
-                      name="confirmPassword"
-                      required
-                    />
-                    <button type="button" class="password-toggle">
-                      <i class="bi bi-eye"></i>
-                    </button>
-                  </div>
-                </div>
+              <div class="col-md-6 form-group">
+                <label for="confirmPassword"
+                  >Confirm Password
+                  <span class="required" id="confirmPasswordRequiredSpan"
+                    >*</span
+                  ></label
+                >
+                <input
+                  type="password"
+                  class="form-control"
+                  id="confirmPassword"
+                  name="confirmPassword"
+                />
               </div>
             </div>
           </div>
@@ -676,253 +661,497 @@
     <div class="modal" id="deleteConfirmModal">
       <div class="modal-header">
         <h3 class="modal-title">Confirm Delete</h3>
-        <button class="modal-close" id="closeDeleteModal">&times;</button>
+        <button class="modal-close" id="closeDeleteModalBtn">&times;</button>
       </div>
       <div class="modal-body">
         <p>
-          Are you sure you want to delete this user? This action cannot be
-          undone.
+          Are you sure you want to delete user:
+          <strong id="userNameToDelete"></strong>?
         </p>
-        <div class="alert alert-warning">
-          <i class="bi bi-exclamation-triangle"></i>
-          <span
-            >Warning: All data associated with this user will be permanently
-            removed.</span
-          >
-        </div>
+        <p class="text-danger">This action cannot be undone.</p>
       </div>
       <div class="modal-footer">
-        <button class="btn btn-outline" id="cancelDeleteBtn">Cancel</button>
-        <button class="btn btn-danger" id="confirmDeleteBtn">
-          <i class="bi bi-trash"></i> Delete User
-        </button>
+        <form
+          id="deleteUserForm"
+          method="post"
+          action="${pageContext.request.contextPath}/users"
+        >
+          <input type="hidden" name="action" value="delete" />
+          <input
+            type="hidden"
+            id="userIdToDelete"
+            name="userIdToDelete"
+            value=""
+          />
+          <button type="button" class="btn btn-outline" id="cancelDeleteBtn">
+            Cancel
+          </button>
+          <button type="submit" class="btn btn-danger">Delete User</button>
+        </form>
       </div>
     </div>
 
-    <!-- JavaScript -->
     <script>
+      var contextPath = "${pageContext.request.contextPath}";
+      function dismissAlert(alertElement) {
+        if (alertElement) {
+          alertElement.classList.add("fade-out");
+          setTimeout(() => {
+            if (alertElement.parentNode) {
+              alertElement.parentNode.removeChild(alertElement);
+            }
+          }, 300); // Match animation duration
+        }
+      }
+
       document.addEventListener("DOMContentLoaded", function () {
-        // Modal elements
+        // ... auto-dismiss alerts ...
+        const alerts = document.querySelectorAll(".alert");
+        alerts.forEach((alert) => {
+          setTimeout(() => {
+            dismissAlert(alert);
+          }, 5000); // Dismiss after 5 seconds
+          const dismissButton = alert.querySelector(".dismiss-btn");
+          if (dismissButton && !dismissButton.getAttribute("onclick")) {
+            dismissButton.addEventListener("click", function () {
+              dismissAlert(alert);
+            });
+          }
+        });
+
         const modalBackdrop = document.getElementById("modalBackdrop");
-        const viewUserModal = document.getElementById("viewUserModal");
         const userFormModal = document.getElementById("userFormModal");
+        const viewUserModal = document.getElementById("viewUserModal");
         const deleteConfirmModal =
           document.getElementById("deleteConfirmModal");
 
-        // View user modal
-        const viewBtns = document.querySelectorAll(".view-btn");
-        viewBtns.forEach((btn) => {
-          btn.addEventListener("click", function () {
-            const userId = this.getAttribute("data-id");
-            viewUserModal.style.display = "block";
-            modalBackdrop.style.display = "block";
-          });
-        });
+        function openModal(modal) {
+          document.getElementById("modalBackdrop").style.display = "block";
+          modal.style.display = "block";
+          document.body.style.overflow = "hidden";
+        }
 
-        // Close view modal
+        function closeModal(modal) {
+          document.getElementById("modalBackdrop").style.display = "none";
+          modal.style.display = "none";
+          document.body.style.overflow = "";
+        }
+
+        function closeAllModals() {
+          modalBackdrop.style.display = "none";
+          if (userFormModal) userFormModal.style.display = "none";
+          if (viewUserModal) viewUserModal.style.display = "none";
+          if (deleteConfirmModal) deleteConfirmModal.style.display = "none";
+          document.body.style.overflow = "";
+        }
+
+        function fetchWithJsonErrorHandling(url) {
+          return fetch(url)
+            .then((response) => {
+              if (!response.ok) {
+                throw new Error(HTTP error! Status: ${response.status});
+              }
+              return response.text(); // Get as text first for debugging
+            })
+            .then((text) => {
+              try {
+                // Log the raw text for debugging
+                console.log("Raw response:", text);
+                return JSON.parse(text);
+              } catch (e) {
+                console.error("JSON parsing error:", e);
+                console.error("Response text was:", text);
+                throw new Error("Failed to parse server response as JSON");
+              }
+            });
+        }
+
+        // Modal close buttons
         document
-          .getElementById("closeViewModal")
-          .addEventListener("click", function () {
-            viewUserModal.style.display = "none";
-            modalBackdrop.style.display = "none";
-          });
-
+          .getElementById("closeFormModalBtn")
+          ?.addEventListener("click", () => closeModal(userFormModal));
+        document
+          .getElementById("cancelFormBtn")
+          ?.addEventListener("click", () => closeModal(userFormModal));
         document
           .getElementById("closeViewModalBtn")
-          .addEventListener("click", function () {
-            viewUserModal.style.display = "none";
-            modalBackdrop.style.display = "none";
+          ?.addEventListener("click", () => closeModal(viewUserModal));
+        document
+          .getElementById("closeViewModalFooterBtn")
+          ?.addEventListener("click", () => closeModal(viewUserModal));
+        document
+          .getElementById("closeDeleteModalBtn")
+          ?.addEventListener("click", () => closeModal(deleteConfirmModal));
+        document
+          .getElementById("cancelDeleteBtn")
+          ?.addEventListener("click", (e) => {
+            e.preventDefault();
+            closeModal(deleteConfirmModal);
           });
 
-        // Add new user
+        // Add New User button
         document
           .getElementById("newUserBtn")
-          .addEventListener("click", function () {
+          ?.addEventListener("click", function () {
             document.getElementById("userFormTitle").textContent =
               "Add New User";
             document.getElementById("userForm").reset();
+            document.getElementById("formAction").value = "add";
             document.getElementById("userId").value = "";
-            document.querySelector(".password-fields").style.display = "flex";
-            userFormModal.style.display = "block";
-            modalBackdrop.style.display = "block";
-          });
-
-        // Edit user
-        const editBtns = document.querySelectorAll(".edit-btn");
-        editBtns.forEach((btn) => {
-          btn.addEventListener("click", function () {
-            const userId = this.getAttribute("data-id");
-            document.getElementById("userFormTitle").textContent = "Edit User";
-            document.getElementById("userId").value = userId;
-            document.querySelector(".password-fields").style.display = "none";
-            viewUserModal.style.display = "none";
-
-            userFormModal.style.display = "block";
-            modalBackdrop.style.display = "block";
-          });
-        });
-
-        // Close user form modal
-        document
-          .getElementById("closeFormModal")
-          .addEventListener("click", function () {
-            userFormModal.style.display = "none";
-            modalBackdrop.style.display = "none";
-          });
-
-        document
-          .getElementById("cancelFormBtn")
-          .addEventListener("click", function () {
-            userFormModal.style.display = "none";
-            modalBackdrop.style.display = "none";
-          });
-
-        // Delete user
-        const deleteBtns = document.querySelectorAll(".delete-btn");
-        deleteBtns.forEach((btn) => {
-          btn.addEventListener("click", function () {
-            const userId = this.getAttribute("data-id");
+            document.getElementById("imgPreview").style.display = "none";
             document
-              .getElementById("confirmDeleteBtn")
-              .setAttribute("data-id", userId);
-            deleteConfirmModal.style.display = "block";
-            modalBackdrop.style.display = "block";
+              .getElementById("profilePreview")
+              .querySelector("i").style.display = "block";
+            document.getElementById("password").required = true;
+            document.getElementById("confirmPassword").required = true;
+            document.getElementById("passwordRequiredSpan").style.display =
+              "inline";
+            document.getElementById(
+              "confirmPasswordRequiredSpan"
+            ).style.display = "inline";
+            document.getElementById("passwordHelp").style.display = "none";
+            openModal(userFormModal);
+          });
+
+        // Edit User buttons
+        document.querySelectorAll(".edit-btn").forEach((button) => {
+          button.addEventListener("click", function () {
+            const userId = this.getAttribute("data-id");
+            fetchUserAndPopulateForm(userId);
           });
         });
 
-        // Close delete modal
+        // Edit from View Modal button
         document
-          .getElementById("closeDeleteModal")
-          .addEventListener("click", function () {
-            deleteConfirmModal.style.display = "none";
-            modalBackdrop.style.display = "none";
-          });
-
-        document
-          .getElementById("cancelDeleteBtn")
-          .addEventListener("click", function () {
-            deleteConfirmModal.style.display = "none";
-            modalBackdrop.style.display = "none";
-          });
-
-        // Confirm delete
-        document
-          .getElementById("confirmDeleteBtn")
-          .addEventListener("click", function () {
+          .querySelector(".edit-from-view-btn")
+          ?.addEventListener("click", function () {
             const userId = this.getAttribute("data-id");
-            alert(`User ${userId} has been deleted.`);
-            deleteConfirmModal.style.display = "none";
-            modalBackdrop.style.display = "none";
+            if (userId) {
+              closeModal(viewUserModal);
+              fetchUserAndPopulateForm(userId);
+            }
           });
 
-        document
-          .getElementById("saveUserBtn")
-          .addEventListener("click", function () {
-            const form = document.getElementById("userForm");
-            if (form.checkValidity()) {
-              const userId = document.getElementById("userId").value;
-              const isNewUser = !userId;
-              if (isNewUser) {
-                alert("New user has been created successfully!");
+        function fetchUserAndPopulateForm(userId) {
+          fetchWithJsonErrorHandling(
+            contextPath + "/users?action=getUserDetails&id=" + userId
+          )
+            .then((data) => {
+              // Rest of code stays the same
+              if (data.error) {
+                alert("Error fetching user details: " + data.error);
+                return;
+              }
+              document.getElementById("userFormTitle").textContent =
+                "Edit User";
+              document.getElementById("formAction").value = "update";
+              document.getElementById("userId").value = data.userId;
+              document.getElementById("firstName").value = data.firstName || "";
+              document.getElementById("lastName").value = data.lastName || "";
+              document.getElementById("phoneNumber").value =
+                data.phoneNumber || "";
+              document.getElementById("dob").value = data.dob || "";
+              document.getElementById("gender").value = data.gender || "";
+              document.getElementById("email").value = data.email || "";
+              document.getElementById("address").value = data.address || "";
+              document.getElementById("role").value = data.role || "";
+              document.getElementById("department").value =
+                data.department || "";
+              // Removed line for setting status field: document.getElementById("status").value = data.status;
+
+              const imgPreview = document.getElementById("imgPreview");
+              const iconPreview = document
+                .getElementById("profilePreview")
+                .querySelector("i");
+              if (data.profilePicture) {
+                imgPreview.src = contextPath + "/" + data.profilePicture;
+                imgPreview.style.display = "block";
+                iconPreview.style.display = "none";
               } else {
-                alert(`User ${userId} has been updated successfully!`);
+                imgPreview.src = "#"; // Clear previous image if any
+                imgPreview.style.display = "none";
+                iconPreview.style.display = "block";
               }
 
-              userFormModal.style.display = "none";
-              modalBackdrop.style.display = "none";
-            } else {
-              form.reportValidity();
-            }
-          });
+              document.getElementById("password").required = false;
+              document.getElementById("confirmPassword").required = false;
+              document.getElementById("passwordRequiredSpan").style.display =
+                "none";
+              document.getElementById(
+                "confirmPasswordRequiredSpan"
+              ).style.display = "none";
+              document.getElementById("passwordHelp").style.display = "block";
+              document.getElementById("password").value = "";
+              document.getElementById("confirmPassword").value = "";
 
-        // Toggle password visibility
-        const passwordToggles = document.querySelectorAll(".password-toggle");
-        passwordToggles.forEach((toggle) => {
-          toggle.addEventListener("click", function () {
-            const passwordField = this.previousElementSibling;
-            const type = passwordField.getAttribute("type");
+              openModal(userFormModal);
+            })
+            .catch((error) => {
+              console.error("Error in fetchUserAndPopulateForm:", error);
+              alert(
+                "Could not load user details for editing: " + error.message
+              );
+            });
+        }
 
-            if (type === "password") {
-              passwordField.setAttribute("type", "text");
-              this.innerHTML = '<i class="bi bi-eye-slash"></i>';
-            } else {
-              passwordField.setAttribute("type", "password");
-              this.innerHTML = '<i class="bi bi-eye"></i>';
-            }
+        // View User buttons
+        document.querySelectorAll(".view-btn").forEach((button) => {
+          button.addEventListener("click", function () {
+            const userId = this.getAttribute("data-id");
+            fetchWithJsonErrorHandling(
+              contextPath + "/users?action=getUserDetails&id=" + userId
+            )
+              .then((data) => {
+                if (data.error) {
+                  alert("Error fetching user details: " + data.error);
+                  return;
+                }
+                const modalBody = document.getElementById("viewUserModalBody");
+                const profilePicUrl = data.profilePicture
+                  ? contextPath + "/" + data.profilePicture
+                  : contextPath + "/assets/images/avatars/default-avatar.png";
+
+                // Avoid template literals with JSP expressions by concatenating instead
+                modalBody.innerHTML =
+                  '<div class="user-profile-header">' +
+                  '<div class="user-avatar-large">' +
+                  '<img src="' +
+                  profilePicUrl +
+                  '" alt="' +
+                  (data.firstName || "") +
+                  '" onerror="this.onerror=null;this.src=\'' +
+                  contextPath +
+                  "/assets/images/avatars/default-avatar.png';\"/>" +
+                  "</div>" +
+                  '<div class="user-profile-info">' +
+                  "<h3>" +
+                  (data.firstName || "") +
+                  " " +
+                  (data.lastName || "") +
+                  "</h3>" +
+                  '<span class="badge badge-' +
+                  ((data.role || "").toLowerCase() === "admin"
+                    ? "admin"
+                    : "staff") +
+                  '">' +
+                  (data.role || "N/A") +
+                  "</span>" +
+                  "<p>" +
+                  (data.department || "N/A") +
+                  "</p>" +
+                  "</div>" +
+                  "</div>" +
+                  '<div class="info-group">' +
+                  "<h4>Personal Information</h4>" +
+                  '<div class="info-row"><div class="info-label">User ID:</div><div class="info-value">USR-' +
+                  String(data.userId || "").padStart(3, "0") +
+                  "</div></div>" +
+                  '<div class="info-row"><div class="info-label">Full Name:</div><div class="info-value">' +
+                  (data.firstName || "") +
+                  " " +
+                  (data.lastName || "") +
+                  "</div></div>" +
+                  '<div class="info-row"><div class="info-label">Email:</div><div class="info-value">' +
+                  (data.email || "N/A") +
+                  "</div></div>" +
+                  '<div class="info-row"><div class="info-label">Phone:</div><div class="info-value">' +
+                  (data.phoneNumber || "N/A") +
+                  "</div></div>" +
+                  '<div class="info-row"><div class="info-label">DOB:</div><div class="info-value">' +
+                  (data.dob || "N/A") +
+                  "</div></div>" +
+                  '<div class="info-row"><div class="info-label">Gender:</div><div class="info-value">' +
+                  (data.gender || "N/A") +
+                  "</div></div>" +
+                  '<div class="info-row"><div class="info-label">Address:</div><div class="info-value">' +
+                  (data.address || "N/A") +
+                  "</div></div>" +
+                  "</div>" +
+                  '<div class="info-group">' +
+                  "<h4>Account Information</h4>" +
+                  '<div class="info-row"><div class="info-label">Role:</div><div class="info-value">' +
+                  (data.role || "N/A") +
+                  "</div></div>" +
+                  '<div class="info-row"><div class="info-label">Department:</div><div class="info-value">' +
+                  (data.department || "N/A") +
+                  "</div></div>" +
+                  "</div>";
+
+                document
+                  .querySelector("#viewUserModal .edit-from-view-btn")
+                  .setAttribute("data-id", data.userId);
+                openModal(viewUserModal);
+              })
+              .catch((error) => {
+                console.error("Error in view button handler:", error);
+                alert(
+                  "Could not load user details for viewing: " + error.message
+                );
+              });
           });
         });
 
-        document
-          .getElementById("profilePicture")
-          .addEventListener("change", function () {
-            const file = this.files[0];
-            if (file) {
-              const reader = new FileReader();
-              reader.onload = function (e) {
-                const preview = document.getElementById("profilePreview");
-                preview.innerHTML = `<img src="${e.target.result}" alt="Profile Preview">`;
-              };
-              reader.readAsDataURL(file);
-            }
-          });
-
-        document
-          .getElementById("uploadProfileBtn")
-          .addEventListener("click", function () {
-            document.getElementById("profilePicture").click();
-          });
-
-        // View toggle buttons
-        const viewToggleBtns = document.querySelectorAll(".view-toggle-btn");
-        viewToggleBtns.forEach((btn) => {
-          btn.addEventListener("click", function () {
-            viewToggleBtns.forEach((b) => b.classList.remove("active"));
-            this.classList.add("active");
-
-            const view = this.getAttribute("data-view");
-            document.querySelector(".card-title").textContent =
-              view === "all"
-                ? "All Users"
-                : view === "admin"
-                ? "Admin Users"
-                : view === "staff"
-                ? "Staff Users"
-                : view === "active"
-                ? "Active Users"
-                : "Inactive Users";
+        // Delete User buttons
+        document.querySelectorAll(".delete-btn").forEach((button) => {
+          button.addEventListener("click", function () {
+            const userId = this.getAttribute("data-id");
+            const userName = this.getAttribute("data-name");
+            document.getElementById("userIdToDelete").value = userId;
+            document.getElementById("userNameToDelete").textContent = userName;
+            openModal(deleteConfirmModal);
           });
         });
 
-        // Search functionality
-        document
-          .getElementById("searchUsers")
-          .addEventListener("input", function () {
-            const searchTerm = this.value.toLowerCase();
-          });
+        // User Form submission validation
+        // ... (existing validation logic, no changes needed for status removal here) ...
+        const userForm = document.getElementById("userForm");
+        userForm.addEventListener("submit", function (event) {
+          const action = document.getElementById("formAction").value;
+          const password = document.getElementById("password").value;
+          const confirmPassword =
+            document.getElementById("confirmPassword").value;
 
-        // Role filter
-        document
-          .getElementById("filterRole")
-          .addEventListener("change", function () {
-            const role = this.value;
-          });
+          if (action === "update") {
+            if (password || confirmPassword) {
+              if (password !== confirmPassword) {
+                alert("Passwords do not match.");
+                event.preventDefault();
+                return;
+              }
+              if (password.length > 0 && password.length < 6) {
+                alert("Password must be at least 6 characters long.");
+                event.preventDefault();
+                return;
+              }
+            }
+          } else {
+            if (password !== confirmPassword) {
+              alert("Passwords do not match.");
+              event.preventDefault();
+              return;
+            }
+            if (!password || password.length < 6) {
+              alert(
+                "Password is required and must be at least 6 characters long."
+              );
+              event.preventDefault();
+              return;
+            }
+          }
+        });
 
-        // Status filter
-        document
-          .getElementById("filterStatus")
-          .addEventListener("change", function () {
-            const status = this.value;
-          });
-
-        // Reset filters
-        document
-          .getElementById("resetFilters")
-          .addEventListener("click", function () {
-            document.getElementById("searchUsers").value = "";
-            document.getElementById("filterRole").value = "all";
-            document.getElementById("filterStatus").value = "all";
-          });
+        // Escape key to close modals
+        document.addEventListener("keydown", function (e) {
+          if (e.key === "Escape") {
+            closeAllModals();
+          }
+        });
       });
+
+      function previewImage(event) {
+        // ... (existing previewImage function) ...
+        const reader = new FileReader();
+        const imageField = document.getElementById("imgPreview");
+        const iconPreview = document
+          .getElementById("profilePreview")
+          .querySelector("i");
+
+        reader.onload = function () {
+          if (reader.readyState == 2) {
+            imageField.src = reader.result;
+            imageField.style.display = "block";
+            iconPreview.style.display = "none";
+          }
+        };
+        if (event.target.files[0]) {
+          reader.readAsDataURL(event.target.files[0]);
+        } else {
+          imageField.src = "#";
+          imageField.style.display = "none";
+          iconPreview.style.display = "block";
+        }
+      }
+
+      // Search/filter logic
+      document
+        .getElementById("searchUsers")
+        ?.addEventListener("input", applyFilters);
+      document
+        .getElementById("filterRole")
+        ?.addEventListener("change", applyFilters);
+      // Removed event listener for filterStatus
+      document.getElementById("resetFilters")?.addEventListener("click", () => {
+        document.getElementById("searchUsers").value = "";
+        document.getElementById("filterRole").value = "all";
+        // Removed reset for filterStatus
+        applyFilters();
+      });
+
+      function applyFilters() {
+        const searchTerm = document
+          .getElementById("searchUsers")
+          .value.toLowerCase();
+        const roleFilter = document.getElementById("filterRole").value;
+        // Removed statusFilter
+        let visibleCount = 0;
+
+        document.querySelectorAll("#usersTableBody tr").forEach((row) => {
+          if (!row.hasAttribute("data-user-id")) {
+            if (row.querySelector(".empty-state")) row.style.display = "none";
+            return;
+          }
+
+          const userNameElement = row.querySelector(".user-name");
+          const userEmailElement = row.querySelector(".user-email-small");
+
+          const name = userNameElement
+            ? userNameElement.textContent.toLowerCase()
+            : "";
+          const email = userEmailElement
+            ? userEmailElement.textContent.toLowerCase()
+            : "";
+
+          const userRole = row.getAttribute("data-role");
+          // Removed userStatus
+
+          const matchesSearch =
+            name.includes(searchTerm) || email.includes(searchTerm);
+          const matchesRole = roleFilter === "all" || userRole === roleFilter;
+          // Removed matchesStatus
+
+          if (matchesSearch && matchesRole) {
+            // Updated condition
+            row.style.display = "";
+            visibleCount++;
+          } else {
+            row.style.display = "none";
+          }
+        });
+
+        const emptyStateRow = document
+          .querySelector("#usersTableBody .empty-state")
+          ?.closest("tr");
+        if (emptyStateRow) {
+          if (
+            visibleCount === 0 &&
+            document.querySelectorAll("#usersTableBody tr[data-user-id]")
+              .length > 0
+          ) {
+            emptyStateRow.style.display = "";
+            emptyStateRow.querySelector(".empty-state-message").textContent =
+              "No users match your current filter criteria.";
+          } else if (
+            document.querySelectorAll("#usersTableBody tr[data-user-id]")
+              .length === 0
+          ) {
+            emptyStateRow.style.display = "";
+            emptyStateRow.querySelector(".empty-state-message").textContent =
+              "There are no users in the system yet.";
+          } else {
+            emptyStateRow.style.display = "none";
+          }
+        }
+      }
     </script>
   </body>
 </html>

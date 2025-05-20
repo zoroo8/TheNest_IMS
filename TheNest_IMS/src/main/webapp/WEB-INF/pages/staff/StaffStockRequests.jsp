@@ -8,6 +8,8 @@ pageEncoding="UTF-8"%>
         return;
     }
 %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -396,39 +398,28 @@ pageEncoding="UTF-8"%>
       </div>
       <div class="modal-body">
         <form id="newRequestForm">
-          <div class="row">
-            <div class="col-md-6">
-              <div class="form-group">
-                <label for="priority">Priority</label>
-                <select class="form-control" id="priority" required>
-                  <option value="">Select Priority</option>
-                  <option value="low">Low</option>
-                  <option value="medium">Medium</option>
-                  <option value="high">High</option>
-                </select>
-              </div>
-            </div>
-          </div>
 
           <div class="form-group">
             <label>Items</label>
             <div id="itemsList">
               <div class="item-row">
-                <select class="form-control item-select" required>
-                  <option value="">Select Item</option>
-                  <option value="1">Laptop Charger</option>
-                  <option value="2">Wireless Mouse</option>
-                  <option value="3">HDMI Cable</option>
-                  <option value="4">Keyboard</option>
-                  <option value="5">Monitor</option>
-                </select>
+                <select class="form-control" id="productSupplier" name="productSupplier" required>
+				  <option value="">Select Product</option>
+				 <c:forEach var="product" items="${products}">
+				    <option value="${product.id}" data-stock="${product.stock}">
+				      ${product.name}
+				    </option>
+				</c:forEach>
+				</select>
+				
                 <input
-                  type="number"
-                  class="form-control item-quantity"
-                  min="1"
-                  placeholder="Qty"
-                  required
-                />
+				  type="number"
+				  id="quantityInput"
+				  class="form-control item-quantity"
+				  min="1"
+				  placeholder="Qty"
+				  required
+				/>
                 <button type="button" class="btn btn-outline remove-item">
                   <i class="material-icons">delete</i>
                 </button>
@@ -497,6 +488,7 @@ pageEncoding="UTF-8"%>
             modalBackdrop.style.display = "block";
           });
         });
+        //Ends total stock display
 
         // Close view modal
         document
@@ -514,12 +506,122 @@ pageEncoding="UTF-8"%>
           });
 
         // New request modal
-        document
-          .getElementById("newRequestBtn")
-          .addEventListener("click", function () {
-            newRequestModal.style.display = "block";
-            modalBackdrop.style.display = "block";
-          });
+        const newRequestButton = document.getElementById("newRequestBtn");
+		if (newRequestButton) {
+		  console.log("newRequestBtn found");
+		  newRequestButton.addEventListener("click", function () {
+		    console.log("Add Request clicked");
+		    newRequestModal.style.display = "block";
+		    modalBackdrop.style.display = "block";
+		  });
+		} else {
+		  console.log("newRequestBtn NOT found");
+		}
+
+        
+        //Auto-fill stock quantity after selecting
+
+	  const itemsList = document.getElementById("itemsList");
+	  const addItemBtn = document.getElementById("addItemBtn");
+	
+	  // Function to create a new item row
+	  function createItemRow() {
+	    const div = document.createElement("div");
+	    div.className = "item-row";
+	
+	    // Create select element with products copied from the first one
+	    const firstSelect = document.querySelector("#itemsList .item-row select");
+	    const selectClone = firstSelect.cloneNode(true);
+	    selectClone.value = ""; // reset selection
+	
+	    // Create quantity input
+	    const quantityInput = document.createElement("input");
+	    quantityInput.type = "number";
+	    quantityInput.min = 1;
+	    quantityInput.placeholder = "Qty";
+	    quantityInput.required = true;
+	    quantityInput.className = "form-control item-quantity";
+	    quantityInput.disabled = true; // initially disabled
+	
+	    // Create remove button
+	    const removeBtn = document.createElement("button");
+	    removeBtn.type = "button";
+	    removeBtn.className = "btn btn-outline remove-item";
+	    removeBtn.innerHTML = '<i class="material-icons">delete</i>';
+	
+	    // Append children
+	    div.appendChild(selectClone);
+	    div.appendChild(quantityInput);
+	    div.appendChild(removeBtn);
+	
+	    // Add event listeners
+	    selectClone.addEventListener("change", onProductChange);
+	    quantityInput.addEventListener("input", onQuantityInput);
+	    removeBtn.addEventListener("click", () => {
+	      itemsList.removeChild(div);
+	    });
+	
+	    return div;
+	  }
+	
+	  // Event handler for product change
+	  function onProductChange(e) {
+	    const select = e.target;
+	    const selectedOption = select.options[select.selectedIndex];
+	    const quantityInput = select.nextElementSibling;
+	
+	    const stock = selectedOption.getAttribute("data-stock");
+	    const stockNum = parseInt(stock, 10);
+	
+	    if (!stock || isNaN(stockNum) || stockNum <= 0) {
+	      quantityInput.disabled = true;
+	      quantityInput.value = "";
+	      quantityInput.placeholder = "Out of stock";
+	      quantityInput.removeAttribute("max");
+	    } else {
+	      quantityInput.disabled = false;
+	      quantityInput.max = stockNum;
+	      quantityInput.value = 1;
+	      quantityInput.placeholder = `Max: ${stockNum}`;
+	    }
+	  }
+	
+	  // Event handler for quantity input
+	  function onQuantityInput(e) {
+	    const input = e.target;
+	    const max = input.max ? parseInt(input.max, 10) : null;
+	    const min = input.min ? parseInt(input.min, 10) : 1;
+	    let val = parseInt(input.value, 10);
+	
+	    if (isNaN(val) || val < min) {
+	      input.value = min;
+	    } else if (max !== null && val > max) {
+	      input.value = max;
+	    }
+	  }
+	
+	  // Initial wiring for existing item row
+	  const initialSelect = document.querySelector("#itemsList .item-row select");
+	  const initialQuantityInput = document.querySelector("#itemsList .item-row .item-quantity");
+	  const initialRemoveBtn = document.querySelector("#itemsList .item-row .remove-item");
+	
+	  initialQuantityInput.disabled = true; // disable quantity initially
+	
+	  initialSelect.addEventListener("change", onProductChange);
+	  initialQuantityInput.addEventListener("input", onQuantityInput);
+	
+	  initialRemoveBtn.addEventListener("click", () => {
+	    if (itemsList.children.length > 1) {
+	      itemsList.removeChild(initialSelect.parentElement);
+	    }
+	  });
+	
+	  // Add new item row on button click
+	  addItemBtn.addEventListener("click", () => {
+	    const newRow = createItemRow();
+	    itemsList.appendChild(newRow);
+	  });
+
 
         // Close new request modal
         document
@@ -537,45 +639,36 @@ pageEncoding="UTF-8"%>
           });
 
         // Add item row in new request form
-        document
-          .getElementById("addItemBtn")
-          .addEventListener("click", function () {
-            const itemsList = document.getElementById("itemsList");
-            const newItemRow = document.createElement("div");
-            newItemRow.className = "item-row";
-            newItemRow.innerHTML = `
-              <select class="form-control item-select" required>
-                <option value="">Select Item</option>
-                <option value="1">Laptop Charger</option>
-                <option value="2">Wireless Mouse</option>
-                <option value="3">HDMI Cable</option>
-                <option value="4">Keyboard</option>
-                <option value="5">Monitor</option>
-              </select>
-              <input type="number" class="form-control item-quantity" min="1" placeholder="Qty" required>
-              <button type="button" class="btn btn-outline remove-item">
-                <i class="material-icons">delete</i>
-              </button>
-            `;
-            itemsList.appendChild(newItemRow);
+        const productContainer = document.getElementById("productContainer");
+        const existing = productContainer.querySelector(".product-entry");
+        document.getElementById("addProductBtn").addEventListener("click", () => {
+        	  const clone = existing.cloneNode(true);
+        	  clone.querySelector("select").selectedIndex = 0;
+        	  clone.querySelector("input").value = "";
+        	  productContainer.appendChild(clone);
+        	});
 
-            // Event listener to the new remove button
-            newItemRow
-              .querySelector(".remove-item")
-              .addEventListener("click", function () {
-                itemsList.removeChild(newItemRow);
-              });
-          });
 
+        document.addEventListener("click", function (e) {
+        	  if (e.target.closest(".remove-item")) {
+        	    const entries = document.querySelectorAll(".product-entry");
+        	    if (entries.length > 1) {
+        	      e.target.closest(".product-entry").remove();
+        	    }
+        	  }
+        	});
+
+            
         // Remove item row
         document.querySelectorAll(".remove-item").forEach((btn) => {
-          btn.addEventListener("click", function () {
-            const itemRow = this.closest(".item-row");
-            if (document.querySelectorAll(".item-row").length > 1) {
-              itemRow.parentNode.removeChild(itemRow);
-            }
-          });
-        });
+		  btn.addEventListener("click", function () {
+		    const itemRow = this.closest(".item-row");
+		    if (document.querySelectorAll(".item-row").length > 1) {
+		      itemRow.parentNode.removeChild(itemRow);
+		    }
+		  });
+		});
+
 
         // Submit request form
         document
@@ -645,18 +738,20 @@ pageEncoding="UTF-8"%>
             const rows = document.querySelectorAll("tbody tr");
 
             if (view === "all") {
-              rows.forEach((row) => (row.style.display = ""));
-            } else {
-              rows.forEach((row) => {
-                const statusCell = row
-                  .querySelector("td:nth-child(6)")
-                  .textContent.toLowerCase();
-                if (statusCell.includes(view)) {
-                  row.style.display = "";
-                } else {
-                  row.style.display = "none";
-                }
-              });
+            	rows.forEach((row) => {
+          		  const statusCell = row.querySelector("td:nth-child(6)");
+          		  if (statusCell) {
+          		    const cellText = statusCell.textContent.toLowerCase();
+          		    if (cellText.includes(status)) {
+          		      row.style.display = "";
+          		    } else {
+          		      row.style.display = "none";
+          		    }
+          		  } else {
+          		    // Optional: Hide or keep the row if the cell doesn't exist
+          		    row.style.display = "none";
+          		  }
+          		});
             }
           });
         });
@@ -680,26 +775,27 @@ pageEncoding="UTF-8"%>
 
         // Filter by status
         document
-          .getElementById("filterStatus")
-          .addEventListener("change", function () {
-            const status = this.value;
-            const rows = document.querySelectorAll("tbody tr");
+		  .getElementById("filterStatus")
+		  .addEventListener("change", function () {
+		    const status = this.value;
+		    const rows = document.querySelectorAll("tbody tr");
+		
+		    if (status === "all") {
+		      rows.forEach((row) => (row.style.display = ""));
+		    } else {
+		      rows.forEach((row) => {
+		        const statusCell = row
+		          .querySelector("td:nth-child(6)")
+		          .textContent.toLowerCase();
+		        if (statusCell.includes(status)) {
+		          row.style.display = "";
+		        } else {
+		          row.style.display = "none";
+		        }
+		      });
+		    }
+		  });
 
-            if (status === "all") {
-              rows.forEach((row) => (row.style.display = ""));
-            } else {
-              rows.forEach((row) => {
-                const statusCell = row
-                  .querySelector("td:nth-child(6)")
-                  .textContent.toLowerCase();
-                if (statusCell.includes(status)) {
-                  row.style.display = "";
-                } else {
-                  row.style.display = "none";
-                }
-              });
-            }
-          });
 
         // Filter by priority
         document

@@ -11,6 +11,20 @@ public class SupplierModel {
     private String logo;
     private LocalDateTime createdAt;
 
+    public SupplierModel(int supplierId, String supplierName, String phoneNumber, String email,
+                         String address, String logo, LocalDateTime createdAt) {
+        this.supplierId = supplierId;
+        this.supplierName = supplierName;
+        this.phoneNumber = phoneNumber;
+        this.email = email;
+        this.address = address;
+        this.logo = logo;
+        this.createdAt = createdAt;
+    }
+
+    
+    public SupplierModel() {}
+    
     // Getters and Setters
     public int getSupplierId() {
         return supplierId;

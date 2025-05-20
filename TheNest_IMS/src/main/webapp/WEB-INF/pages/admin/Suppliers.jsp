@@ -557,9 +557,8 @@ response.sendRedirect("Error"); return; } %>
         const searchInput = document.getElementById("searchSuppliers");
         const sortSelect = document.getElementById("sortOptions");
         const resetFiltersBtn = document.getElementById("resetFilters");
-        const supplierRows = document.querySelectorAll(
-          "#suppliersTableBody tr"
-        );
+        const suppliersTableBody = document.getElementById("suppliersTableBody");
+        const supplierRows = suppliersTableBody.querySelectorAll("tr");
         const totalBadge = document.getElementById("visibleSuppliers");
 
         document.getElementById("totalSuppliers").textContent =
@@ -751,18 +750,8 @@ response.sendRedirect("Error"); return; } %>
               const id = row.getAttribute("data-id");
               console.log("Found parent row with data-id:", id);
 
-              const rowViaQuerySelector = document.querySelector(
-                #suppliersTableBody tr[data-id="${id}"]
-              );
-              if (!rowViaQuerySelector) {
-                console.warn(
-                  DIAGNOSTIC: querySelector still failed for #suppliersTableBody tr[data-id="${id}"]
-                );
-              } else {
-                console.log(
-                  "DIAGNOSTIC: querySelector check successful for this row."
-                );
-              }
+              const rowViaQuerySelector = suppliersTableBody.querySelector(`tr[data-id="${id}"]`);
+             
 
               if (
                 !viewSupplierModal ||

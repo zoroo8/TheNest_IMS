@@ -84,7 +84,7 @@ public class SupplierController extends HttpServlet {
             supplierService.addSupplier(supplier);
 
             // Redirect to a list page or success page - adjust URL accordingly
-            response.sendRedirect(request.getContextPath() + "//WEB-INF/pages/admin/Suppliers.jsp?success=Supplier added successfully");
+            response.sendRedirect(request.getContextPath() + "/admin/suppliers");
 
         } catch (Exception e) {
             e.printStackTrace();

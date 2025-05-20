@@ -5,10 +5,14 @@ public class CategoryModel {
     private String name;
     private String icon;
     private String description;
+    private int productCount; // This field is populated by a JOIN in CategoryService
+    private String lastUpdated; // This field is populated by a JOIN and formatted in CategoryService
 
-    // Constructors
-    public CategoryModel() {}
+    public CategoryModel() {
+        // Default constructor
+    }
 
+    // Constructor with essential fields (optional, but good practice)
     public CategoryModel(int id, String name, String icon, String description) {
         this.id = id;
         this.name = name;
@@ -16,37 +20,53 @@ public class CategoryModel {
         this.description = description;
     }
 
-	public int getId() {
-		return id;
-	}
+    // Getters
+    public int getId() {
+        return id;
+    }
 
-	public void setId(int id) {
-		this.id = id;
-	}
+    public String getName() {
+        return name;
+    }
 
-	public String getName() {
-		return name;
-	}
+    public String getIcon() {
+        return icon;
+    }
 
-	public void setName(String name) {
-		this.name = name;
-	}
+    public String getDescription() {
+        return description;
+    }
 
-	public String getIcon() {
-		return icon;
-	}
+    public int getProductCount() {
+        return productCount;
+    }
 
-	public void setIcon(String icon) {
-		this.icon = icon;
-	}
+    public String getLastUpdated() {
+        return lastUpdated;
+    }
 
-	public String getDescription() {
-		return description;
-	}
+    // Setters
+    public void setId(int id) {
+        this.id = id;
+    }
 
-	public void setDescription(String description) {
-		this.description = description;
-	}
-    
-    
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setIcon(String icon) {
+        this.icon = icon;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public void setProductCount(int productCount) {
+        this.productCount = productCount;
+    }
+
+    public void setLastUpdated(String lastUpdated) {
+        this.lastUpdated = lastUpdated;
+    }
 }

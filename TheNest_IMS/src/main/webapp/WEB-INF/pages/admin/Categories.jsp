@@ -60,7 +60,7 @@ uri="http://java.sun.com/jsp/jstl/core" %>
         </button>
       </div>
 
-      <!-- Stats Cards - Now Dynamic -->
+      <!-- Stats Cards -->
       <div class="stats-row">
         <div class="stat-card">
           <div class="stat-icon category-icon-stat">
@@ -117,7 +117,7 @@ uri="http://java.sun.com/jsp/jstl/core" %>
         </div>
       </div>
 
-      <!-- Categories Grid - Now Dynamic -->
+      <!-- Categories Grid -->
       <div class="categories-grid">
         <c:choose>
           <c:when test="${empty categories}">
@@ -157,6 +157,11 @@ uri="http://java.sun.com/jsp/jstl/core" %>
         <span class="category-label">Products</span>
         <span class="category-value">${category.productCount} items</span>
       </div>
+      <c:if test="${not empty category.description}">
+    <div class="category-description">
+      <p>${category.description}</p>
+    </div>
+  </c:if>
     </div>
     <div class="category-card-footer">
       <a
@@ -178,39 +183,73 @@ uri="http://java.sun.com/jsp/jstl/core" %>
       </a>
     </div>
   </div>
-            </c:forEach>
-          </c:otherwise>
-        </c:choose>
-      </div>
-      <!-- Pagination -->
-      <div class="pagination-container">
-        <ul class="pagination">
-          <li class="page-item">
-            <a href="#" class="page-link" aria-label="First">
-              <span aria-hidden="true">&laquo;&laquo; First</span>
-            </a>
-          </li>
-          <li class="page-item">
-            <a href="#" class="page-link" aria-label="Previous">
-              <span aria-hidden="true">&laquo; Previous</span>
-            </a>
-          </li>
-          <li class="page-item active"><a href="#" class="page-link">1</a></li>
-          <li class="page-item"><a href="#" class="page-link">2</a></li>
-          <li class="page-item"><a href="#" class="page-link">3</a></li>
-          <li class="page-item">
-            <a href="#" class="page-link" aria-label="Next">
-              <span aria-hidden="true">Next &raquo;</span>
-            </a>
-          </li>
-          <li class="page-item">
-            <a href="#" class="page-link" aria-label="Last">
-              <span aria-hidden="true">Last &raquo;&raquo;</span>
-            </a>
-          </li>
-        </ul>
-      </div>
-    </div>
+ </c:forEach>
+</c:otherwise>
+</c:choose>
+</div>
+
+<!-- Pagination -->
+<c:if test="${totalPages > 1}">
+  <div class="pagination-info">
+    <c:set var="start" value="${(currentPage-1) * pageSize + 1}"/>
+    <c:set var="end" value="${(currentPage * pageSize < stats.totalCategories) ? currentPage * pageSize : stats.totalCategories}"/>
+    Showing ${start} to ${end} of ${stats.totalCategories} categories
+  </div>
+  <div class="pagination-container">
+    <ul class="pagination">
+      <!-- First Page -->
+      <li class="page-item ${currentPage == 1 ? 'disabled' : ''}">
+        <a href="${pageContext.request.contextPath}/categories?page=1" 
+           class="page-link" 
+           aria-label="First"
+           ${currentPage == 1 ? 'tabindex="-1"' : ''}>
+          <span aria-hidden="true">&laquo;&laquo; First</span>
+        </a>
+      </li>
+
+      <!-- Previous Page -->
+      <li class="page-item ${currentPage == 1 ? 'disabled' : ''}">
+        <a href="${pageContext.request.contextPath}/categories?page=${currentPage - 1}" 
+           class="page-link" 
+           aria-label="Previous"
+           ${currentPage == 1 ? 'tabindex="-1"' : ''}>
+          <span aria-hidden="true">&laquo; Previous</span>
+        </a>
+      </li>
+
+      <!-- Page Numbers -->
+      <c:set var="beginPage" value="${(currentPage - 2 < 1) ? 1 : currentPage - 2}"/>
+      <c:set var="endPage" value="${(currentPage + 2 > totalPages) ? totalPages : currentPage + 2}"/>
+      <c:forEach var="i" begin="${beginPage}" end="${endPage}">
+        <li class="page-item ${i == currentPage ? 'active' : ''}">
+          <a href="${pageContext.request.contextPath}/categories?page=${i}" class="page-link">
+            ${i}
+          </a>
+        </li>
+      </c:forEach>
+
+      <!-- Next Page -->
+      <li class="page-item ${currentPage == totalPages ? 'disabled' : ''}">
+        <a href="${pageContext.request.contextPath}/categories?page=${currentPage + 1}" 
+           class="page-link" 
+           aria-label="Next"
+           ${currentPage == totalPages ? 'tabindex="-1"' : ''}>
+          <span aria-hidden="true">Next &raquo;</span>
+        </a>
+      </li>
+
+      <!-- Last Page -->
+      <li class="page-item ${currentPage == totalPages ? 'disabled' : ''}">
+        <a href="${pageContext.request.contextPath}/categories?page=${totalPages}" 
+           class="page-link" 
+           aria-label="Last"
+           ${currentPage == totalPages ? 'tabindex="-1"' : ''}>
+          <span aria-hidden="true">Last &raquo;&raquo;</span>
+        </a>
+      </li>
+    </ul>
+  </div>
+</c:if>
 
     <!-- Add/Edit Category Modal -->
     <div class="modal-backdrop" id="modalBackdrop"></div>
@@ -321,7 +360,7 @@ uri="http://java.sun.com/jsp/jstl/core" %>
       </div>
     </div>
 
-    <!-- Add CSS for alert messages -->
+    <!-- CSS for alert messages -->
     <style>
       .alert {
         padding: 12px 20px;
@@ -332,19 +371,19 @@ uri="http://java.sun.com/jsp/jstl/core" %>
         align-items: center;
         animation: fadeIn 0.3s ease-out;
       }
-    
+
       .alert-success {
         background-color: rgba(76, 175, 80, 0.1);
         color: var(--success-color);
         border-left: 4px solid var(--success-color);
       }
-    
+
       .alert-danger {
         background-color: rgba(66, 66, 66, 0.1);
         color: var(--danger-color);
         border-left: 4px solid var(--danger-color);
       }
-      
+
       .alert .dismiss-btn {
         position: absolute;
         right: 10px;
@@ -356,21 +395,21 @@ uri="http://java.sun.com/jsp/jstl/core" %>
         opacity: 0.6;
         transition: opacity 0.2s;
       }
-      
+
       .alert .dismiss-btn:hover {
         opacity: 1;
       }
-      
+
       @keyframes fadeIn {
         from { opacity: 0; transform: translateY(-10px); }
         to { opacity: 1; transform: translateY(0); }
       }
-      
+
       @keyframes fadeOut {
         from { opacity: 1; transform: translateY(0); }
         to { opacity: 0; transform: translateY(-10px); }
       }
-      
+
       .alert.fade-out {
         animation: fadeOut 0.3s ease-out forwards;
       }
@@ -389,7 +428,7 @@ uri="http://java.sun.com/jsp/jstl/core" %>
               }, 300);
             }
           }
-  // Auto-dismiss alerts after 3 seconds
+
   const alerts = document.querySelectorAll('.alert');
       if (alerts.length > 0) {
         alerts.forEach(alert => {
@@ -403,7 +442,6 @@ uri="http://java.sun.com/jsp/jstl/core" %>
         const filterProductCount =
           document.getElementById("filterProductCount");
 
-        // Modal elements
         const modalBackdrop = document.getElementById("modalBackdrop");
         const categoryModal = document.getElementById("categoryModal");
         const deleteModal = document.getElementById("deleteModal");
@@ -414,8 +452,14 @@ uri="http://java.sun.com/jsp/jstl/core" %>
         const cancelBtn = document.getElementById("cancelBtn");
         const cancelDeleteBtn = document.getElementById("cancelDeleteBtn");
 
-        // Form elements
         const categoryForm = document.getElementById("categoryForm");
+        if (categoryForm) {
+  categoryForm.addEventListener("submit", function(e) {
+
+    categoryName.value = categoryName.value.trim();
+    categoryDescription.value = categoryDescription.value.trim();
+  });
+}
         const categoryId = document.getElementById("categoryId");
         const categoryName = document.getElementById("categoryName");
         const categoryIcon = document.getElementById("categoryIcon");
@@ -429,7 +473,6 @@ uri="http://java.sun.com/jsp/jstl/core" %>
         const deleteCategoryName =
           document.getElementById("deleteCategoryName");
 
-        // Filter functionality
         function filterCategories() {
           const searchTerm = searchInput.value.toLowerCase();
           const productCountFilter = filterProductCount.value;
@@ -447,7 +490,6 @@ uri="http://java.sun.com/jsp/jstl/core" %>
             let showBySearch = name.includes(searchTerm);
             let showByCount = true;
 
-            // Apply product count filter
             if (productCountFilter !== "all") {
               if (productCountFilter === "high" && productCount < 30) {
                 showByCount = false;
@@ -474,9 +516,6 @@ uri="http://java.sun.com/jsp/jstl/core" %>
             }
           });
 
-         
-
-          // Show empty state if no results
           if (visibleCount === 0 && categoryCards.length > 0) {
             let emptyState = document.querySelector(".empty-state");
             if (!emptyState) {
@@ -501,7 +540,6 @@ uri="http://java.sun.com/jsp/jstl/core" %>
           }
         }
 
-        // Add event listeners for search and filter
         if (searchInput) {
           searchInput.addEventListener("input", filterCategories);
         }
@@ -510,7 +548,6 @@ uri="http://java.sun.com/jsp/jstl/core" %>
           filterProductCount.addEventListener("change", filterCategories);
         }
 
-        // Reset filters
         document
           .getElementById("resetFilters")
           .addEventListener("click", function () {
@@ -519,7 +556,6 @@ uri="http://java.sun.com/jsp/jstl/core" %>
             filterCategories();
           });
 
-        // Modal functionality
         function openModal(modal) {
           modalBackdrop.style.display = "block";
           modal.style.display = "block";
@@ -533,7 +569,6 @@ uri="http://java.sun.com/jsp/jstl/core" %>
           document.body.style.overflow = "";
         }
 
-        // Add Category button
         if (addCategoryBtn) {
           addCategoryBtn.addEventListener("click", function () {
             document.getElementById("modalTitle").textContent = "Add Category";
@@ -544,51 +579,66 @@ uri="http://java.sun.com/jsp/jstl/core" %>
           });
         }
 
-        // Edit Category buttons
-        document.querySelectorAll(".edit-category").forEach((button) => {
-          button.addEventListener("click", function (e) {
-            e.preventDefault();
-            const id = this.getAttribute("data-id");
-            const card = this.closest(".category-card");
-            const name = card.querySelector(".category-name").textContent;
-            const iconElement = card.querySelector(".category-icon i");
-            const iconClass = iconElement ? iconElement.className : "";
+document.querySelectorAll(".edit-category").forEach((button) => {
+  button.addEventListener("click", function (e) {
+    e.preventDefault();
+    const id = this.getAttribute("data-id");
+    const card = this.closest(".category-card");
+    const name = card.querySelector(".category-name").textContent.trim();
+    const iconElement = card.querySelector(".category-icon i");
+    const iconClass = iconElement ? iconElement.className : "";
 
-            document.getElementById("modalTitle").textContent = "Edit Category";
-            categoryId.value = id;
-            categoryName.value = name;
+    const descriptionElement = card.querySelector(".category-description p");
+    const descriptionFromCard = descriptionElement ? descriptionElement.textContent.trim() : null;
 
-            // Extract the icon class
-            if (iconClass) {
-              const iconValue = iconClass
-                .split(" ")
-                .find((cls) => cls.startsWith("bi-"));
-              if (iconValue) {
-                categoryIcon.value = iconValue;
-              }
-            }
+    document.getElementById("modalTitle").textContent = "Edit Category";
+    categoryId.value = id;
+    categoryName.value = name;
 
-            // Fetch description via AJAX or use the description from data attribute
-            fetch(
-              "${pageContext.request.contextPath}/categories?action=getCategory&id=" +
-                id
-            )
-              .then((response) => response.json())
-              .then((data) => {
-                categoryDescription.value = data.description || "";
-              })
-              .catch((error) => {
-                console.error("Error fetching category details:", error);
-                // fallback - set an empty description
-                categoryDescription.value = "";
-              });
+    if (iconClass) {
+      const iconValue = iconClass
+        .split(" ")
+        .find((cls) => cls.startsWith("bi-"));
+      if (iconValue) {
+        categoryIcon.value = iconValue;
+      }
+    }
 
-            updateIconPreview();
-            openModal(categoryModal);
-          });
+    if (descriptionFromCard) {
+      categoryDescription.value = descriptionFromCard;
+      updateIconPreview();
+      openModal(categoryModal);
+    } else {
+
+      categoryDescription.value = "Loading...";
+
+      fetch(
+        "${pageContext.request.contextPath}/categories?action=getCategory&id=" +
+          id
+      )
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error('Network response was not ok');
+          }
+          return response.json();
+        })
+        .then((data) => {
+
+          categoryDescription.value = data.description ? data.description.trim() : "";
+        })
+        .catch((error) => {
+          console.error("Error fetching category details:", error);
+
+          categoryDescription.value = "";
+          alert("Could not load category description. Please try again.");
         });
 
-        // Delete Category setup
+      updateIconPreview();
+      openModal(categoryModal);
+    }
+  });
+});
+
         document.querySelectorAll(".delete-category").forEach((button) => {
           button.addEventListener("click", function (e) {
             e.preventDefault();
@@ -605,20 +655,18 @@ uri="http://java.sun.com/jsp/jstl/core" %>
           });
         });
 
-        // Close modal buttons
         if (closeModal) closeModal.addEventListener("click", closeAllModals);
         if (closeDeleteModal)
           closeDeleteModal.addEventListener("click", closeAllModals);
           if (cancelBtn) {
   cancelBtn.addEventListener("click", function(e) {
-    e.preventDefault(); // Prevent form submission
+    e.preventDefault(); 
     closeAllModals();
   });
 }
         if (cancelDeleteBtn)
           cancelDeleteBtn.addEventListener("click", closeAllModals);
 
-        // Update icon preview
         function updateIconPreview() {
           const selectedIcon = categoryIcon.value;
           const iconPreview = document.querySelector(".icon-preview i");
@@ -630,13 +678,11 @@ uri="http://java.sun.com/jsp/jstl/core" %>
         if (categoryIcon) {
           categoryIcon.addEventListener("change", updateIconPreview);
 
-          // Initialize preview
           updateIconPreview();
         }
 
-        // Add keyboard shortcuts
         document.addEventListener("keydown", function (e) {
-          // Escape key closes modals
+
           if (e.key === "Escape") {
             closeAllModals();
           }

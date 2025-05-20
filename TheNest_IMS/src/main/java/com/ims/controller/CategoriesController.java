@@ -27,31 +27,118 @@ public class CategoriesController extends HttpServlet {
         categoryService = new CategoryService();
     }
 
-    @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-
-        HttpSession session = request.getSession(false);
-        if (session == null || !"admin".equals(session.getAttribute("role"))) {
-            response.sendRedirect(request.getContextPath() + "/login");
+    private void handleGetCategory(HttpServletRequest request, HttpServletResponse response) 
+        throws ServletException, IOException, SQLException, ClassNotFoundException {
+    
+    String idParam = request.getParameter("id");
+    if (idParam == null || idParam.isEmpty()) {
+        response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+        response.getWriter().write("{\"error\": \"Category ID is required\"}");
+        return;
+    }
+    
+    try {
+        int id = Integer.parseInt(idParam);
+        CategoryModel category = categoryService.getCategoryById(id);
+        
+        if (category == null) {
+            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+            response.getWriter().write("{\"error\": \"Category not found\"}");
             return;
         }
+        
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+        
+        String json = String.format(
+            "{\"id\": %d, \"name\": \"%s\", \"icon\": \"%s\", \"description\": \"%s\", \"productCount\": %d}",
+            category.getId(),
+            escapeJson(category.getName()),
+            escapeJson(category.getIcon()),
+            escapeJson(category.getDescription()),
+            category.getProductCount()
+        );
+        
+        response.getWriter().write(json);
+    } catch (NumberFormatException e) {
+        response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+        response.getWriter().write("{\"error\": \"Invalid category ID format\"}");
+    }
+}
 
-       try {
+private String escapeJson(String input) {
+    if (input == null) {
+        return "";
+    }
+    return input.replace("\\", "\\\\")
+                .replace("\"", "\\\"")
+                .replace("\n", "\\n")
+                .replace("\r", "\\r")
+                .replace("\t", "\\t");
+}
 
-            List<CategoryModel> categories = categoryService.getAllCategoriesWithProductCounts();
-            request.setAttribute("categories", categories);
-
-            Map<String, Object> stats = categoryService.getCategoryStatistics(); // Return type is now Map<String, Object>
-            request.setAttribute("stats", stats);
-
-        } catch (SQLException | ClassNotFoundException e) {
-            e.printStackTrace();
-            request.setAttribute("errorMessage", "Error fetching categories: " + e.getMessage());
+   @Override
+protected void doGet(HttpServletRequest request, HttpServletResponse response)
+        throws ServletException, IOException {
+    
+    HttpSession session = request.getSession();
+    
+    if (session == null || !"admin".equals(session.getAttribute("role"))) {
+        response.sendRedirect(request.getContextPath() + "/login");
+        return;
+    }
+    
+    try {
+        String action = request.getParameter("action");
+        
+        if ("getCategory".equals(action)) {
+            handleGetCategory(request, response);
+            return;
+        }
+        
+        int pageSize = 6;
+        int currentPage = 1;
+        
+        try {
+            String pageParam = request.getParameter("page");
+            if (pageParam != null && !pageParam.isEmpty()) {
+                currentPage = Integer.parseInt(pageParam);
+                if (currentPage < 1) {
+                    currentPage = 1;
+                }
+            }
+        } catch (NumberFormatException e) {
+            currentPage = 1;
         }
 
-        request.getRequestDispatcher("WEB-INF/pages/admin/Categories.jsp").forward(request, response);
+        CategoryService categoryService = new CategoryService();
+        Map<String, Object> stats = categoryService.getCategoryStats();
+        
+        int totalCategories = (Integer) stats.get("totalCategories");
+        int totalPages = (int) Math.ceil((double) totalCategories / pageSize);
+
+        if (totalPages > 0 && currentPage > totalPages) {
+            currentPage = totalPages;
+        }
+        
+        int offset = (currentPage - 1) * pageSize;
+        
+        List<CategoryModel> categories = categoryService.getCategoriesWithPagination(offset, pageSize);
+        
+        request.setAttribute("categories", categories);
+        request.setAttribute("stats", stats);
+        request.setAttribute("currentPage", currentPage);
+        request.setAttribute("totalPages", totalPages);
+        request.setAttribute("pageSize", pageSize);
+        
+        request.getRequestDispatcher("/WEB-INF/pages/admin/Categories.jsp").forward(request, response);
+        
+    } catch (SQLException | ClassNotFoundException e) {
+        e.printStackTrace();
+        session.setAttribute("errorMessage", "Database error: " + e.getMessage());
+        response.sendRedirect(request.getContextPath() + "/categories");
     }
+}
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
@@ -77,11 +164,11 @@ public class CategoriesController extends HttpServlet {
         } 
          catch (SQLIntegrityConstraintViolationException e) {
             e.printStackTrace();
-            // Check if the error message indicates a foreign key constraint failure
+           
             if (e.getMessage().toLowerCase().contains("foreign key constraint fails")) {
                 session.setAttribute("errorMessage", "Cannot delete category: It is currently associated with existing products. Please reassign or delete these products first.");
             } else {
-                // For other integrity constraint violations
+
                 session.setAttribute("errorMessage", "Database integrity error: " + e.getMessage());
             }
         }

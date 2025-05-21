@@ -4,6 +4,7 @@ import com.ims.config.DbConfig;
 import com.ims.model.UserModel;
 import com.ims.util.PasswordUtil;
 import java.sql.*;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -55,7 +56,13 @@ public class RegisterService {
             stmt.setString(paramIndex++, user.getFirstName());
             stmt.setString(paramIndex++, user.getLastName());
             stmt.setString(paramIndex++, user.getPhoneNumber());
-            stmt.setDate(paramIndex++, java.sql.Date.valueOf(user.getDob()));
+            LocalDate dob = user.getDob();
+            if (dob != null) {
+                stmt.setDate(paramIndex++, java.sql.Date.valueOf(dob));
+            } else {
+                stmt.setNull(paramIndex++, java.sql.Types.DATE);
+            }
+
             stmt.setString(paramIndex++, user.getGender());
             stmt.setString(paramIndex++, user.getEmail().trim().toLowerCase());
             stmt.setString(paramIndex++, user.getAddress());
@@ -82,7 +89,6 @@ public class RegisterService {
             return stmt.executeUpdate() > 0;
         }
     }
-
 
     // Delete user by ID
     public boolean deleteUser(int userId) throws SQLException, ClassNotFoundException {
@@ -166,6 +172,7 @@ public class RegisterService {
         if (rs.getDate("dob") != null) {
             user.setDob(rs.getDate("dob").toLocalDate());
         }
+        user.setPassword(rs.getString("password"));
         user.setGender(rs.getString("gender"));
         user.setEmail(rs.getString("email"));
         user.setAddress(rs.getString("address"));

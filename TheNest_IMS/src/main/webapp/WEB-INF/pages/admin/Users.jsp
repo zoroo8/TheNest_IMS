@@ -574,13 +574,14 @@ uri="http://java.sun.com/jsp/jstl/fmt" %>
                 <label for="department"
                   >Department <span class="required">*</span></label
                 >
-                <input
-                  type="text"
-                  class="form-control"
-                  id="department"
-                  name="department"
-                  required
-                />
+                <select id="department" 
+                  name="department" class="form-control">
+                      <option value="it" selected>IT Department</option>
+                      <option value="hr">HR Department</option>
+                      <option value="finance">Finance Department</option>
+                      <option value="operations">Operations</option>
+                      <option value="marketing">Marketing</option>
+                      </select>
               </div>
             </div>
             <%-- Removed Status Select Field from form --%>

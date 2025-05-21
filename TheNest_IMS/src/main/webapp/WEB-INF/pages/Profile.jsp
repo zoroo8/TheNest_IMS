@@ -1,5 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 pageEncoding="UTF-8"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -31,7 +33,22 @@ pageEncoding="UTF-8"%>
   </head>
   <body>
     <jsp:include page="components/Sidebar.jsp" />
-
+	<!-- Message Display Component -->
+	<c:if test="${not empty sessionScope.successMessage}">
+	    <div class="alert alert-success">
+	        <span>${sessionScope.successMessage}</span>
+	        <span class="dismiss-btn" onclick="this.parentElement.style.display='none';">&times;</span>
+	    </div>
+	    <c:remove var="successMessage" scope="session" />
+	</c:if>
+	
+	<c:if test="${not empty sessionScope.errorMessage}">
+	    <div class="alert alert-danger">
+	        <span>${sessionScope.errorMessage}</span>
+	        <span class="dismiss-btn" onclick="this.parentElement.style.display='none';">&times;</span>
+	    </div>
+	    <c:remove var="errorMessage" scope="session" />
+	</c:if>
     <!-- Main Content -->
     <div class="main-content">
       <div class="page-header">
@@ -47,18 +64,30 @@ pageEncoding="UTF-8"%>
         <div class="profile-card">
           <div class="profile-header">
             <div class="profile-avatar">
-              <img
-                src="${pageContext.request.contextPath}/assets/images/avatars/admin1.jpg"
+              <form id="avatarForm" method="POST" enctype="multipart/form-data" action="uploadProfileImage">
+				  <img
+                src="${pageContext.request.contextPath}/uploads/profiles/1747643028873_infinity.jpeg"
                 alt="Profile Picture"
-              />
+              />		  
+				</form>
               <div class="avatar-overlay">
                 <i class="bi bi-camera"></i>
               </div>
             </div>
             <div class="profile-info">
-              <h2 class="profile-name">John Doe</h2>
-              <span class="badge badge-admin">Administrator</span>
-              <p class="profile-email">john.doe@thenest.com</p>
+              <h2 class="profile-name"><c:out value="${user.firstName}" /> <c:out value="${user.lastName}" /></h2>
+              <c:choose>
+				    <c:when test="${user.role == 'admin'}">
+				        <span class="badge badge-admin">Administrator</span>
+				    </c:when>
+				    <c:when test="${user.role == 'staff'}">
+				        <span class="badge badge-staff">Staff</span>
+				    </c:when>
+				    <c:otherwise>
+				        <span class="badge badge-user">User</span>
+				    </c:otherwise>
+				</c:choose>
+              <p class="profile-email">${user.email}</p>
             </div>
           </div>
           <div class="profile-stats">
@@ -92,6 +121,8 @@ pageEncoding="UTF-8"%>
           <div class="tab-content">
             <!-- Personal Information Tab -->
             <div class="tab-pane active" id="personal-tab">
+            <form id="profileForm" action="${pageContext.request.contextPath}/profile" method="post">
+             <input type="hidden" name="action" value="updatePersonal" />
               <div class="form-section">
                 <h3 class="section-title">Personal Details</h3>
                 <div class="form-row">
@@ -100,8 +131,9 @@ pageEncoding="UTF-8"%>
                     <input
                       type="text"
                       id="firstName"
+               	      name="firstName"
                       class="form-control"
-                      value="John"
+       				  value="${user.firstName}"
                     />
                   </div>
                   <div class="form-group">
@@ -109,8 +141,9 @@ pageEncoding="UTF-8"%>
                     <input
                       type="text"
                       id="lastName"
+                      name="lastName"
                       class="form-control"
-                      value="Doe"
+                      value="${user.lastName}"
                     />
                   </div>
                 </div>
@@ -120,8 +153,9 @@ pageEncoding="UTF-8"%>
                     <input
                       type="email"
                       id="email"
+                      name="email"
                       class="form-control"
-                      value="john.doe@thenest.com"
+                      value="${user.email}"
                     />
                   </div>
                   <div class="form-group">
@@ -129,37 +163,41 @@ pageEncoding="UTF-8"%>
                     <input
                       type="tel"
                       id="phone"
+                      name="phone"
                       class="form-control"
-                      value="+1 (555) 123-4567"
+                      value="${user.phoneNumber}"
                     />
                   </div>
                 </div>
                 <div class="form-row">
                   <div class="form-group">
                     <label for="department">Department</label>
-                    <select id="department" class="form-control">
-                      <option value="it" selected>IT Department</option>
-                      <option value="hr">HR Department</option>
-                      <option value="finance">Finance Department</option>
-                      <option value="operations">Operations</option>
-                      <option value="marketing">Marketing</option>
-                    </select>
+                    <select id="department" name="department" class="form-control">
+			        <option value="it" ${user.department == 'it' ? 'selected' : ''}>IT Department</option>
+			        <option value="hr" ${user.department == 'hr' ? 'selected' : ''}>HR Department</option>
+			        <option value="finance" ${user.department == 'finance' ? 'selected' : ''}>Finance Department</option>
+			        <option value="operations" ${user.department == 'operations' ? 'selected' : ''}>Operations</option>
+			        <option value="marketing" ${user.department == 'marketing' ? 'selected' : ''}>Marketing</option>
+			      </select>
                   </div>
+                  
                   <div class="form-group">
                     <label for="position">Position</label>
-                    <input
-                      type="text"
-                      id="position"
-                      class="form-control"
-                      value="System Administrator"
-                    />
+                    <select class="form-control" id="position" name="position" required>
+			        	<option value="">Select Position</option>
+			        	<option value="admin" ${user.role == 'admin' ? 'selected' : ''}>System Administrator</option>
+			        	<option value="staff" ${user.role == 'staff' ? 'selected' : ''}>Warehouse Staff</option>
+			       </select>
                   </div>
                 </div>
               </div>
+              </form>
             </div>
 
             <!-- Change Password Tab -->
             <div class="tab-pane" id="password-tab">
+            <form id="passwordForm" method="POST" action="#">
+            <input type="hidden" name="action" value="changePassword" />
               <div class="form-section">
                 <h3 class="section-title">Change Password</h3>
                 <div class="password-requirements">
@@ -180,6 +218,7 @@ pageEncoding="UTF-8"%>
                     <input
                       type="password"
                       id="currentPassword"
+                      name="current_password"
                       class="form-control"
                       placeholder="Enter your current password"
                     />
@@ -194,6 +233,7 @@ pageEncoding="UTF-8"%>
                     <input
                       type="password"
                       id="newPassword"
+                      name="new_password"
                       class="form-control"
                       placeholder="Enter your new password"
                     />
@@ -214,21 +254,20 @@ pageEncoding="UTF-8"%>
                     <input
                       type="password"
                       id="confirmPassword"
+                      name="confirm_password"
                       class="form-control"
                       placeholder="Confirm your new password"
                     />
-                    <button class="password-toggle" type="button">
-                      <i class="bi bi-eye"></i>
-                    </button>
+                  
                   </div>
                 </div>
-                <button class="btn btn-primary" id="changePasswordBtn">
-                  <i class="bi bi-shield-check"></i> Update Password
-                </button>
+                
               </div>
+             </form>
             </div>
-
             </div>
+           </div>
+    </div>
     </div>
 
     <!-- JavaScript -->
@@ -272,11 +311,28 @@ pageEncoding="UTF-8"%>
             }
           });
         });
-
+        
+     // Auto-dismiss alerts after 5 seconds
+        const alerts = document.querySelectorAll(".alert");
+        alerts.forEach((alert) => {
+            setTimeout(() => {
+                if (alert && alert.parentNode) {
+                    alert.style.display = "none";
+                }
+            }, 5000);
+        });
+        
         // Save changes button
         document
           .getElementById("saveChangesBtn")
           .addEventListener("click", function () {
+        	const profileForm = document.getElementById("profileForm");
+        	const passwordForm = document.getElementById("passwordForm");
+        	if (profileForm.offsetParent !== null) {
+        	      profileForm.submit(); // profile form is visible
+        	    } else if (passwordForm.offsetParent !== null) {
+        	      passwordForm.submit(); // password form is visible
+        	    }
             alert("Profile changes saved successfully!");
           });
 

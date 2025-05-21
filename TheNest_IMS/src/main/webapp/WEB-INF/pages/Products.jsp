@@ -220,25 +220,27 @@ prefix="fn" %> <% Integer userId = (Integer) session.getAttribute("userId"); if
                   </th>
                   <th>Category</th>
                   <th>Price (Rs)</th>
+                  <th>Supplier</th>
                   <th>Actions</th>
                 </tr>
               </thead>
               <tbody>
                 <c:forEach items="${products}" var="product">
-                  <tr class="category-${fn:toLowerCase(product.categoryName)}" data-supplier-id="${product.supplierId}" data-category-id="${product.categoryId}" data-product-id="${product.productId}" data-description="<c:out value="${product.description}"/>" data-supplier-name="<c:out value="${product.supplierName}"/>" data-category-name="<c:out value="${product.categoryName}"/>">
+                  <tr class="category-${fn:toLowerCase(product.categoryName)}" 
+                      data-supplier-id="${product.supplierId}" 
+                      data-category-id="${product.categoryId}" 
+                      data-product-id="${product.productId}" 
+                      data-description="<c:out value="${product.description}"/>" 
+                      data-supplier-name="<c:out value="${product.supplierName}"/>" 
+                      data-category-name="<c:out value="${product.categoryName}"/>"
+                      data-import-id="${product.importId}">
                     <td><c:out value="${product.productName}" /></td>
                     <td><c:out value="${product.stock}" /></td>
                     <td>
-                      <c:forEach items="${categories}" var="category">
-                        <c:if test="${category.id == product.categoryId}">
-                          <span
-                            class="badge badge-${fn:toLowerCase(category.name)}"
-                            ><c:out value="${category.name}"
-                          /></span>
-                        </c:if>
-                      </c:forEach>
+                      <span class="badge badge-${fn:toLowerCase(product.categoryName)}"><c:out value="${product.categoryName}"/></span>
                     </td>
                     <td><c:out value="${product.price}" /></td>
+                    <td><c:out value="${product.supplierName}" /></td> 
                     <td>
                       <div class="action-buttons">
                         <button
@@ -496,6 +498,10 @@ prefix="fn" %> <% Integer userId = (Integer) session.getAttribute("userId"); if
 
     <!-- JavaScript for functionality -->
     <script>
+      // Note: The error "net::ERR_INCOMPLETE_CHUNKED_ENCODING" is typically a server-side or network issue.
+      // Review server logs and server-side code (Servlets, JSPs) for errors during response generation.
+      // The following JavaScript updates address client-side logic and robustness.
+
       document.addEventListener("DOMContentLoaded", function () {
         // Elements
         const searchInput = document.getElementById("searchProducts");
@@ -503,29 +509,23 @@ prefix="fn" %> <% Integer userId = (Integer) session.getAttribute("userId"); if
         const supplierFilter = document.getElementById("filterSupplier");
         const resetFiltersBtn = document.getElementById("resetFilters");
         const viewToggleBtns = document.querySelectorAll(".view-toggle-btn");
-        const productRows = document.querySelectorAll("tbody tr");
-        const totalBadge = document.querySelector(".badge-primary");
+        const totalBadge = document.querySelector(".card-header .badge-primary");
 
         // Modal elements
         const modalBackdrop = document.getElementById("modalBackdrop");
         const productModal = document.getElementById("productModal");
         const viewProductModal = document.getElementById("viewProductModal");
         const deleteModal = document.getElementById("deleteModal");
-        const closeModal = document.getElementById("closeModal");
-        const closeViewModal = document.getElementById("closeViewModal");
-        const closeDeleteModal = document.getElementById("closeDeleteModal");
+        const closeModalBtn = document.getElementById("closeModal");
+        const closeViewModalBtn = document.getElementById("closeViewModal");
+        const closeDeleteModalBtn = document.getElementById("closeDeleteModal");
         const addProductBtn = document.getElementById("addProductBtn");
-        const saveProductBtn = document.getElementById("saveProductBtn");
+        const saveProductBtn = document.getElementById("saveProductBtn"); // This is the button of type="submit"
         const cancelBtn = document.getElementById("cancelBtn");
         const closeViewBtn = document.getElementById("closeViewBtn");
         const editFromViewBtn = document.getElementById("editFromViewBtn");
         const cancelDeleteBtn = document.getElementById("cancelDeleteBtn");
         const confirmDeleteBtn = document.getElementById("confirmDeleteBtn");
-
-        // Action buttons
-        const viewButtons = document.querySelectorAll(".view-btn");
-        const editButtons = document.querySelectorAll(".edit-btn");
-        const deleteButtons = document.querySelectorAll(".delete-btn");
 
         // Form elements
         const productForm = document.getElementById("productForm");
@@ -535,106 +535,66 @@ prefix="fn" %> <% Integer userId = (Integer) session.getAttribute("userId"); if
         const productQuantity = document.getElementById("productQuantity");
         const productPrice = document.getElementById("productPrice");
         const productSupplier = document.getElementById("productSupplier");
-        const productDescription =
-          document.getElementById("productDescription");
+        const productDescription = document.getElementById("productDescription");
         const productImportSelect = document.getElementById("productImport");
 
         // View elements
         const viewProductName = document.getElementById("viewProductName");
-        const viewProductCategory = document.getElementById(
-          "viewProductCategory"
-        );
-        const viewProductQuantity = document.getElementById(
-          "viewProductQuantity"
-        );
+        const viewProductCategory = document.getElementById("viewProductCategory");
+        const viewProductQuantity = document.getElementById("viewProductQuantity");
         const viewProductPrice = document.getElementById("viewProductPrice");
-        const viewProductSupplier = document.getElementById(
-          "viewProductSupplier"
-        );
-        const viewProductDescription = document.getElementById(
-          "viewProductDescription"
-        );
+        const viewProductSupplier = document.getElementById("viewProductSupplier");
+        const viewProductDescription = document.getElementById("viewProductDescription");
 
         // Delete elements
         const deleteProductName = document.getElementById("deleteProductName");
 
-        // Search and filter functionality
-        function filterProducts() {
-          const searchTerm = searchInput.value.toLowerCase();
-          const categoryValue = categoryFilter.value; // This is already lowercase category name
-          const supplierValue = supplierFilter.value; // This will be supplier ID or "all"
-          const activeView = document
-            .querySelector(".view-toggle-btn.active")
-            .getAttribute("data-view");
+        let currentViewedRowElement = null;
 
+        function filterProducts() {
+          const currentProductRows = document.querySelectorAll("tbody tr");
+          const searchTerm = searchInput.value.toLowerCase();
+          const categoryValue = categoryFilter.value;
+          const supplierValue = supplierFilter.value;
+          const activeViewElement = document.querySelector(".view-toggle-btn.active");
+          const activeView = activeViewElement ? activeViewElement.getAttribute("data-view") : "all";
           let visibleCount = 0;
 
-          productRows.forEach((row) => {
+          currentProductRows.forEach((row) => {
             const productNameText = row.cells[0].textContent.toLowerCase();
-            const categoryClass = row.className; // e.g., "category-groceries"
+            const rowCategoryClass = row.className;
             const supplierIdFromRow = row.dataset.supplierId;
-
-            // Check if product matches search term
             const matchesSearch = productNameText.includes(searchTerm);
+            const matchesCategory = categoryValue === "all" || rowCategoryClass.includes("category-" + categoryValue);
+            const matchesSupplier = supplierValue === "all" || supplierIdFromRow === supplierValue;
+            const matchesView = activeView === "all" || rowCategoryClass.includes("category-" + activeView);
 
-            // Check if product matches category filter (uses category name from class)
-            const matchesCategory =
-              categoryValue === "all" ||
-              categoryClass.includes("category-" + categoryValue);
-
-            // Check if product matches supplier filter (uses supplier ID)
-            const matchesSupplier = 
-              supplierValue === "all" || 
-              supplierIdFromRow === supplierValue;
-
-            // Check if product matches view toggle (uses category name from class)
-            const matchesView =
-              activeView === "all" ||
-              categoryClass.includes("category-" + activeView);
-
-            // Show or hide the row based on all filters
-            if (
-              matchesSearch &&
-              matchesCategory &&
-              matchesSupplier &&
-              matchesView
-            ) {
+            if (matchesSearch && matchesCategory && matchesSupplier && matchesView) {
               row.style.display = "";
               visibleCount++;
             } else {
               row.style.display = "none";
             }
           });
-
-          // Update the total products count in the badge
-          if (totalBadge) {
-            totalBadge.textContent = Total: ${visibleCount} Products;
-          }
+          if (totalBadge) totalBadge.textContent = `Total: ${visibleCount} Products`;
         }
 
-        // Add event listeners for search and filters
-        if (searchInput) {
-          searchInput.addEventListener("input", filterProducts);
-        }
-
-        if (categoryFilter) {
-          categoryFilter.addEventListener("change", filterProducts);
-        }
-
-        if (supplierFilter) {
-          supplierFilter.addEventListener("change", filterProducts);
-        }
+        if (searchInput) searchInput.addEventListener("input", filterProducts);
+        if (categoryFilter) categoryFilter.addEventListener("change", filterProducts);
+        if (supplierFilter) supplierFilter.addEventListener("change", filterProducts);
 
         if (resetFiltersBtn) {
           resetFiltersBtn.addEventListener("click", function () {
-            searchInput.value = "";
-            categoryFilter.value = "all";
-            supplierFilter.value = "all";
+            if (searchInput) searchInput.value = "";
+            if (categoryFilter) categoryFilter.value = "all";
+            if (supplierFilter) supplierFilter.value = "all";
+            viewToggleBtns.forEach(btn => btn.classList.remove("active"));
+            const allProductsToggle = document.querySelector('.view-toggle-btn[data-view="all"]');
+            if (allProductsToggle) allProductsToggle.classList.add("active");
             filterProducts();
           });
         }
 
-        // View toggle functionality
         viewToggleBtns.forEach((btn) => {
           btn.addEventListener("click", function () {
             viewToggleBtns.forEach((b) => b.classList.remove("active"));
@@ -643,450 +603,214 @@ prefix="fn" %> <% Integer userId = (Integer) session.getAttribute("userId"); if
           });
         });
 
-        // Sort functionality
         const sortableHeaders = document.querySelectorAll("th.sortable");
         sortableHeaders.forEach((header) => {
           header.addEventListener("click", function () {
-            const isAscending =
-              this.querySelector("i").classList.contains("bi-caret-up-fill");
+            const icon = this.querySelector("i");
+            const isAscending = icon && icon.classList.contains("bi-caret-up-fill");
             sortTable(this, !isAscending);
           });
         });
 
         function sortTable(header, ascending) {
           const table = header.closest("table");
-          const columnIndex = Array.from(header.parentNode.children).indexOf(
-            header
-          );
-          const rows = Array.from(table.querySelectorAll("tbody tr"));
-
-          // Update sort icon
-          const icons = document.querySelectorAll("th.sortable i");
-          icons.forEach((icon) => {
-            icon.className = "bi bi-caret-down-fill";
-          });
-
+          const tbody = table.querySelector("tbody");
+          if (!tbody) return;
+          const columnIndex = Array.from(header.parentNode.children).indexOf(header);
+          const rows = Array.from(tbody.querySelectorAll("tr"));
+          document.querySelectorAll("th.sortable i").forEach((icon) => icon.className = "bi bi-caret-down-fill");
           const currentIcon = header.querySelector("i");
-          currentIcon.className = ascending
-            ? "bi bi-caret-up-fill"
-            : "bi bi-caret-down-fill";
+          if (currentIcon) currentIcon.className = ascending ? "bi bi-caret-up-fill" : "bi bi-caret-down-fill";
 
-          // Sort rows
           rows.sort((a, b) => {
             let aValue = a.cells[columnIndex].textContent.trim();
             let bValue = b.cells[columnIndex].textContent.trim();
-
-            // Check if values are numbers
-            if (!isNaN(aValue) && !isNaN(bValue)) {
+            if (!isNaN(parseFloat(aValue)) && !isNaN(parseFloat(bValue))) {
               aValue = parseFloat(aValue);
               bValue = parseFloat(bValue);
             } else {
               aValue = aValue.toLowerCase();
               bValue = bValue.toLowerCase();
             }
-
-            if (aValue < bValue) {
-              return ascending ? -1 : 1;
-            }
-            if (aValue > bValue) {
-              return ascending ? 1 : -1;
-            }
+            if (aValue < bValue) return ascending ? -1 : 1;
+            if (aValue > bValue) return ascending ? 1 : -1;
             return 0;
           });
-
-          // Reappend rows in the new order
-          const tbody = table.querySelector("tbody");
           rows.forEach((row) => tbody.appendChild(row));
         }
 
-        // Modal functionality
         function openModal(modal) {
-          modalBackdrop.style.display = "block";
-          modal.style.display = "block";
+          if (modalBackdrop) modalBackdrop.style.display = "block";
+          if (modal) modal.style.display = "block";
           document.body.style.overflow = "hidden";
         }
 
         function closeAllModals() {
-          modalBackdrop.style.display = "none";
-          productModal.style.display = "none";
-          viewProductModal.style.display = "none";
-          deleteModal.style.display = "none";
+          if (modalBackdrop) modalBackdrop.style.display = "none";
+          if (productModal) productModal.style.display = "none";
+          if (viewProductModal) viewProductModal.style.display = "none";
+          if (deleteModal) deleteModal.style.display = "none";
           document.body.style.overflow = "";
+          currentViewedRowElement = null;
         }
 
-        // Add Product button
         if (addProductBtn) {
           addProductBtn.addEventListener("click", function () {
-            document.getElementById("modalTitle").textContent =
-              "Add New Product";
+            document.getElementById("modalTitle").textContent = "Add New Product";
             productForm.reset();
             productId.value = "";
+            if (productImportSelect && typeof productImportSelect._productImportChangeListener === 'function') {
+              productImportSelect.value = "";
+              productImportSelect._productImportChangeListener.call(productImportSelect);
+            }
+            if (productQuantity) productQuantity.disabled = true;
             openModal(productModal);
           });
         }
 
-        // View Product buttons
-        viewButtons.forEach((button) => {
-          button.addEventListener("click", function () {
-            const productId = this.getAttribute("data-id");
-            const row = this.closest("tr");
+        function attachActionListeners(row) {
+          const viewBtn = row.querySelector(".view-btn");
+          const editBtn = row.querySelector(".edit-btn");
+          const deleteBtn = row.querySelector(".delete-btn");
 
-            // Populate view modal with data from the row
-            viewProductName.textContent = row.cells[0].textContent;
-            viewProductCategory.textContent =
-              row.cells[2].querySelector(".badge").textContent;
-            viewProductQuantity.textContent = row.cells[1].textContent;
-            viewProductPrice.textContent = "Rs " + row.cells[3].textContent;
-            // viewProductSupplier.textContent = "Supplier 1"; // Example data removed
-            // viewProductDescription.textContent =
-            //   "This is a sample description for " + row.cells[0].textContent; // Example data removed
+          if (viewBtn) {
+            viewBtn.addEventListener("click", function () {
+              const currentRow = this.closest("tr");
+              currentViewedRowElement = currentRow;
+              viewProductName.textContent = currentRow.cells[0].textContent;
+              viewProductCategory.textContent = currentRow.dataset.categoryName || currentRow.cells[2].querySelector(".badge").textContent;
+              viewProductQuantity.textContent = currentRow.cells[1].textContent;
+              viewProductPrice.textContent = "Rs " + currentRow.cells[3].textContent;
+              viewProductSupplier.textContent = currentRow.dataset.supplierName || "N/A";
+              viewProductDescription.textContent = currentRow.dataset.description || "N/A";
+              openModal(viewProductModal);
+            });
+          }
 
-            // Fetch actual supplier and description if available, or leave blank/placeholder
-            viewProductSupplier.textContent = ""; // Or fetch from data attribute if available
-            viewProductDescription.textContent = ""; // Or fetch from data attribute if available
+          if (editBtn) {
+            editBtn.addEventListener("click", function () {
+              const currentRow = this.closest("tr");
+              document.getElementById("modalTitle").textContent = "Edit Product";
+              productId.value = currentRow.dataset.productId;
+              productName.value = currentRow.cells[0].textContent;
+              productQuantity.value = currentRow.cells[1].textContent;
+              productPrice.value = currentRow.cells[3].textContent;
+              if (productCategory) productCategory.value = currentRow.dataset.categoryId || "";
+              if (productSupplier) productSupplier.value = currentRow.dataset.supplierId || "";
+              if (productDescription) productDescription.value = currentRow.dataset.description || "";
+              if (productImportSelect) {
+                productImportSelect.value = currentRow.dataset.importId || "";
+                if (typeof productImportSelect._productImportChangeListener === 'function') {
+                  productImportSelect._productImportChangeListener.call(productImportSelect);
+                }
+              }
+              openModal(productModal);
+            });
+          }
 
-            openModal(viewProductModal);
-          });
-        });
+          if (deleteBtn) {
+            deleteBtn.addEventListener("click", function () {
+              const currentRow = this.closest("tr");
+              const prodId = this.getAttribute("data-id");
+              deleteProductName.textContent = currentRow.cells[0].textContent;
+              confirmDeleteBtn.setAttribute("data-id", prodId);
+              openModal(deleteModal);
+            });
+          }
+        }
 
-        // Edit Product buttons
-        editButtons.forEach((button) => {
-          button.addEventListener("click", function () {
-            const productIdValue = this.getAttribute("data-id"); // Renamed to avoid conflict
-            const row = this.closest("tr");
+        document.querySelectorAll("tbody tr").forEach(row => attachActionListeners(row));
 
-            document.getElementById("modalTitle").textContent = "Edit Product";
-
-            // Populate form with data from the row
-            productId.value = productIdValue; // Use the renamed variable
-            productName.value = row.cells[0].textContent;
-            productQuantity.value = row.cells[1].textContent;
-            productPrice.value = row.cells[3].textContent;
-
-            // Set category based on badge class
-            const categoryBadge = row.cells[2].querySelector(".badge");
-            const categoryClass = categoryBadge.className;
-            let categoryValue = ""; // Variable to hold the category value
-
-            if (categoryClass.includes("badge-groceries")) {
-              categoryValue = "groceries";
-            } else if (categoryClass.includes("badge-furnitures")) {
-              categoryValue = "furnitures";
-            } else if (categoryClass.includes("badge-beverages")) {
-              categoryValue = "beverages";
-            } else if (categoryClass.includes("badge-clothing")) {
-              categoryValue = "clothing";
-            } else if (categoryClass.includes("badge-electronics")) {
-              categoryValue = "electronics";
-            }
-            // Ensure productCategory element exists before setting its value
-            if (productCategory) {
-              productCategory.value = categoryValue;
-            }
-
-            // Example data for supplier and description removed
-            // document.getElementById("productSupplier").value = "supplier1";
-            // document.getElementById("productDescription").value =
-            //   "This is a sample description for " + row.cells[0].textContent;
-
-            // Clear or fetch actual supplier and description
-            if (productSupplier) {
-              productSupplier.value = ""; // Or fetch from data attribute if available
-            }
-            if (productDescription) {
-              productDescription.value = ""; // Or fetch from data attribute if available
-            }
-
-            openModal(productModal);
-          });
-        });
-
-        // Delete Product buttons
-        deleteButtons.forEach((button) => {
-          button.addEventListener("click", function () {
-            const productId = this.getAttribute("data-id");
-            const row = this.closest("tr");
-
-            deleteProductName.textContent = row.cells[0].textContent;
-            openModal(deleteModal);
-
-            // Store the product ID for the delete confirmation
-            confirmDeleteBtn.setAttribute("data-id", productId);
-          });
-        });
-
-        // Edit from view button
         if (editFromViewBtn) {
           editFromViewBtn.addEventListener("click", function () {
+            if (!currentViewedRowElement) {
+              alert("Error: No product selected or product data is missing.");
+              return;
+            }
+            const rowToEdit = currentViewedRowElement;
             closeAllModals();
-
             document.getElementById("modalTitle").textContent = "Edit Product";
-
-            productName.value = viewProductName.textContent;
-
-            // Extract category from view modal
-            const categoryText = viewProductCategory.textContent.toLowerCase();
-            let categoryValue = "";
-            if (categoryText === "groceries") {
-              categoryValue = "groceries";
-            } else if (categoryText === "furnitures") {
-              categoryValue = "furnitures";
-            } else if (categoryText === "beverages") {
-              categoryValue = "beverages";
-            } else if (categoryText === "clothing") {
-              categoryValue = "clothing";
-            } else if (categoryText === "electronics") {
-              categoryValue = "electronics";
+            productId.value = rowToEdit.dataset.productId;
+            productName.value = rowToEdit.cells[0].textContent;
+            productQuantity.value = rowToEdit.cells[1].textContent;
+            productPrice.value = rowToEdit.cells[3].textContent;
+            if (productCategory) productCategory.value = rowToEdit.dataset.categoryId || "";
+            if (productSupplier) productSupplier.value = rowToEdit.dataset.supplierId || "";
+            if (productDescription) productDescription.value = rowToEdit.dataset.description || "";
+            if (productImportSelect) {
+              productImportSelect.value = rowToEdit.dataset.importId || "";
+              if (typeof productImportSelect._productImportChangeListener === 'function') {
+                productImportSelect._productImportChangeListener.call(productImportSelect);
+              }
             }
-            if (productCategory) {
-              productCategory.value = categoryValue;
-            }
-
-            // Extract quantity from view modal
-            productQuantity.value = viewProductQuantity.textContent;
-
-            // Extract price from view modal (remove 'Rs ' prefix)
-            const priceText = viewProductPrice.textContent;
-            productPrice.value = priceText.replace("Rs ", "");
-
-            // Set supplier and description from view modal - remove hardcoding
-            // productSupplier.value =
-            //   viewProductSupplier.textContent === "Supplier 1"
-            //     ? "supplier1"
-            //     : viewProductSupplier.textContent === "Supplier 2"
-            //     ? "supplier2"
-            //     : "supplier3";
-            if (productSupplier) {
-              productSupplier.value = ""; // Or map from viewProductSupplier.textContent if it holds actual value/ID
-            }
-            if (productDescription) {
-              productDescription.value = viewProductDescription.textContent; // This can stay if description is meant to be copied
-            }
-
             openModal(productModal);
           });
         }
 
-        // Close modal buttons
-        if (closeModal) {
-          closeModal.addEventListener("click", closeAllModals);
-        }
+        if (closeModalBtn) closeModalBtn.addEventListener("click", closeAllModals);
+        if (closeViewModalBtn) closeViewModalBtn.addEventListener("click", closeAllModals);
+        if (closeDeleteModalBtn) closeDeleteModalBtn.addEventListener("click", closeAllModals);
+        if (cancelBtn) cancelBtn.addEventListener("click", closeAllModals);
+        if (closeViewBtn) closeViewBtn.addEventListener("click", closeAllModals);
+        if (cancelDeleteBtn) cancelDeleteBtn.addEventListener("click", closeAllModals);
 
-        if (closeViewModal) {
-          closeViewModal.addEventListener("click", closeAllModals);
-        }
+        if (productImportSelect) {
+          const productImportChangeListener = function () {
+            const selectedImportId = this.value;
+            const selectedOption = this.options[this.selectedIndex];
+            const quantityInput = document.getElementById("productQuantity");
+            const priceInput = document.getElementById("productPrice");
 
-        if (closeDeleteModal) {
-          closeDeleteModal.addEventListener("click", closeAllModals);
-        }
+            if (quantityInput) quantityInput.disabled = !selectedImportId;
 
-        if (cancelBtn) {
-          cancelBtn.addEventListener("click", closeAllModals);
-        }
-
-        if (closeViewBtn) {
-          closeViewBtn.addEventListener("click", closeAllModals);
-        }
-
-        if (cancelDeleteBtn) {
-          cancelDeleteBtn.addEventListener("click", closeAllModals);
-        }
-
-        // Save product button
-        if (saveProductBtn) {
-          saveProductBtn.addEventListener("click", function () {
-            // Validate form
-            if (productForm.checkValidity()) {
-              // Get form data
-              const formData = {
-                id: productId.value,
-                name: productName.value,
-                category: productCategory.value,
-                quantity: productQuantity.value,
-                price: productPrice.value,
-                supplier: productSupplier.value,
-                description: productDescription.value,
-              };
-
-              // Here you would typically send the data to the server
-              console.log("Saving product:", formData);
-
-              // For demo purposes, update the UI directly
-              if (formData.id) {
-                // Update existing product
-                const row = document
-                  .querySelector(tr .edit-btn[data-id="${formData.id}"])
-                  .closest("tr");
-                row.cells[0].textContent = formData.name;
-                row.cells[1].textContent = formData.quantity;
-                row.cells[3].textContent = formData.price;
-
-                // Update category badge
-                const badge = row.cells[2].querySelector(".badge");
-                badge.textContent =
-                  formData.category.charAt(0).toUpperCase() +
-                  formData.category.slice(1);
-                badge.className = badge badge-${formData.category};
-
-                // Update row class for filtering
-                row.className = category-${formData.category};
-              } else {
-                // Add new product
-                const tbody = document.querySelector("tbody");
-                const newRow = document.createElement("tr");
-                newRow.className = category-${formData.category};
-
-                // Generate a new ID
-                const newId = Date.now().toString();
-
-                newRow.innerHTML = `
-                  <td>${formData.name}</td>
-                  <td>${formData.quantity}</td>
-                  <td><span class="badge badge-${formData.category}">${
-                  formData.category.charAt(0).toUpperCase() +
-                  formData.category.slice(1)
-                }</span></td>
-                  <td>${formData.price}</td>
-                  <td>
-                    <div class="action-buttons">
-                      <button class="action-btn view-btn" data-id="${newId}" title="View">
-                        <i class="bi bi-eye"></i>
-                      </button>
-                      <button class="action-btn edit-btn" data-id="${newId}" title="Edit">
-                        <i class="bi bi-pencil"></i>
-                      </button>
-                      <button class="action-btn delete-btn" data-id="${newId}" title="Delete">
-                        <i class="bi bi-trash"></i>
-                      </button>
-                    </div>
-                  </td>
-                `;
-				newRow.dataset.supplierId = formData.supplier; 
-                tbody.appendChild(newRow);
-
-                // Add event listeners to new buttons
-                const newViewBtn = newRow.querySelector(".view-btn");
-                const newEditBtn = newRow.querySelector(".edit-btn");
-                const newDeleteBtn = newRow.querySelector(".delete-btn");
-                const supplierLabel = productSupplier
-                ? productSupplier.querySelector(option[value="${formData.supplier}"])?.textContent
-                : formData.supplier;
-              viewProductSupplier.textContent = supplierLabel ?? "";
-
-                newViewBtn.addEventListener("click", function () {
-                  viewProductName.textContent = formData.name;
-                  viewProductCategory.textContent =
-                    formData.category.charAt(0).toUpperCase() +
-                    formData.category.slice(1);
-                  viewProductQuantity.textContent = formData.quantity;
-                  viewProductPrice.textContent = "Rs " + formData.price;
-                  // viewProductSupplier.textContent =
-                  //   formData.supplier === "supplier1"
-                  //     ? "Supplier 1"
-                  //     : formData.supplier === "supplier2"
-                  //     ? "Supplier 2"
-                  //     : "Supplier 3"; // Example data removed
-                  // Fetch actual supplier name based on formData.supplier (which should be an ID)
-                  viewProductSupplier.textContent = formData.supplier; // Or look up name
-                  viewProductDescription.textContent = formData.description;
-
-                  openModal(viewProductModal);
-                });
-
-                newEditBtn.addEventListener("click", function () {
-                  document.getElementById("modalTitle").textContent =
-                    "Edit Product";
-
-                  productId.value = newId;
-                  productName.value = formData.name;
-                  if (productCategory)
-                    productCategory.value = formData.category;
-                  productQuantity.value = formData.quantity;
-                  productPrice.value = formData.price;
-                  if (productSupplier)
-                    productSupplier.value = formData.supplier;
-                  if (productDescription)
-                    productDescription.value = formData.description;
-
-                  openModal(productModal);
-                });
-
-                newDeleteBtn.addEventListener("click", function () {
-                  deleteProductName.textContent = formData.name;
-                  confirmDeleteBtn.setAttribute("data-id", newId);
-                  openModal(deleteModal);
-                });
-              }
-              
-              if (productImportSelect) {
-                  productImportSelect.addEventListener("change", function () {
-                    const selectedImportId = this.value;
-                    const selectedOption = this.options[this.selectedIndex];
-
-                    // Example: Enable quantity field only when import is selected
-                    document.getElementById("productQuantity").disabled =
-                      !selectedImportId;
-
-                    // Example: Get data attributes from option
-                    const availableStock = selectedOption.dataset.stock;
-                    const importPrice = selectedOption.dataset.price;
-
-                    // Example: Update form fields
-                    if (selectedImportId) {
-                      document.getElementById("productPrice").value =
-                        importPrice || "";
-                      document.getElementById("productQuantity").max =
-                        availableStock || 0;
-                    }
-
-                    // Example: Show warning for out-of-stock imports
-                    if (availableStock <= 0) {
-                      alert("Selected import has no available stock!");
-                      this.value = "";
-                    }
-                  });
+            if (selectedImportId && selectedOption) {
+              const availableStock = selectedOption.dataset.stock;
+              const importPrice = selectedOption.dataset.price;
+              if (priceInput) priceInput.value = importPrice || "";
+              if (quantityInput) {
+                quantityInput.max = availableStock || "";
+                if (availableStock && parseInt(availableStock) <= 0) {
+                  quantityInput.value = 0;
                 }
-              
-
-              // Update stats
-              const totalProductsValue = document.querySelector(
-                ".total-products-icon"
-              ).nextElementSibling;
-              totalProductsValue.textContent =
-                document.querySelectorAll("tbody tr").length;
-
-              // Update badge count
-              totalBadge.textContent = `Total: ${
-                document.querySelectorAll("tbody tr").length
-              } Products`;
-
-              // Close modal
-              closeAllModals();
-
-              // Show success message (you could add a toast notification here)
-              alert("Product saved successfully!");
+              }
             } else {
-              // Form is invalid, trigger browser validation UI
-              productForm.reportValidity();
+              if (priceInput) priceInput.value = "";
+              if (quantityInput) {
+                quantityInput.removeAttribute("max");
+                quantityInput.value = "";
+              }
+            }
+          };
+          productImportSelect.addEventListener("change", productImportChangeListener);
+          productImportSelect._productImportChangeListener = productImportChangeListener;
+          if (productQuantity && !productImportSelect.value) productQuantity.disabled = true;
+        }
+
+        if (saveProductBtn) {
+          saveProductBtn.addEventListener("click", function (event) {
+            if (productForm.checkValidity()) {
+              // Form is valid. Allow the form to submit to the server.
+              // No event.preventDefault() is needed here.
+              // The server (ProductsController) will handle database operations and redirect.
+              // Client-side demo logic for table manipulation and alerts is removed.
+              // The modal will close automatically upon page reload after successful submission.
+            } else {
+              // Form is invalid.
+              event.preventDefault(); // Prevent the default (invalid) form submission.
+              productForm.reportValidity(); // Show HTML5 validation messages.
             }
           });
         }
 
-        // Confirm delete button
         if (confirmDeleteBtn) {
           confirmDeleteBtn.addEventListener("click", function () {
             const productIdToDelete = this.getAttribute("data-id");
-
-            // Set the product ID in the hidden form and submit
             const deleteForm = document.getElementById("deleteProductForm");
-            const deleteProductIdInput =
-              document.getElementById("deleteProductId");
+            const deleteProductIdInput = document.getElementById("deleteProductId");
 
             if (deleteForm && deleteProductIdInput) {
               deleteProductIdInput.value = productIdToDelete;
-              deleteForm.submit();
-              // The page will reload due to form submission and redirect from servlet.
-              // Client-side row removal and alert will be handled by page reload and success/error messages from server.
+              deleteForm.submit(); // This submits the hidden form for deletion.
             } else {
               console.error("Delete form or product ID input not found.");
               alert("Error initiating delete. Please try again.");
@@ -1095,37 +819,29 @@ prefix="fn" %> <% Integer userId = (Integer) session.getAttribute("userId"); if
           });
         }
 
-        // Initialize filters
-        filterProducts();
+        filterProducts(); // Initialize filters on page load
 
         function dismissAlert(alertElement) {
-            if (alertElement) {
-                alertElement.classList.add('fade-out');
-                setTimeout(() => {
-                    if (alertElement.parentNode) {
-                        alertElement.parentNode.removeChild(alertElement);
-                    }
-                }, 300); // Matches animation duration
-            }
+          if (alertElement) {
+            alertElement.classList.add('fade-out');
+            setTimeout(() => {
+              if (alertElement.parentNode) {
+                alertElement.parentNode.removeChild(alertElement);
+              }
+            }, 300);
+          }
         }
 
-        const alerts = document.querySelectorAll('.alert'); // Select all alerts on the page
-        if (alerts.length > 0) {
-            alerts.forEach(alert => {
-                // Auto-dismiss after 3 seconds
-                setTimeout(() => {
-                    dismissAlert(alert);
-                }, 3000);
+        document.querySelectorAll('.alert').forEach(alert => {
+          setTimeout(() => dismissAlert(alert), 3000); // Auto-dismiss after 3 seconds
+          const dismissButton = alert.querySelector('.dismiss-btn');
+          if (dismissButton) {
+            // The onclick is already in the HTML, but this ensures it if added dynamically
+            // or if you prefer to attach listeners here.
+            // For now, relying on the inline onclick in the JSP for dismiss buttons.
+          }
+        });
 
-                // Allow manual dismissal
-                const dismissButton = alert.querySelector('.dismiss-btn');
-                if (dismissButton) {
-                    dismissButton.onclick = function() {
-                        dismissAlert(alert);
-                    };
-                }
-            });
-        }
       });
     </script>
   </body>

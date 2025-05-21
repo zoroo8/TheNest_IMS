@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?><project-modules id="moduleCoreId" project-version="1.5.0">
-                                        
+                                            
+    
     
     
     
@@ -9,7 +10,8 @@
     
     
     <wb-module deploy-name="TheNest_IMS">
-                                                                                
+                                                                                        
+        
         
         
         
@@ -19,7 +21,8 @@
         
         
         <wb-resource deploy-path="/" source-path="/src/main/webapp" tag="defaultRootSource"/>
-                                                                                
+                                                                                        
+        
         
         
         
@@ -29,22 +32,23 @@
         
         
         <wb-resource deploy-path="/WEB-INF/classes" source-path="/src/main/java"/>
-        <dependent-module archiveName="jakarta.servlet-api-6.0.0.jar" deploy-path="/WEB-INF/lib" handle="module:/classpath/lib/C:/Users/Acer/OneDrive - islingtoncollege.edu.np/Documents/Y2/Y2 Coursework/Y2 S2/Advanced Programming and Technology/TheNest_IMS/TheNest_IMS/src/main/webapp/WEB-INF/lib/jakarta.servlet-api-6.0.0.jar">
+        <dependent-module archiveName="mysql-connector-j-9.2.0.jar" deploy-path="/WEB-INF/lib" handle="module:/classpath/lib/D:/College/AdvancedProgramming/Coursework/Development/TheNest_IMS/TheNest_IMS/src/main/webapp/WEB-INF/lib/mysql-connector-j-9.2.0.jar">
             <dependency-type>uses</dependency-type>
         </dependent-module>
-        <dependent-module archiveName="mysql-connector-j-9.2.0.jar" deploy-path="/WEB-INF/lib" handle="module:/classpath/lib/C:/Users/Acer/OneDrive - islingtoncollege.edu.np/Documents/Y2/Y2 Coursework/Y2 S2/Advanced Programming and Technology/TheNest_IMS/TheNest_IMS/src/main/webapp/WEB-INF/lib/mysql-connector-j-9.2.0.jar">
+        <dependent-module archiveName="jakarta.servlet-api-6.0.0.jar" deploy-path="/WEB-INF/lib" handle="module:/classpath/lib/D:/College/AdvancedProgramming/Coursework/Development/TheNest_IMS/TheNest_IMS/src/main/webapp/WEB-INF/lib/jakarta.servlet-api-6.0.0.jar">
             <dependency-type>uses</dependency-type>
         </dependent-module>
-        <dependent-module archiveName="jakarta.servlet.jsp-api-3.1.1.jar" deploy-path="/WEB-INF/lib" handle="module:/classpath/lib/C:/Users/Acer/OneDrive - islingtoncollege.edu.np/Documents/Y2/Y2 Coursework/Y2 S2/Advanced Programming and Technology/TheNest_IMS/TheNest_IMS/src/main/webapp/WEB-INF/lib/jakarta.servlet.jsp-api-3.1.1.jar">
+        <dependent-module archiveName="jakarta.servlet.jsp.jstl-3.0.0.jar" deploy-path="/WEB-INF/lib" handle="module:/classpath/lib/D:/College/AdvancedProgramming/Coursework/Development/TheNest_IMS/TheNest_IMS/src/main/webapp/WEB-INF/lib/jakarta.servlet.jsp.jstl-3.0.0.jar">
             <dependency-type>uses</dependency-type>
         </dependent-module>
-        <dependent-module archiveName="jakarta.servlet.jsp.jstl-3.0.0.jar" deploy-path="/WEB-INF/lib" handle="module:/classpath/lib/C:/Users/Acer/OneDrive - islingtoncollege.edu.np/Documents/Y2/Y2 Coursework/Y2 S2/Advanced Programming and Technology/TheNest_IMS/TheNest_IMS/src/main/webapp/WEB-INF/lib/jakarta.servlet.jsp.jstl-3.0.0.jar">
+        <dependent-module archiveName="jakarta.servlet.jsp-api-3.1.1.jar" deploy-path="/WEB-INF/lib" handle="module:/classpath/lib/D:/College/AdvancedProgramming/Coursework/Development/TheNest_IMS/TheNest_IMS/src/main/webapp/WEB-INF/lib/jakarta.servlet.jsp-api-3.1.1.jar">
             <dependency-type>uses</dependency-type>
         </dependent-module>
-        <dependent-module archiveName="jakarta.servlet.jsp.jstl-api-3.0.0.jar" deploy-path="/WEB-INF/lib" handle="module:/classpath/lib/C:/Users/Acer/OneDrive - islingtoncollege.edu.np/Documents/Y2/Y2 Coursework/Y2 S2/Advanced Programming and Technology/TheNest_IMS/TheNest_IMS/src/main/webapp/WEB-INF/lib/jakarta.servlet.jsp.jstl-api-3.0.0.jar">
+        <dependent-module archiveName="jakarta.servlet.jsp.jstl-api-3.0.0.jar" deploy-path="/WEB-INF/lib" handle="module:/classpath/lib/D:/College/AdvancedProgramming/Coursework/Development/TheNest_IMS/TheNest_IMS/src/main/webapp/WEB-INF/lib/jakarta.servlet.jsp.jstl-api-3.0.0.jar">
             <dependency-type>uses</dependency-type>
         </dependent-module>
-                                                                                
+                                                                                        
+        
         
         
         
@@ -54,7 +58,8 @@
         
         
         <property name="context-root" value="TheNest_IMS"/>
-                                                                                
+                                                                                        
+        
         
         
         
@@ -64,7 +69,8 @@
         
         
         <property name="java-output-path" value="/TheNest_IMS/build/classes"/>
-                                                                            
+                                                                                    
+    
     
     
     
@@ -74,7 +80,8 @@
     
     
     </wb-module>
-                                    
+                                        
+
 
 
 

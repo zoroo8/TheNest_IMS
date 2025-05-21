@@ -1,7 +1,6 @@
 package com.ims.model;
 
 import java.time.LocalDate;
-import java.util.List;
 public class ImportModel {
     private int importId;
     private String importName;

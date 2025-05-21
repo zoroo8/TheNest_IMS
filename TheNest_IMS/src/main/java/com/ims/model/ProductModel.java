@@ -7,7 +7,10 @@ public class ProductModel {
     private int stock;
     private int categoryId;
     private String categoryName;
+    private int supplierId;
+    private String supplierName;
     private String description;
+    private int importId; // Add this field
 
     public int getProductId() {
         return productId;
@@ -39,17 +42,37 @@ public class ProductModel {
     public void setCategoryId(int categoryId) {
         this.categoryId = categoryId;
     }
-    public String getCategoryName() {
-        return categoryName;
+    public int getSupplierId() {
+        return supplierId;
     }
-    public void setCategoryName(String categoryName) {
-        this.categoryName = categoryName;
+    public void setSupplierId(int supplierId) {
+        this.supplierId = supplierId;
     }
-    
     public String getDescription() {
         return description;
     }
     public void setDescription(String description) {
         this.description = description;
+    }
+    public String getCategoryName() { // Getter for categoryName
+        return categoryName;
+    }
+    public void setCategoryName(String categoryName) { // Setter for categoryName
+        this.categoryName = categoryName;
+    }
+    public String getSupplierName() {
+        return supplierName;
+    }
+    public void setSupplierName(String supplierName) {
+        this.supplierName = supplierName;
+    }
+
+    // Getter and Setter for importId
+    public int getImportId() {
+        return importId;
+    }
+
+    public void setImportId(int importId) {
+        this.importId = importId;
     }
 }

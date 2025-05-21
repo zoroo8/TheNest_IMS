@@ -1,3 +1,7 @@
+body {
+  margin: 0;
+  padding: 0;
+}
 /* Stats Cards */
 .stats-row {
   display: flex;
@@ -339,6 +343,14 @@ tr:hover {
   color: #666666;
   text-decoration: none;
   transition: all 0.2s;
+}
+
+.main-content {
+  /* Make sure padding/margin match the Categories page */
+  padding-left: 0; /* Remove any left padding if present */
+  margin-left: 0; /* Remove any left margin if present */
+  /* You might need to adjust width as well */
+  width: 100%; /* Ensure it takes full width of its container */
 }
 
 .page-item.active .page-link {

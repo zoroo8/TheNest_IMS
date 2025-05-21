@@ -3,7 +3,6 @@ pageEncoding="UTF-8"%> <%@ taglib uri="http://java.sun.com/jsp/jstl/core"
 prefix="c" %> <%@ taglib uri="http://java.sun.com/jsp/jstl/functions"
 prefix="fn" %> <% Integer userId = (Integer) session.getAttribute("userId"); if
 (userId != null) { %>
-<p>Logged in as user ID: <%= userId %></p>
 <% } %>
 
 <!DOCTYPE html>
@@ -155,15 +154,11 @@ prefix="fn" %> <% Integer userId = (Integer) session.getAttribute("userId"); if
         <button class="view-toggle-btn active" data-view="all">
           All Products
         </button>
-        <button class="view-toggle-btn" data-view="groceries">Groceries</button>
-        <button class="view-toggle-btn" data-view="furnitures">
-          Furnitures
-        </button>
-        <button class="view-toggle-btn" data-view="beverages">Beverages</button>
-        <button class="view-toggle-btn" data-view="clothing">Clothing</button>
-        <button class="view-toggle-btn" data-view="electronics">
-          Electronics
-        </button>
+        <c:forEach var="cat" items="${categories}">
+          <button class="view-toggle-btn" data-view="${fn:toLowerCase(cat.name)}">
+            <c:out value="${cat.name}" />
+          </button>
+        </c:forEach>
       </div>
 
       <!-- Search and Filters -->

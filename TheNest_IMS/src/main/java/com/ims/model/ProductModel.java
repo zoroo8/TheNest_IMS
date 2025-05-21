@@ -1,29 +1,29 @@
 package com.ims.model;
 
 public class ProductModel {
-    private int id;
-    private String name;
-    private double price;
+    private int productId;
+    private String productName;
+    private float price;
     private int stock;
     private int categoryId;
     private int supplierId;
-    
-	public int getId() {
-		return id;
+    private String description;
+	public int getProductId() {
+		return productId;
 	}
-	public void setId(int id) {
-		this.id = id;
+	public void setProductId(int productId) {
+		this.productId = productId;
 	}
-	public String getName() {
-		return name;
+	public String getProductName() {
+		return productName;
 	}
-	public void setName(String name) {
-		this.name = name;
+	public void setProductName(String productName) {
+		this.productName = productName;
 	}
-	public double getPrice() {
+	public float getPrice() {
 		return price;
 	}
-	public void setPrice(double price) {
+	public void setPrice(float price) {
 		this.price = price;
 	}
 	public int getStock() {
@@ -43,6 +43,12 @@ public class ProductModel {
 	}
 	public void setSupplierId(int supplierId) {
 		this.supplierId = supplierId;
+	}
+	public String getDescription() {
+		return description;
+	}
+	public void setDescription(String description) {
+		this.description = description;
 	}
 
     

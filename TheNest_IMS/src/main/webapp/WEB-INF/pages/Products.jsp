@@ -1,5 +1,14 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%
+    Integer userId = (Integer) session.getAttribute("userId");
+    if (userId != null) {
+%>
+    <p>Logged in as user ID: <%= userId %></p>
+<%
+    }
+%>
+
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -436,10 +445,19 @@
 			  <c:forEach var="sup" items="${suppliers}">
 			    <option value="${sup.supplierId}">${sup.supplierName}</option>
 			</c:forEach>
-
 			</select>
           </div>
-
+		 <div class="form-group">
+		  <label for="productImport" class="form-label">Import</label>
+		  <select class="form-control" id="productImport" name="productImport" required>
+		    <option value="">Select Import</option>
+		    <c:forEach var="imp" items="${imports}">
+		      <option value="${imp.importId}">
+			  ${imp.importName} {ID:${imp.importId}}
+			</option>
+		    </c:forEach>
+		  </select>
+		</div>
           <div class="form-group">
             <label for="productDescription" class="form-label"
               >Description</label
@@ -568,6 +586,7 @@
         const productSupplier = document.getElementById("productSupplier");
         const productDescription =
           document.getElementById("productDescription");
+        const productImportSelect = document.getElementById("productImport");
 
         // View elements
         const viewProductName = document.getElementById("viewProductName");
@@ -836,7 +855,9 @@
             confirmDeleteBtn.setAttribute("data-id", productId);
           });
         });
-
+        
+        
+        
         // Edit from view button
         if (editFromViewBtn) {
           editFromViewBtn.addEventListener("click", function () {
@@ -1033,7 +1054,32 @@
                   openModal(deleteModal);
                 });
               }
-
+              if (productImportSelect) {
+            	  productImportSelect.addEventListener("change", function() {
+            	    const selectedImportId = this.value;
+            	    const selectedOption = this.options[this.selectedIndex];
+            	    
+            	    // Example: Enable quantity field only when import is selected
+            	    document.getElementById("productQuantity").disabled = !selectedImportId;
+            	    
+            	    // Example: Get data attributes from option
+            	    const availableStock = selectedOption.dataset.stock;
+            	    const importPrice = selectedOption.dataset.price;
+            	    
+            	    // Example: Update form fields
+            	    if (selectedImportId) {
+            	      document.getElementById("productPrice").value = importPrice || "";
+            	      document.getElementById("productQuantity").max = availableStock || 0;
+            	    }
+            	    
+            	    // Example: Show warning for out-of-stock imports
+            	    if (availableStock <= 0) {
+            	      alert("Selected import has no available stock!");
+            	      this.value = "";
+            	    }
+            	  });
+            	}
+              
               // Update stats
               const totalProductsValue = document.querySelector(
                 ".total-products-icon"
@@ -1045,7 +1091,7 @@
               totalBadge.textContent = `Total: ${
                 document.querySelectorAll("tbody tr").length
               } Products`;
-
+		
               // Close modal
               closeAllModals();
 

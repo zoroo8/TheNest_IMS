@@ -749,7 +749,7 @@ uri="http://java.sun.com/jsp/jstl/fmt" %>
           return fetch(url)
             .then((response) => {
               if (!response.ok) {
-                throw new Error(HTTP error! Status: ${response.status});
+            	  throw new Error(`HTTP error! Status: ${response.status}`);
               }
               return response.text(); // Get as text first for debugging
             })
@@ -894,7 +894,7 @@ uri="http://java.sun.com/jsp/jstl/fmt" %>
             });
         }
 
-        // View User buttons
+     // View User buttons
         document.querySelectorAll(".view-btn").forEach((button) => {
           button.addEventListener("click", function () {
             const userId = this.getAttribute("data-id");
@@ -909,9 +909,8 @@ uri="http://java.sun.com/jsp/jstl/fmt" %>
                 const modalBody = document.getElementById("viewUserModalBody");
                 const profilePicUrl = data.profilePicture
                   ? contextPath + "/" + data.profilePicture
-                  : contextPath + "/assets/images/avatars/default-avatar.png";
+                  : contextPath + "/assets/uploads/profiles/default-avatar.png";
 
-                // Avoid template literals with JSP expressions by concatenating instead
                 modalBody.innerHTML =
                   '<div class="user-profile-header">' +
                   '<div class="user-avatar-large">' +
@@ -921,7 +920,7 @@ uri="http://java.sun.com/jsp/jstl/fmt" %>
                   (data.firstName || "") +
                   '" onerror="this.onerror=null;this.src=\'' +
                   contextPath +
-                  "/assets/images/avatars/default-avatar.png';\"/>" +
+                  "/uploads/profiles/default-avatar.png'\"/>" +
                   "</div>" +
                   '<div class="user-profile-info">' +
                   "<h3>" +
@@ -930,9 +929,7 @@ uri="http://java.sun.com/jsp/jstl/fmt" %>
                   (data.lastName || "") +
                   "</h3>" +
                   '<span class="badge badge-' +
-                  ((data.role || "").toLowerCase() === "admin"
-                    ? "admin"
-                    : "staff") +
+                  ((data.role || "").toLowerCase() === "admin" ? "admin" : "staff") +
                   '">' +
                   (data.role || "N/A") +
                   "</span>" +
@@ -990,7 +987,7 @@ uri="http://java.sun.com/jsp/jstl/fmt" %>
               });
           });
         });
-
+     
         // Delete User buttons
         document.querySelectorAll(".delete-btn").forEach((button) => {
           button.addEventListener("click", function () {

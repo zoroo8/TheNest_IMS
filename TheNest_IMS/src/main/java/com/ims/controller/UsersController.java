@@ -55,7 +55,7 @@ protected void doGet(HttpServletRequest request, HttpServletResponse response)
     if (!"admin".equals(session.getAttribute("role"))) {
         request.getServletContext().log("UsersController doGet: User is not admin. Redirecting to login."); // TEMP LOG
         // Consider redirecting to an error page or home page if already logged in but wrong role
-        response.sendRedirect(request.getContextPath() + "/login"); 
+        response.sendRedirect(request.getContextPath() + "/Login"); 
         return;
     }
 

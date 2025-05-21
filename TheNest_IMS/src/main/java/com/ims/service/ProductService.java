@@ -3,34 +3,15 @@ package com.ims.service;
 import com.ims.config.DbConfig;
 import com.ims.model.ProductModel;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
 public class ProductService {
+	public List<ProductModel> getAllProducts() throws SQLException {
+        List<ProductModel> products = new ArrayList<>();
 
-    public void saveProduct(ProductModel product) throws Exception {
-        String sql = "INSERT INTO Product (product_name, price, stock, category_id, supplier_id) VALUES (?, ?, ?, ?, ?)";
-
-        try (Connection conn = DbConfig.getDBConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-
-            stmt.setString(1, product.getName());
-            stmt.setDouble(2, product.getPrice());
-            stmt.setInt(3, product.getStock());
-            stmt.setInt(4, product.getCategoryId());
-            stmt.setInt(5, product.getSupplierId());
-
-            stmt.executeUpdate();
-        }
-    }
-
-    public List<ProductModel> getAllProducts() throws Exception {
-        List<ProductModel> productList = new ArrayList<>();
-
-        String sql = "SELECT * FROM Product";
+        String sql = "SELECT product_id, product_name, price, stock, category_id, supplier_id, description FROM product";
 
         try (Connection conn = DbConfig.getDBConnection();
              PreparedStatement stmt = conn.prepareStatement(sql);
@@ -38,17 +19,63 @@ public class ProductService {
 
             while (rs.next()) {
                 ProductModel product = new ProductModel();
-                product.setId(rs.getInt("product_id"));
-                product.setName(rs.getString("product_name"));
-                product.setPrice(rs.getDouble("price"));
+
+                product.setProductId(rs.getInt("product_id"));
+                product.setProductName(rs.getString("product_name"));
+                product.setPrice(rs.getFloat("price"));
                 product.setStock(rs.getInt("stock"));
                 product.setCategoryId(rs.getInt("category_id"));
                 product.setSupplierId(rs.getInt("supplier_id"));
+                product.setDescription(rs.getString("description"));
 
-                productList.add(product);
+                products.add(product);
             }
         }
 
-        return productList;
+        return products;
+    }
+	
+    public void addProductWithImport(String productName, float price, int stock, int categoryId, int supplierId, String description,
+                                     int importId, int userId) throws SQLException {
+
+        String insertProductSQL = "INSERT INTO product (product_name, price, stock, category_id, supplier_id, description) VALUES (?, ?, ?, ?, ?, ?)";
+        String insertImportProductUserSQL = "INSERT INTO import_product_user (import_id, product_id, user_id) VALUES (?, ?, ?)";
+
+        try (Connection conn = DbConfig.getDBConnection()) {
+            conn.setAutoCommit(false);
+
+            try (PreparedStatement productStmt = conn.prepareStatement(insertProductSQL, Statement.RETURN_GENERATED_KEYS)) {
+                productStmt.setString(1, productName);
+                productStmt.setFloat(2, price);
+                productStmt.setInt(3, stock);
+                productStmt.setInt(4, categoryId);
+                productStmt.setInt(5, supplierId);
+                productStmt.setString(6, description);
+
+                int affectedRows = productStmt.executeUpdate();
+                if (affectedRows == 0) {
+                    throw new SQLException("Creating product failed, no rows affected.");
+                }
+
+                try (ResultSet generatedKeys = productStmt.getGeneratedKeys()) {
+                    if (generatedKeys.next()) {
+                        int productId = generatedKeys.getInt(1);
+
+                        try (PreparedStatement ipuStmt = conn.prepareStatement(insertImportProductUserSQL)) {
+                            ipuStmt.setInt(1, importId);
+                            ipuStmt.setInt(2, productId);
+                            ipuStmt.setInt(3, userId);
+                            ipuStmt.executeUpdate();
+                        }
+                    } else {
+                        throw new SQLException("Creating product failed, no ID obtained.");
+                    }
+                }
+            }
+
+            conn.commit();
+        } catch (SQLException e) {
+            throw e;
+        }
     }
 }

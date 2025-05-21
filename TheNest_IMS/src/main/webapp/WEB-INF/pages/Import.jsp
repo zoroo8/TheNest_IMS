@@ -1,7 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
-pageEncoding="UTF-8"%>
-<%@ page session="true" %>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+pageEncoding="UTF-8"%> <%@ page session="true" %> <%@ taglib
+uri="http://java.sun.com/jsp/jstl/core" prefix="c" %> <%@ taglib prefix="fmt"
+uri="http://java.sun.com/jsp/jstl/fmt" %>
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -62,6 +62,30 @@ pageEncoding="UTF-8"%>
         width: 100%;
         text-indent: 20px;
       }
+
+      .alert {
+        padding: 15px;
+        margin-bottom: 20px;
+        border-radius: 4px;
+        position: relative;
+      }
+      .alert-success {
+        background-color: #dff0d8;
+        color: #3c763d;
+        border: 1px solid #d6e9c6;
+      }
+      .alert-danger {
+        background-color: #f2dede;
+        color: #a94442;
+        border: 1px solid #ebccd1;
+      }
+      .alert .dismiss-btn {
+        position: absolute;
+        right: 10px;
+        top: 10px;
+        cursor: pointer;
+        font-weight: bold;
+      }
     </style>
   </head>
   <body>
@@ -69,6 +93,30 @@ pageEncoding="UTF-8"%>
 
     <!-- Main Content -->
     <div class="main-content">
+      <!-- Display success/error messages -->
+      <c:if test="${not empty sessionScope.successMessage}">
+        <div class="alert alert-success">
+          <span>${sessionScope.successMessage}</span>
+          <span
+            class="dismiss-btn"
+            onclick="this.parentElement.style.display='none';"
+            >&times;</span
+          >
+        </div>
+        <c:remove var="successMessage" scope="session" />
+      </c:if>
+      <c:if test="${not empty sessionScope.errorMessage}">
+        <div class="alert alert-danger">
+          <span>${sessionScope.errorMessage}</span>
+          <span
+            class="dismiss-btn"
+            onclick="this.parentElement.style.display='none';"
+            >&times;</span
+          >
+        </div>
+        <c:remove var="errorMessage" scope="session" />
+      </c:if>
+
       <div class="page-header">
         <h1 class="page-title">Import Management</h1>
         <button class="btn btn-primary" id="addItemBtn">
@@ -82,21 +130,21 @@ pageEncoding="UTF-8"%>
           <div class="stat-icon pending-icon">
             <i class="bi bi-box-seam"></i>
           </div>
-          <div class="stat-value">28</div>
+          <div class="stat-value">${totalImports}</div>
           <div class="stat-label">Total Imports</div>
         </div>
         <div class="stat-card">
           <div class="stat-icon low-stock-icon">
             <i class="bi bi-calendar-check"></i>
           </div>
-          <div class="stat-value">5</div>
+          <div class="stat-value">${currentMonthImports}</div>
           <div class="stat-label">This Month</div>
         </div>
         <div class="stat-card">
           <div class="stat-icon approved-icon">
             <i class="bi bi-building"></i>
           </div>
-          <div class="stat-value">4</div>
+          <div class="stat-value">${activeSuppliers}</div>
           <div class="stat-label">Active Suppliers</div>
         </div>
       </div>
@@ -118,10 +166,11 @@ pageEncoding="UTF-8"%>
           <div class="filter-group">
             <select class="form-control" id="filterSupplier">
               <option value="all" selected>All Suppliers</option>
-              <option value="1">ABC Office Supplies</option>
-              <option value="2">Tech Solutions Inc.</option>
-              <option value="3">Furniture World</option>
-              <option value="4">General Distributors</option>
+              <c:forEach var="supplier" items="${suppliers}">
+                <option value="${supplier.supplierId}">
+                  ${supplier.supplierName}
+                </option>
+              </c:forEach>
             </select>
           </div>
           <div class="filter-group">
@@ -141,227 +190,64 @@ pageEncoding="UTF-8"%>
 
       <!-- Import Grid -->
       <div class="stock-grid">
-        <!-- Import 1 -->
-        <div class="stock-card">
-          <div class="stock-card-header">
-            <h3 class="stock-card-title">Office Supplies Restock</h3>
-            <div class="category-icon">
-              <i class="bi bi-building"></i>
+        <c:choose>
+          <c:when test="${empty imports}">
+            <div class="no-data-message">
+              <p>No imports found. Click "Add New Import" to create one.</p>
             </div>
-          </div>
-          <div class="stock-card-body">
-            <div class="stock-level">ABC Office Supplies</div>
-            <div class="stock-info">
-              <span class="stock-label">Import ID</span>
-              <span class="stock-value">IMP001</span>
-            </div>
-            <div class="stock-info">
-              <span class="stock-label">Date</span>
-              <span class="stock-value">2025-05-15</span>
-            </div>
-            <div class="stock-info">
-              <span class="stock-label">Supplier ID</span>
-              <span class="stock-value">1</span>
-            </div>
-            <div class="stock-info">
-              <span class="stock-label">Status</span>
-              <span class="badge badge-stock normal">Completed</span>
-            </div>
-          </div>
-          <div class="stock-card-footer">
-            <a href="#" class="edit-item" data-id="1">
-              <i class="bi bi-pencil"></i> Edit
-            </a>
-            <a href="#" class="view-details" data-id="1">
-              <i class="bi bi-eye"></i> View Details
-            </a>
-          </div>
-        </div>
-
-        <!-- Import 2 -->
-        <div class="stock-card">
-          <div class="stock-card-header">
-            <h3 class="stock-card-title">IT Equipment Order</h3>
-            <div class="category-icon">
-              <i class="bi bi-building"></i>
-            </div>
-          </div>
-          <div class="stock-card-body">
-            <div class="stock-level">Tech Solutions Inc.</div>
-            <div class="stock-info">
-              <span class="stock-label">Import ID</span>
-              <span class="stock-value">IMP002</span>
-            </div>
-            <div class="stock-info">
-              <span class="stock-label">Date</span>
-              <span class="stock-value">2025-05-10</span>
-            </div>
-            <div class="stock-info">
-              <span class="stock-label">Supplier ID</span>
-              <span class="stock-value">2</span>
-            </div>
-            <div class="stock-info">
-              <span class="stock-label">Status</span>
-              <span class="badge badge-stock high">Completed</span>
-            </div>
-          </div>
-          <div class="stock-card-footer">
-            <a href="#" class="edit-item" data-id="2">
-              <i class="bi bi-pencil"></i> Edit
-            </a>
-            <a href="#" class="view-details" data-id="2">
-              <i class="bi bi-eye"></i> View Details
-            </a>
-          </div>
-        </div>
-
-        <!-- Import 3 -->
-        <div class="stock-card">
-          <div class="stock-card-header">
-            <h3 class="stock-card-title">Furniture Delivery</h3>
-            <div class="category-icon">
-              <i class="bi bi-building"></i>
-            </div>
-          </div>
-          <div class="stock-card-body">
-            <div class="stock-level">Furniture World</div>
-            <div class="stock-info">
-              <span class="stock-label">Import ID</span>
-              <span class="stock-value">IMP003</span>
-            </div>
-            <div class="stock-info">
-              <span class="stock-label">Date</span>
-              <span class="stock-value">2025-05-05</span>
-            </div>
-            <div class="stock-info">
-              <span class="stock-label">Supplier ID</span>
-              <span class="stock-value">3</span>
-            </div>
-            <div class="stock-info">
-              <span class="stock-label">Status</span>
-              <span class="badge badge-stock normal">Completed</span>
-            </div>
-          </div>
-          <div class="stock-card-footer">
-            <a href="#" class="edit-item" data-id="3">
-              <i class="bi bi-pencil"></i> Edit
-            </a>
-            <a href="#" class="view-details" data-id="3">
-              <i class="bi bi-eye"></i> View Details
-            </a>
-          </div>
-        </div>
-
-        <!-- Import 4 -->
-        <div class="stock-card">
-          <div class="stock-card-header">
-            <h3 class="stock-card-title">General Supplies</h3>
-            <div class="category-icon">
-              <i class="bi bi-building"></i>
-            </div>
-          </div>
-          <div class="stock-card-body">
-            <div class="stock-level">General Distributors</div>
-            <div class="stock-info">
-              <span class="stock-label">Import ID</span>
-              <span class="stock-value">IMP004</span>
-            </div>
-            <div class="stock-info">
-              <span class="stock-label">Date</span>
-              <span class="stock-value">2025-04-28</span>
-            </div>
-            <div class="stock-info">
-              <span class="stock-label">Supplier ID</span>
-              <span class="stock-value">4</span>
-            </div>
-            <div class="stock-info">
-              <span class="stock-label">Status</span>
-              <span class="badge badge-stock normal">Completed</span>
-            </div>
-          </div>
-          <div class="stock-card-footer">
-            <a href="#" class="edit-item" data-id="4">
-              <i class="bi bi-pencil"></i> Edit
-            </a>
-            <a href="#" class="view-details" data-id="4">
-              <i class="bi bi-eye"></i> View Details
-            </a>
-          </div>
-        </div>
-
-        <!-- Import 5 -->
-        <div class="stock-card">
-          <div class="stock-card-header">
-            <h3 class="stock-card-title">Office Equipment</h3>
-            <div class="category-icon">
-              <i class="bi bi-building"></i>
-            </div>
-          </div>
-          <div class="stock-card-body">
-            <div class="stock-level">ABC Office Supplies</div>
-            <div class="stock-info">
-              <span class="stock-label">Import ID</span>
-              <span class="stock-value">IMP005</span>
-            </div>
-            <div class="stock-info">
-              <span class="stock-label">Date</span>
-              <span class="stock-value">2025-04-20</span>
-            </div>
-            <div class="stock-info">
-              <span class="stock-label">Supplier ID</span>
-              <span class="stock-value">1</span>
-            </div>
-            <div class="stock-info">
-              <span class="stock-label">Status</span>
-              <span class="badge badge-stock normal">Completed</span>
-            </div>
-          </div>
-          <div class="stock-card-footer">
-            <a href="#" class="edit-item" data-id="5">
-              <i class="bi bi-pencil"></i> Edit
-            </a>
-            <a href="#" class="view-details" data-id="5">
-              <i class="bi bi-eye"></i> View Details
-            </a>
-          </div>
-        </div>
-
-        <!-- Import 6 -->
-        <div class="stock-card">
-          <div class="stock-card-header">
-            <h3 class="stock-card-title">Tech Accessories</h3>
-            <div class="category-icon">
-              <i class="bi bi-building"></i>
-            </div>
-          </div>
-          <div class="stock-card-body">
-            <div class="stock-level">Tech Solutions Inc.</div>
-            <div class="stock-info">
-              <span class="stock-label">Import ID</span>
-              <span class="stock-value">IMP006</span>
-            </div>
-            <div class="stock-info">
-              <span class="stock-label">Date</span>
-              <span class="stock-value">2025-04-15</span>
-            </div>
-            <div class="stock-info">
-              <span class="stock-label">Supplier ID</span>
-              <span class="stock-value">2</span>
-            </div>
-            <div class="stock-info">
-              <span class="stock-label">Status</span>
-              <span class="badge badge-stock normal">Completed</span>
-            </div>
-          </div>
-          <div class="stock-card-footer">
-            <a href="#" class="edit-item" data-id="6">
-              <i class="bi bi-pencil"></i> Edit
-            </a>
-            <a href="#" class="view-details" data-id="6">
-              <i class="bi bi-eye"></i> View Details
-            </a>
-          </div>
-        </div>
+          </c:when>
+          <c:otherwise>
+            <c:forEach var="importItem" items="${imports}">
+              <div
+                class="stock-card"
+                data-id="${importItem.importId}"
+                data-supplier="${importItem.supplierId}"
+              >
+                <div class="stock-card-header">
+                  <h3 class="stock-card-title">${importItem.importName}</h3>
+                  <div class="category-icon">
+                    <i class="bi bi-building"></i>
+                  </div>
+                </div>
+                <div class="stock-card-body">
+                  <div class="stock-level">${importItem.supplierName}</div>
+                  <div class="stock-info">
+                    <span class="stock-label">Import ID</span>
+                    <span class="stock-value">IMP${importItem.importId}</span>
+                  </div>
+                  <div class="stock-info">
+                    <span class="stock-label">Date</span>
+                    <span class="stock-value">${importItem.importDate}</span>
+                  </div>
+                  <div class="stock-info">
+                    <span class="stock-label">Supplier ID</span>
+                    <span class="stock-value">${importItem.supplierId}</span>
+                  </div>
+                  <div class="stock-info">
+                    <span class="stock-label">Status</span>
+                    <span class="badge badge-stock normal">Completed</span>
+                  </div>
+                </div>
+                <div class="stock-card-footer">
+                  <a
+                    href="#"
+                    class="edit-item"
+                    data-id="${importItem.importId}"
+                  >
+                    <i class="bi bi-pencil"></i> Edit
+                  </a>
+                  <a
+                    href="#"
+                    class="view-details"
+                    data-id="${importItem.importId}"
+                  >
+                    <i class="bi bi-eye"></i> View Details
+                  </a>
+                </div>
+              </div>
+            </c:forEach>
+          </c:otherwise>
+        </c:choose>
       </div>
     </div>
 
@@ -375,7 +261,12 @@ pageEncoding="UTF-8"%>
         <button class="modal-close" id="closeItemModal">&times;</button>
       </div>
       <div class="modal-body">
-        <form id="itemForm" method="post" action="<%=request.getContextPath()%>/import">
+        <form
+          id="itemForm"
+          method="post"
+          action="${pageContext.request.contextPath}/import"
+        >
+          <input type="hidden" id="editImportId" name="importId" value="" />
           <div class="row">
             <div class="col-md-6">
               <div class="form-group">
@@ -406,22 +297,27 @@ pageEncoding="UTF-8"%>
 
           <div class="form-group">
             <label for="supplier">Supplier</label>
-			<select class="form-control" name="supplier" id="supplier" required>
-			  <option value="">Select Supplier</option>
-			  <c:forEach var="sup" items="${suppliers}">
-			  <option value="${sup.supplierId}">
-			    ${sup.supplierName}
-			  </option>
-			  </c:forEach>
-			</select>
+            <select class="form-control" name="supplier" id="supplier" required>
+              <option value="">Select Supplier</option>
+              <c:forEach var="sup" items="${suppliers}">
+                <option value="${sup.supplierId}">${sup.supplierName}</option>
+              </c:forEach>
+            </select>
           </div>
+
           <div class="modal-footer">
-	        <button class="btn btn-outline" id="closeItemModalBtn">Cancel</button>
-	        <button type="submit" class="btn btn-primary" id="saveItemBtn">
-	          <i class="bi bi-save"></i> Save Import
-	        </button>
-	      </div>
-      </form>
+            <button
+              type="button"
+              class="btn btn-outline"
+              id="closeItemModalBtn"
+            >
+              Cancel
+            </button>
+            <button type="submit" class="btn btn-primary" id="saveItemBtn">
+              <i class="bi bi-save"></i> Save Import
+            </button>
+          </div>
+        </form>
       </div>
     </div>
 
@@ -435,9 +331,7 @@ pageEncoding="UTF-8"%>
         <div id="importDetails">
           <div class="form-group">
             <label>Import Name</label>
-            <p id="detailImportName" class="form-control-static">
-              Office Supplies Restock
-            </p>
+            <p id="detailImportName" class="form-control-static">Loading...</p>
           </div>
 
           <div class="row">
@@ -445,29 +339,29 @@ pageEncoding="UTF-8"%>
               <div class="form-group">
                 <label>Import Date</label>
                 <p id="detailImportDate" class="form-control-static">
-                  2025-05-15
+                  Loading...
                 </p>
               </div>
             </div>
             <div class="col-md-6">
               <div class="form-group">
                 <label>Import ID</label>
-                <p id="detailImportId" class="form-control-static">IMP001</p>
+                <p id="detailImportId" class="form-control-static">
+                  Loading...
+                </p>
               </div>
             </div>
           </div>
 
           <div class="form-group">
             <label>Supplier</label>
-            <p id="detailSupplier" class="form-control-static">
-              ABC Office Supplies
-            </p>
+            <p id="detailSupplier" class="form-control-static">Loading...</p>
           </div>
 
           <div class="form-group">
             <label>Supplier Contact</label>
             <p id="detailSupplierContact" class="form-control-static">
-              Phone: (555) 123-4567 | Email: contact@abcoffice.com
+              Loading...
             </p>
           </div>
         </div>
@@ -483,10 +377,16 @@ pageEncoding="UTF-8"%>
     <!-- JavaScript -->
     <script>
       document.addEventListener("DOMContentLoaded", function () {
+        const contextPath = "${pageContext.request.contextPath}";
+
         // Modal elements
         const modalBackdrop = document.getElementById("modalBackdrop");
         const itemModal = document.getElementById("itemModal");
         const detailsModal = document.getElementById("orderModal");
+        const editImportIdField = document.getElementById("editImportId");
+
+        // Today's date for the date input default value
+        document.getElementById("importDate").valueAsDate = new Date();
 
         // Add new import button
         document
@@ -495,8 +395,9 @@ pageEncoding="UTF-8"%>
             document.getElementById("itemModalTitle").textContent =
               "Add New Import";
             document.getElementById("itemForm").reset();
-            itemModal.style.display = "block";
-            modalBackdrop.style.display = "block";
+            document.getElementById("importDate").valueAsDate = new Date();
+            editImportIdField.value = "";
+            openModal(itemModal);
           });
 
         // Edit import buttons
@@ -504,10 +405,29 @@ pageEncoding="UTF-8"%>
           btn.addEventListener("click", function (e) {
             e.preventDefault();
             const importId = this.getAttribute("data-id");
-            document.getElementById("itemModalTitle").textContent =
-              "Edit Import";
-            itemModal.style.display = "block";
-            modalBackdrop.style.display = "block";
+
+            fetch(
+              `${contextPath}/import?action=getImportDetails&id=${importId}`
+            )
+              .then((response) => {
+                if (!response.ok)
+                  throw new Error("Failed to fetch import details");
+                return response.json();
+              })
+              .then((data) => {
+                document.getElementById("itemModalTitle").textContent =
+                  "Edit Import";
+                document.getElementById("importName").value = data.importName;
+                document.getElementById("importDate").value = data.importDate;
+                document.getElementById("supplier").value = data.supplierId;
+                editImportIdField.value = data.importId;
+
+                openModal(itemModal);
+              })
+              .catch((error) => {
+                console.error("Error fetching import details:", error);
+                alert("Error loading import details. Please try again.");
+              });
           });
         });
 
@@ -516,151 +436,144 @@ pageEncoding="UTF-8"%>
           btn.addEventListener("click", function (e) {
             e.preventDefault();
             const importId = this.getAttribute("data-id");
-            detailsModal.style.display = "block";
-            modalBackdrop.style.display = "block";
+
+            // Reset the fields
+            document.getElementById("detailImportName").textContent =
+              "Loading...";
+            document.getElementById("detailImportDate").textContent =
+              "Loading...";
+            document.getElementById("detailImportId").textContent =
+              "Loading...";
+            document.getElementById("detailSupplier").textContent =
+              "Loading...";
+            document.getElementById("detailSupplierContact").textContent =
+              "Loading...";
+
+            fetch(
+              `${contextPath}/import?action=getImportDetails&id=${importId}`
+            )
+              .then((response) => {
+                if (!response.ok)
+                  throw new Error("Failed to fetch import details");
+                return response.json();
+              })
+              .then((data) => {
+                document.getElementById("detailImportName").textContent =
+                  data.importName;
+                document.getElementById("detailImportDate").textContent =
+                  data.importDate;
+                document.getElementById("detailImportId").textContent =
+                  "IMP" + data.importId;
+                document.getElementById("detailSupplier").textContent =
+                  data.supplierName;
+
+                let contactInfo = "";
+                if (data.supplierPhone)
+                  contactInfo += `Phone: ${data.supplierPhone}`;
+                if (data.supplierPhone && data.supplierEmail)
+                  contactInfo += " | ";
+                if (data.supplierEmail)
+                  contactInfo += `Email: ${data.supplierEmail}`;
+
+                document.getElementById("detailSupplierContact").textContent =
+                  contactInfo || "No contact information available";
+
+                openModal(detailsModal);
+              })
+              .catch((error) => {
+                console.error("Error fetching import details:", error);
+                alert("Error loading import details. Please try again.");
+              });
           });
         });
+
+        function openModal(modal) {
+          modalBackdrop.style.display = "block";
+          modal.style.display = "block";
+          document.body.style.overflow = "hidden";
+        }
+
+        function closeModal(modal) {
+          modalBackdrop.style.display = "none";
+          modal.style.display = "none";
+          document.body.style.overflow = "";
+        }
 
         // Close item modal
         document
           .getElementById("closeItemModal")
-          .addEventListener("click", function () {
-            itemModal.style.display = "none";
-            modalBackdrop.style.display = "none";
-          });
+          .addEventListener("click", () => closeModal(itemModal));
 
         document
           .getElementById("closeItemModalBtn")
-          .addEventListener("click", function () {
-            itemModal.style.display = "none";
-            modalBackdrop.style.display = "none";
+          .addEventListener("click", (e) => {
+            e.preventDefault();
+            closeModal(itemModal);
           });
 
         // Close details modal
         document
           .getElementById("closeOrderModal")
-          .addEventListener("click", function () {
-            detailsModal.style.display = "none";
-            modalBackdrop.style.display = "none";
-          });
+          .addEventListener("click", () => closeModal(detailsModal));
 
         document
           .getElementById("closeOrderModalBtn")
-          .addEventListener("click", function () {
-            detailsModal.style.display = "none";
-            modalBackdrop.style.display = "none";
-          });
-
-        // Save import
-        document
-          .getElementById("saveItemBtn")
-          .addEventListener("click", function () {
-            const form = document.getElementById("itemForm");
-            if (form.checkValidity()) {
-              alert("Import saved successfully!");
-              itemModal.style.display = "none";
-              modalBackdrop.style.display = "none";
-            } else {
-              form.reportValidity();
-            }
-          });
+          .addEventListener("click", () => closeModal(detailsModal));
 
         // Print details
         document
           .getElementById("printDetailsBtn")
           .addEventListener("click", function () {
-            alert("Printing import details...");
+            const content = document.getElementById("importDetails").innerHTML;
+            const printWindow = window.open("", "_blank");
+            printWindow.document.write(`
+              <html>
+                <head>
+                  <title>Import Details</title>
+                  <style>
+                    body { font-family: Arial, sans-serif; line-height: 1.6; }
+                    .form-group { margin-bottom: 15px; }
+                    label { font-weight: bold; display: block; }
+                    .row { display: flex; }
+                    .col-md-6 { width: 50%; padding: 0 10px; }
+                    @media print {
+                      body { padding: 20px; }
+                    }
+                  </style>
+                </head>
+                <body>
+                  <h1>Import Details</h1>
+                  ${content}
+                </body>
+              </html>
+            `);
+            printWindow.document.close();
+            printWindow.focus();
+            setTimeout(() => {
+              printWindow.print();
+              printWindow.close();
+            }, 250);
           });
 
         // Search functionality
         document
           .getElementById("searchItems")
           .addEventListener("input", function () {
-            const searchTerm = this.value.toLowerCase();
-            const cards = document.querySelectorAll(".stock-card");
-
-            cards.forEach((card) => {
-              const importName = card
-                .querySelector(".stock-card-title")
-                .textContent.toLowerCase();
-              const supplier = card
-                .querySelector(".stock-level")
-                .textContent.toLowerCase();
-
-              if (
-                importName.includes(searchTerm) ||
-                supplier.includes(searchTerm)
-              ) {
-                card.style.display = "";
-              } else {
-                card.style.display = "none";
-              }
-            });
+            filterImports();
           });
 
         // Filter by supplier
         document
           .getElementById("filterSupplier")
           .addEventListener("change", function () {
-            const supplier = this.value;
-            const cards = document.querySelectorAll(".stock-card");
-
-            if (supplier === "all") {
-              cards.forEach((card) => (card.style.display = ""));
-            } else {
-              cards.forEach((card) => {
-                const supplierId = card.querySelector(
-                  ".stock-info:nth-child(4) .stock-value"
-                ).textContent;
-                if (supplierId === supplier) {
-                  card.style.display = "";
-                } else {
-                  card.style.display = "none";
-                }
-              });
-            }
+            filterImports();
           });
 
         // Filter by date
         document
           .getElementById("filterDate")
           .addEventListener("change", function () {
-            const dateFilter = this.value;
-            const cards = document.querySelectorAll(".stock-card");
-            const today = new Date();
-
-            if (dateFilter === "all") {
-              cards.forEach((card) => (card.style.display = ""));
-            } else {
-              cards.forEach((card) => {
-                const dateText = card.querySelector(
-                  ".stock-info:nth-child(3) .stock-value"
-                ).textContent;
-                const importDate = new Date(dateText);
-
-                let show = false;
-
-                if (dateFilter === "today") {
-                  show = importDate.toDateString() === today.toDateString();
-                } else if (dateFilter === "week") {
-                  const weekAgo = new Date(today);
-                  weekAgo.setDate(today.getDate() - 7);
-                  show = importDate >= weekAgo;
-                } else if (dateFilter === "month") {
-                  show =
-                    importDate.getMonth() === today.getMonth() &&
-                    importDate.getFullYear() === today.getFullYear();
-                } else if (dateFilter === "quarter") {
-                  const currentQuarter = Math.floor(today.getMonth() / 3);
-                  const importQuarter = Math.floor(importDate.getMonth() / 3);
-                  show =
-                    importQuarter === currentQuarter &&
-                    importDate.getFullYear() === today.getFullYear();
-                }
-
-                card.style.display = show ? "" : "none";
-              });
-            }
+            filterImports();
           });
 
         // Reset filters
@@ -670,12 +583,99 @@ pageEncoding="UTF-8"%>
             document.getElementById("searchItems").value = "";
             document.getElementById("filterSupplier").value = "all";
             document.getElementById("filterDate").value = "all";
-
-            // Show all cards
-            document.querySelectorAll(".stock-card").forEach((card) => {
-              card.style.display = "";
-            });
+            filterImports();
           });
+
+        // Filter function to apply all filters at once
+        function filterImports() {
+          const searchTerm = document
+            .getElementById("searchItems")
+            .value.toLowerCase();
+          const supplierFilter =
+            document.getElementById("filterSupplier").value;
+          const dateFilter = document.getElementById("filterDate").value;
+          const today = new Date();
+          const cards = document.querySelectorAll(".stock-card");
+
+          cards.forEach((card) => {
+            const importName = card
+              .querySelector(".stock-card-title")
+              .textContent.toLowerCase();
+            const supplierName = card
+              .querySelector(".stock-level")
+              .textContent.toLowerCase();
+            const supplierId = card.getAttribute("data-supplier");
+            const dateText = card.querySelector(
+              ".stock-info:nth-child(3) .stock-value"
+            ).textContent;
+            const importDate = new Date(dateText);
+
+            // Search filter
+            const matchesSearch =
+              importName.includes(searchTerm) ||
+              supplierName.includes(searchTerm);
+
+            // Supplier filter
+            const matchesSupplier =
+              supplierFilter === "all" || supplierId === supplierFilter;
+
+            // Date filter
+            let matchesDate = true;
+            if (dateFilter !== "all") {
+              if (dateFilter === "today") {
+                matchesDate =
+                  importDate.toDateString() === today.toDateString();
+              } else if (dateFilter === "week") {
+                const weekAgo = new Date(today);
+                weekAgo.setDate(today.getDate() - 7);
+                matchesDate = importDate >= weekAgo;
+              } else if (dateFilter === "month") {
+                matchesDate =
+                  importDate.getMonth() === today.getMonth() &&
+                  importDate.getFullYear() === today.getFullYear();
+              } else if (dateFilter === "quarter") {
+                const currentQuarter = Math.floor(today.getMonth() / 3);
+                const importQuarter = Math.floor(importDate.getMonth() / 3);
+                matchesDate =
+                  importQuarter === currentQuarter &&
+                  importDate.getFullYear() === today.getFullYear();
+              }
+            }
+
+            // Show or hide based on all filters
+            if (matchesSearch && matchesSupplier && matchesDate) {
+              card.style.display = "";
+            } else {
+              card.style.display = "none";
+            }
+          });
+
+          // Show "no results" message if needed
+          const visibleCards = document.querySelectorAll(
+            ".stock-card:not([style='display: none;'])"
+          );
+          const noDataMessage = document.querySelector(".no-data-message");
+
+          if (visibleCards.length === 0 && !noDataMessage) {
+            const stockGrid = document.querySelector(".stock-grid");
+            const message = document.createElement("div");
+            message.className = "no-data-message";
+            message.innerHTML = "<p>No imports match your filter criteria.</p>";
+            stockGrid.appendChild(message);
+          } else if (visibleCards.length > 0 && noDataMessage) {
+            noDataMessage.remove();
+          }
+        }
+
+        // Auto-dismiss alerts after 5 seconds
+        const alerts = document.querySelectorAll(".alert");
+        alerts.forEach((alert) => {
+          setTimeout(() => {
+            if (alert && alert.parentNode) {
+              alert.style.display = "none";
+            }
+          }, 5000);
+        });
       });
     </script>
   </body>

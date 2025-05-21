@@ -4,10 +4,11 @@ pageEncoding="UTF-8"%>
 <%
     String role = (String) session.getAttribute("role");
     if (role == null || !role.equals("staff")) {
-        response.sendRedirect("Error");
+        response.sendRedirect(request.getContextPath() + "/Error");
         return;
     }
 %>
+
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 
 <!DOCTYPE html>
@@ -397,29 +398,28 @@ pageEncoding="UTF-8"%>
         <button class="modal-close" id="closeNewModal">&times;</button>
       </div>
       <div class="modal-body">
-        <form id="newRequestForm">
+        <form id="newRequestForm" method="post" action="${pageContext.request.contextPath}/staff/my-requests" >
 
           <div class="form-group">
             <label>Items</label>
             <div id="itemsList">
               <div class="item-row">
-                <select class="form-control" id="productSupplier" name="productSupplier" required>
+              <select class="form-control" name="productId[]" required>
 				  <option value="">Select Product</option>
 				 <c:forEach var="product" items="${products}">
-				    <option value="${product.id}" data-stock="${product.stock}">
-				      ${product.name}
+				    <option value="${product.productId}" data-stock="${product.stock}">
+				      ${product.productName}
 				    </option>
 				</c:forEach>
 				</select>
 				
-                <input
-				  type="number"
-				  id="quantityInput"
-				  class="form-control item-quantity"
-				  min="1"
-				  placeholder="Qty"
-				  required
-				/>
+                <input 
+                type="number" 
+                name="quantity[]" 
+                class="form-control item-quantity" 
+                min="1" placeholder="Qty" 
+                required />
+                
                 <button type="button" class="btn btn-outline remove-item">
                   <i class="material-icons">delete</i>
                 </button>
@@ -435,16 +435,17 @@ pageEncoding="UTF-8"%>
             <textarea
               class="form-control"
               id="notes"
+              name="notes"
               placeholder="Add any additional information..."
             ></textarea>
           </div>
-        </form>
-      </div>
-      <div class="modal-footer">
-        <button class="btn btn-outline" id="closeNewModalBtn">Cancel</button>
-        <button class="btn btn-primary" id="submitRequestBtn">
+          <div class="modal-footer">
+        <button type="button" class="btn btn-outline" id="closeNewModalBtn">Cancel</button>
+        <button type="submit" class="btn btn-primary" id="submitRequestBtn">
           <i class="material-icons">send</i> Submit Request
         </button>
+      </div>
+        </form>
       </div>
     </div>
 
@@ -534,14 +535,15 @@ pageEncoding="UTF-8"%>
 	    const selectClone = firstSelect.cloneNode(true);
 	    selectClone.value = ""; // reset selection
 	
-	    // Create quantity input
+	 // Create quantity input
 	    const quantityInput = document.createElement("input");
+	    quantityInput.name = "quantity[]";
 	    quantityInput.type = "number";
 	    quantityInput.min = 1;
 	    quantityInput.placeholder = "Qty";
 	    quantityInput.required = true;
 	    quantityInput.className = "form-control item-quantity";
-	    quantityInput.disabled = true; // initially disabled
+	    quantityInput.disabled = true; 
 	
 	    // Create remove button
 	    const removeBtn = document.createElement("button");
@@ -723,55 +725,47 @@ pageEncoding="UTF-8"%>
           });
         });
 
-        // View toggle functionality
+     // View toggle functionality
         document.querySelectorAll(".view-toggle-btn").forEach((btn) => {
           btn.addEventListener("click", function () {
             // Remove active class from all buttons
-            document
-              .querySelectorAll(".view-toggle-btn")
-              .forEach((b) => b.classList.remove("active"));
-
-            // Add active class to clicked button
+            document.querySelectorAll(".view-toggle-btn").forEach((b) => b.classList.remove("active"));
             this.classList.add("active");
 
-            const view = this.getAttribute("data-view");
+            const view = this.getAttribute("data-view"); // pending / approved / rejected / all
             const rows = document.querySelectorAll("tbody tr");
 
-            if (view === "all") {
-            	rows.forEach((row) => {
-          		  const statusCell = row.querySelector("td:nth-child(6)");
-          		  if (statusCell) {
-          		    const cellText = statusCell.textContent.toLowerCase();
-          		    if (cellText.includes(status)) {
-          		      row.style.display = "";
-          		    } else {
-          		      row.style.display = "none";
-          		    }
-          		  } else {
-          		    // Optional: Hide or keep the row if the cell doesn't exist
-          		    row.style.display = "none";
-          		  }
-          		});
+            rows.forEach((row) => {
+              const statusCell = row.querySelector("td:nth-child(6)");
+              if (statusCell) {
+                const status = statusCell.textContent.toLowerCase();
+                if (view === "all" || status.includes(view)) {
+                  row.style.display = "";
+                } else {
+                  row.style.display = "none";
+                }
+              }
+            });
+          });
+        });
+
+
+     // Search functionality
+        document.getElementById("searchRequests").addEventListener("input", function () {
+          const searchTerm = this.value.toLowerCase();
+          const rows = document.querySelectorAll("tbody tr");
+
+          rows.forEach((row) => {
+            const rowText = row.textContent.toLowerCase();
+            if (rowText.includes(searchTerm)) {
+              row.style.display = "";
+            } else {
+              row.style.display = "none";
             }
           });
         });
 
-        // Search functionality
-        document
-          .getElementById("searchRequests")
-          .addEventListener("input", function () {
-            const searchTerm = this.value.toLowerCase();
-            const rows = document.querySelectorAll("tbody tr");
 
-            rows.forEach((row) => {
-              const text = row.textContent.toLowerCase();
-              if (text.includes(searchTerm)) {
-                row.style.display = "";
-              } else {
-                row.style.display = "none";
-              }
-            });
-          });
 
         // Filter by status
         document

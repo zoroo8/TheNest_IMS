@@ -6,7 +6,7 @@ public class ProductUserModel {
     private int id;
     private int productId;
     private int userId;
-    private String action; // e.g., "created", "updated", etc.
+    private String action;
     private Timestamp timestamp;
 
     // Constructors

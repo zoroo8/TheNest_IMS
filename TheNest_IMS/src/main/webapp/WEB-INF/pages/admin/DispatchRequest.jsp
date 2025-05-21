@@ -541,14 +541,15 @@ pageEncoding="UTF-8"%>
               <i class="bi bi-plus-circle"></i> Add Item
             </button>
           </div>
+          <div class="modal-footer">
+	        <button type="button" class="btn btn-outline" id="cancelEditBtn">Cancel</button>
+	        <button type="submit" class="btn btn-primary" id="saveRequestBtn">
+	          <i class="bi bi-save"></i> Save Request
+	        </button>
+	      </div>
         </form>
       </div>
-      <div class="modal-footer">
-        <button class="btn btn-outline" id="cancelEditBtn">Cancel</button>
-        <button class="btn btn-primary" id="saveRequestBtn">
-          <i class="bi bi-save"></i> Save Request
-        </button>
-      </div>
+      
     </div>
 
     <!-- Process Request Modal -->

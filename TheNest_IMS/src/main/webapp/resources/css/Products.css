@@ -1,3 +1,7 @@
+body {
+  margin: 0;
+  padding: 0;
+}
 /* Stats Cards */
 .stats-row {
   display: flex;
@@ -339,6 +343,12 @@ tr:hover {
   color: #666666;
   text-decoration: none;
   transition: all 0.2s;
+}
+
+.main-content {
+  padding-left: 0;
+  margin-left: 0;
+  width: 100%;
 }
 
 .page-item.active .page-link {

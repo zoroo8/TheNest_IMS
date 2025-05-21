@@ -3,7 +3,6 @@ pageEncoding="UTF-8"%> <%@ taglib uri="http://java.sun.com/jsp/jstl/core"
 prefix="c" %> <%@ taglib uri="http://java.sun.com/jsp/jstl/functions"
 prefix="fn" %> <% Integer userId = (Integer) session.getAttribute("userId"); if
 (userId != null) { %>
-<p>Logged in as user ID: <%= userId %></p>
 <% } %>
 
 <!DOCTYPE html>
@@ -155,15 +154,11 @@ prefix="fn" %> <% Integer userId = (Integer) session.getAttribute("userId"); if
         <button class="view-toggle-btn active" data-view="all">
           All Products
         </button>
-        <button class="view-toggle-btn" data-view="groceries">Groceries</button>
-        <button class="view-toggle-btn" data-view="furnitures">
-          Furnitures
-        </button>
-        <button class="view-toggle-btn" data-view="beverages">Beverages</button>
-        <button class="view-toggle-btn" data-view="clothing">Clothing</button>
-        <button class="view-toggle-btn" data-view="electronics">
-          Electronics
-        </button>
+        <c:forEach var="cat" items="${categories}">
+          <button class="view-toggle-btn" data-view="${fn:toLowerCase(cat.name)}">
+            <c:out value="${cat.name}" />
+          </button>
+        </c:forEach>
       </div>
 
       <!-- Search and Filters -->
@@ -613,7 +608,7 @@ prefix="fn" %> <% Integer userId = (Integer) session.getAttribute("userId"); if
 
           // Update the total products count in the badge
           if (totalBadge) {
-            totalBadge.textContent = `Total: ${visibleCount} Products`;
+            totalBadge.textContent = Total: ${visibleCount} Products;
           }
         }
 
@@ -920,7 +915,7 @@ prefix="fn" %> <% Integer userId = (Integer) session.getAttribute("userId"); if
               if (formData.id) {
                 // Update existing product
                 const row = document
-                  .querySelector(`tr .edit-btn[data-id="${formData.id}"]`)
+                  .querySelector(tr .edit-btn[data-id="${formData.id}"])
                   .closest("tr");
                 row.cells[0].textContent = formData.name;
                 row.cells[1].textContent = formData.quantity;
@@ -931,15 +926,15 @@ prefix="fn" %> <% Integer userId = (Integer) session.getAttribute("userId"); if
                 badge.textContent =
                   formData.category.charAt(0).toUpperCase() +
                   formData.category.slice(1);
-                badge.className = `badge badge-${formData.category}`;
+                badge.className = badge badge-${formData.category};
 
                 // Update row class for filtering
-                row.className = `category-${formData.category}`;
+                row.className = category-${formData.category};
               } else {
                 // Add new product
                 const tbody = document.querySelector("tbody");
                 const newRow = document.createElement("tr");
-                newRow.className = `category-${formData.category}`;
+                newRow.className = category-${formData.category};
 
                 // Generate a new ID
                 const newId = Date.now().toString();
@@ -966,13 +961,17 @@ prefix="fn" %> <% Integer userId = (Integer) session.getAttribute("userId"); if
                     </div>
                   </td>
                 `;
-
+				newRow.dataset.supplierId = formData.supplier; 
                 tbody.appendChild(newRow);
 
                 // Add event listeners to new buttons
                 const newViewBtn = newRow.querySelector(".view-btn");
                 const newEditBtn = newRow.querySelector(".edit-btn");
                 const newDeleteBtn = newRow.querySelector(".delete-btn");
+                const supplierLabel = productSupplier
+                ? productSupplier.querySelector(option[value="${formData.supplier}"])?.textContent
+                : formData.supplier;
+              viewProductSupplier.textContent = supplierLabel ?? "";
 
                 newViewBtn.addEventListener("click", function () {
                   viewProductName.textContent = formData.name;
@@ -1018,34 +1017,36 @@ prefix="fn" %> <% Integer userId = (Integer) session.getAttribute("userId"); if
                   openModal(deleteModal);
                 });
               }
+              
               if (productImportSelect) {
-                productImportSelect.addEventListener("change", function () {
-                  const selectedImportId = this.value;
-                  const selectedOption = this.options[this.selectedIndex];
+                  productImportSelect.addEventListener("change", function () {
+                    const selectedImportId = this.value;
+                    const selectedOption = this.options[this.selectedIndex];
 
-                  // Example: Enable quantity field only when import is selected
-                  document.getElementById("productQuantity").disabled =
-                    !selectedImportId;
+                    // Example: Enable quantity field only when import is selected
+                    document.getElementById("productQuantity").disabled =
+                      !selectedImportId;
 
-                  // Example: Get data attributes from option
-                  const availableStock = selectedOption.dataset.stock;
-                  const importPrice = selectedOption.dataset.price;
+                    // Example: Get data attributes from option
+                    const availableStock = selectedOption.dataset.stock;
+                    const importPrice = selectedOption.dataset.price;
 
-                  // Example: Update form fields
-                  if (selectedImportId) {
-                    document.getElementById("productPrice").value =
-                      importPrice || "";
-                    document.getElementById("productQuantity").max =
-                      availableStock || 0;
-                  }
+                    // Example: Update form fields
+                    if (selectedImportId) {
+                      document.getElementById("productPrice").value =
+                        importPrice || "";
+                      document.getElementById("productQuantity").max =
+                        availableStock || 0;
+                    }
 
-                  // Example: Show warning for out-of-stock imports
-                  if (availableStock <= 0) {
-                    alert("Selected import has no available stock!");
-                    this.value = "";
-                  }
-                });
-              }
+                    // Example: Show warning for out-of-stock imports
+                    if (availableStock <= 0) {
+                      alert("Selected import has no available stock!");
+                      this.value = "";
+                    }
+                  });
+                }
+              
 
               // Update stats
               const totalProductsValue = document.querySelector(

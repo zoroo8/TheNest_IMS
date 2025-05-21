@@ -6,7 +6,9 @@ public class ProductModel {
     private float price;
     private int stock;
     private int categoryId;
+    private String categoryName;
     private int supplierId;
+    private String supplierName;
     private String description;
 	public int getProductId() {
 		return productId;
@@ -50,6 +52,16 @@ public class ProductModel {
 	public void setDescription(String description) {
 		this.description = description;
 	}
-
-    
+    public String getCategoryName() { // Getter for categoryName
+        return categoryName;
+    }
+    public void setCategoryName(String categoryName) { // Setter for categoryName
+        this.categoryName = categoryName;
+    }
+    public String getSupplierName() {
+        return supplierName;
+    }
+    public void setSupplierName(String supplierName) {
+        this.supplierName = supplierName;
+    }
 }

@@ -1,13 +1,10 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
-<%
-    Integer userId = (Integer) session.getAttribute("userId");
-    if (userId != null) {
-%>
-    <p>Logged in as user ID: <%= userId %></p>
-<%
-    }
-%>
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+pageEncoding="UTF-8"%> <%@ taglib uri="http://java.sun.com/jsp/jstl/core"
+prefix="c" %> <%@ taglib uri="http://java.sun.com/jsp/jstl/functions"
+prefix="fn" %> <% Integer userId = (Integer) session.getAttribute("userId"); if
+(userId != null) { %>
+<p>Logged in as user ID: <%= userId %></p>
+<% } %>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -37,12 +34,90 @@
       rel="stylesheet"
       href="${pageContext.request.contextPath}/resources/css/Products.css"
     />
+    <style>
+      .alert {
+        padding: 12px 20px;
+        margin-bottom: 20px;
+        border-radius: var(--border-radius);
+        position: relative;
+        display: flex;
+        align-items: center;
+        animation: fadeIn 0.3s ease-out;
+      }
+
+      .alert-success {
+        background-color: rgba(76, 175, 80, 0.1);
+        color: var(--success-color); /* Ensure --success-color is defined in your main CSS */
+        border-left: 4px solid var(--success-color); /* Ensure --success-color is defined */
+      }
+
+      .alert-danger {
+        background-color: rgba(244, 67, 54, 0.1); /* Example danger color */
+        color: var(--danger-color); /* Ensure --danger-color is defined in your main CSS */
+        border-left: 4px solid var(--danger-color); /* Ensure --danger-color is defined */
+      }
+
+      .alert .dismiss-btn {
+        position: absolute;
+        right: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        background: transparent;
+        border: none;
+        cursor: pointer;
+        font-size: 1.2rem; /* Adjusted for better visibility */
+        opacity: 0.6;
+        transition: opacity 0.2s;
+        padding: 5px; /* Add some padding for easier clicking */
+      }
+       .alert .dismiss-btn::before {
+        content: "\00D7"; /* Unicode multiplication sign (X) */
+        font-weight: bold;
+      }
+
+      .alert .dismiss-btn:hover {
+        opacity: 1;
+      }
+
+      @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(-10px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+
+      @keyframes fadeOut {
+        from { opacity: 1; transform: translateY(0); }
+        to { opacity: 0; transform: translateY(-10px); }
+      }
+
+      .alert.fade-out {
+        animation: fadeOut 0.3s ease-out forwards;
+      }
+    </style>
   </head>
   <body>
     <jsp:include page="components/Sidebar.jsp" />
 
     <!-- Main Content -->
     <div class="main-content">
+      <!-- Display success/error messages (New Structure) -->
+      <c:if test="${not empty sessionScope.successMessage}">
+        <div class="alert alert-success">
+          <i class="bi bi-check-circle" style="margin-right: 10px; font-size: 1.1rem;"></i>
+          <c:out value="${sessionScope.successMessage}" />
+          <button type="button" class="dismiss-btn" onclick="dismissAlert(this.parentElement)"></button>
+        </div>
+        <c:remove var="successMessage" scope="session" />
+      </c:if>
+
+      <c:if test="${not empty sessionScope.errorMessage}">
+        <div class="alert alert-danger">
+          <i class="bi bi-exclamation-circle" style="margin-right: 10px; font-size: 1.1rem;"></i>
+          <c:out value="${sessionScope.errorMessage}" />
+          <button type="button" class="dismiss-btn" onclick="dismissAlert(this.parentElement)"></button>
+        </div>
+        <c:remove var="errorMessage" scope="session" />
+      </c:if>
+
       <div class="page-header">
         <h1 class="page-title">Manage Products</h1>
         <button class="btn btn-primary" id="addProductBtn">
@@ -56,21 +131,21 @@
           <div class="stat-icon total-products-icon">
             <i class="bi bi-box-seam"></i>
           </div>
-          <div class="stat-value">6</div>
+          <div class="stat-value"><c:out value="${totalProducts}" /></div>
           <div class="stat-label">Total Products</div>
         </div>
         <div class="stat-card">
           <div class="stat-icon low-stock-icon">
             <i class="bi bi-exclamation-triangle"></i>
           </div>
-          <div class="stat-value">2</div>
+          <div class="stat-value"><c:out value="${lowStockCount}" /></div>
           <div class="stat-label">Low Stock</div>
         </div>
         <div class="stat-card">
           <div class="stat-icon out-of-stock-icon">
             <i class="bi bi-x-circle"></i>
           </div>
-          <div class="stat-value">0</div>
+          <div class="stat-value"><c:out value="${outOfStockCount}" /></div>
           <div class="stat-label">Out of Stock</div>
         </div>
       </div>
@@ -108,19 +183,21 @@
           <div class="col-md-3">
             <select class="form-control" id="filterCategory">
               <option value="all" selected>All Categories</option>
-              <option value="groceries">Groceries</option>
-              <option value="furnitures">Furnitures</option>
-              <option value="beverages">Beverages</option>
-              <option value="clothing">Clothing</option>
-              <option value="electronics">Electronics</option>
+              <c:forEach var="cat" items="${categories}">
+                <option value="${fn:toLowerCase(cat.name)}">
+                  <c:out value="${cat.name}" />
+                </option>
+              </c:forEach>
             </select>
           </div>
           <div class="col-md-3">
             <select class="form-control" id="filterSupplier">
               <option value="all" selected>All Suppliers</option>
-              <option value="supplier1">Supplier 1</option>
-              <option value="supplier2">Supplier 2</option>
-              <option value="supplier3">Supplier 3</option>
+              <c:forEach var="sup" items="${suppliers}">
+                <option value="${sup.supplierId}">
+                  <c:out value="${sup.supplierName}" />
+                </option>
+              </c:forEach>
             </select>
           </div>
           <div class="col-md-2">
@@ -133,7 +210,7 @@
       <div class="card">
         <div class="card-header">
           <h2 class="card-title">All Products</h2>
-          <span class="badge badge-primary">Total: 6 Products</span>
+          <span class="badge badge-primary">Total: <c:out value="${totalProducts}" /> Products</span>
         </div>
         <div class="card-body">
           <div class="table-container">
@@ -152,196 +229,48 @@
                 </tr>
               </thead>
               <tbody>
-                <tr class="category-groceries">
-                  <td>Rice</td>
-                  <td>403</td>
-                  <td><span class="badge badge-groceries">Groceries</span></td>
-                  <td>2400</td>
-                  <td>
-                    <div class="action-buttons">
-                      <button
-                        class="action-btn view-btn"
-                        data-id="1"
-                        title="View"
-                      >
-                        <i class="bi bi-eye"></i>
-                      </button>
-                      <button
-                        class="action-btn edit-btn"
-                        data-id="1"
-                        title="Edit"
-                      >
-                        <i class="bi bi-pencil"></i>
-                      </button>
-                      <button
-                        class="action-btn delete-btn"
-                        data-id="1"
-                        title="Delete"
-                      >
-                        <i class="bi bi-trash"></i>
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-                <tr class="category-groceries">
-                  <td>Lentils</td>
-                  <td>381</td>
-                  <td><span class="badge badge-groceries">Groceries</span></td>
-                  <td>1500</td>
-                  <td>
-                    <div class="action-buttons">
-                      <button
-                        class="action-btn view-btn"
-                        data-id="2"
-                        title="View"
-                      >
-                        <i class="bi bi-eye"></i>
-                      </button>
-                      <button
-                        class="action-btn edit-btn"
-                        data-id="2"
-                        title="Edit"
-                      >
-                        <i class="bi bi-pencil"></i>
-                      </button>
-                      <button
-                        class="action-btn delete-btn"
-                        data-id="2"
-                        title="Delete"
-                      >
-                        <i class="bi bi-trash"></i>
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-                <tr class="category-furnitures">
-                  <td>Chair</td>
-                  <td>41</td>
-                  <td>
-                    <span class="badge badge-furnitures">Furnitures</span>
-                  </td>
-                  <td>4500</td>
-                  <td>
-                    <div class="action-buttons">
-                      <button
-                        class="action-btn view-btn"
-                        data-id="3"
-                        title="View"
-                      >
-                        <i class="bi bi-eye"></i>
-                      </button>
-                      <button
-                        class="action-btn edit-btn"
-                        data-id="3"
-                        title="Edit"
-                      >
-                        <i class="bi bi-pencil"></i>
-                      </button>
-                      <button
-                        class="action-btn delete-btn"
-                        data-id="3"
-                        title="Delete"
-                      >
-                        <i class="bi bi-trash"></i>
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-                <tr class="category-beverages">
-                  <td>Sprite</td>
-                  <td>500</td>
-                  <td><span class="badge badge-beverages">Beverages</span></td>
-                  <td>150</td>
-                  <td>
-                    <div class="action-buttons">
-                      <button
-                        class="action-btn view-btn"
-                        data-id="4"
-                        title="View"
-                      >
-                        <i class="bi bi-eye"></i>
-                      </button>
-                      <button
-                        class="action-btn edit-btn"
-                        data-id="4"
-                        title="Edit"
-                      >
-                        <i class="bi bi-pencil"></i>
-                      </button>
-                      <button
-                        class="action-btn delete-btn"
-                        data-id="4"
-                        title="Delete"
-                      >
-                        <i class="bi bi-trash"></i>
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-                <tr class="category-clothing">
-                  <td>T-shirt</td>
-                  <td>120</td>
-                  <td><span class="badge badge-clothing">Clothing</span></td>
-                  <td>800</td>
-                  <td>
-                    <div class="action-buttons">
-                      <button
-                        class="action-btn view-btn"
-                        data-id="5"
-                        title="View"
-                      >
-                        <i class="bi bi-eye"></i>
-                      </button>
-                      <button
-                        class="action-btn edit-btn"
-                        data-id="5"
-                        title="Edit"
-                      >
-                        <i class="bi bi-pencil"></i>
-                      </button>
-                      <button
-                        class="action-btn delete-btn"
-                        data-id="5"
-                        title="Delete"
-                      >
-                        <i class="bi bi-trash"></i>
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-                <tr class="category-electronics">
-                  <td>Headphones</td>
-                  <td>25</td>
-                  <td>
-                    <span class="badge badge-electronics">Electronics</span>
-                  </td>
-                  <td>3500</td>
-                  <td>
-                    <div class="action-buttons">
-                      <button
-                        class="action-btn view-btn"
-                        data-id="6"
-                        title="View"
-                      >
-                        <i class="bi bi-eye"></i>
-                      </button>
-                      <button
-                        class="action-btn edit-btn"
-                        data-id="6"
-                        title="Edit"
-                      >
-                        <i class="bi bi-pencil"></i>
-                      </button>
-                      <button
-                        class="action-btn delete-btn"
-                        data-id="6"
-                        title="Delete"
-                      >
-                        <i class="bi bi-trash"></i>
-                      </button>
-                    </div>
-                  </td>
-                </tr>
+                <c:forEach items="${products}" var="product">
+                  <tr class="category-${fn:toLowerCase(product.categoryName)}" data-supplier-id="${product.supplierId}" data-category-id="${product.categoryId}" data-product-id="${product.productId}" data-description="<c:out value="${product.description}"/>" data-supplier-name="<c:out value="${product.supplierName}"/>" data-category-name="<c:out value="${product.categoryName}"/>">
+                    <td><c:out value="${product.productName}" /></td>
+                    <td><c:out value="${product.stock}" /></td>
+                    <td>
+                      <c:forEach items="${categories}" var="category">
+                        <c:if test="${category.id == product.categoryId}">
+                          <span
+                            class="badge badge-${fn:toLowerCase(category.name)}"
+                            ><c:out value="${category.name}"
+                          /></span>
+                        </c:if>
+                      </c:forEach>
+                    </td>
+                    <td><c:out value="${product.price}" /></td>
+                    <td>
+                      <div class="action-buttons">
+                        <button
+                          class="action-btn view-btn"
+                          data-id="${product.productId}"
+                          title="View"
+                        >
+                          <i class="bi bi-eye"></i>
+                        </button>
+                        <button
+                          class="action-btn edit-btn"
+                          data-id="${product.productId}"
+                          title="Edit"
+                        >
+                          <i class="bi bi-pencil"></i>
+                        </button>
+                        <button
+                          class="action-btn delete-btn"
+                          data-id="${product.productId}"
+                          title="Delete"
+                        >
+                          <i class="bi bi-trash"></i>
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                </c:forEach>
               </tbody>
             </table>
           </div>
@@ -380,16 +309,11 @@
         <button class="modal-close" id="closeModal">&times;</button>
       </div>
       <div class="modal-body">
-      
-      <c:if test="${param.success == '1'}">
-	    <div class="alert alert-success">Product added successfully!</div>
-	  </c:if>
-	
-	  <c:if test="${param.error == '1'}">
-	    <div class="alert alert-danger">Something went wrong. Please try again.</div>
-	  </c:if>
-      
-        <form id="productForm" action="<%=request.getContextPath()%>/products" method="post">
+        <form
+          id="productForm"
+          action="<%=request.getContextPath()%>/products"
+          method="post"
+        >
           <input type="hidden" id="productId" name="productId" value="" />
 
           <div class="form-group">
@@ -405,12 +329,17 @@
 
           <div class="form-group">
             <label for="productCategory" class="form-label">Category</label>
-            <select class="form-control" id="productCategory" name="productCategory" required>
-			  <option value="">Select Category</option>
-			  <c:forEach var="cat" items="${categories}">
-			    <option value="${cat.id}">${cat.name}</option>
-			  </c:forEach>
-			</select>
+            <select
+              class="form-control"
+              id="productCategory"
+              name="productCategory"
+              required
+            >
+              <option value="">Select Category</option>
+              <c:forEach var="cat" items="${categories}">
+                <option value="${cat.id}">${cat.name}</option>
+              </c:forEach>
+            </select>
           </div>
 
           <div class="form-group">
@@ -440,24 +369,34 @@
 
           <div class="form-group">
             <label for="productSupplier" class="form-label">Supplier</label>
-            <select class="form-control" id="productSupplier" name="productSupplier" required>
-			  <option value="">Select Supplier</option>
-			  <c:forEach var="sup" items="${suppliers}">
-			    <option value="${sup.supplierId}">${sup.supplierName}</option>
-			</c:forEach>
-			</select>
+            <select
+              class="form-control"
+              id="productSupplier"
+              name="productSupplier"
+              required
+            >
+              <option value="">Select Supplier</option>
+              <c:forEach var="sup" items="${suppliers}">
+                <option value="${sup.supplierId}">${sup.supplierName}</option>
+              </c:forEach>
+            </select>
           </div>
-		 <div class="form-group">
-		  <label for="productImport" class="form-label">Import</label>
-		  <select class="form-control" id="productImport" name="productImport" required>
-		    <option value="">Select Import</option>
-		    <c:forEach var="imp" items="${imports}">
-		      <option value="${imp.importId}">
-			  ${imp.importName} {ID:${imp.importId}}
-			</option>
-		    </c:forEach>
-		  </select>
-		</div>
+          <div class="form-group">
+            <label for="productImport" class="form-label">Import</label>
+            <select
+              class="form-control"
+              id="productImport"
+              name="productImport"
+              required
+            >
+              <option value="">Select Import</option>
+              <c:forEach var="imp" items="${imports}">
+                <option value="${imp.importId}">
+                  ${imp.importName} {ID:${imp.importId}}
+                </option>
+              </c:forEach>
+            </select>
+          </div>
           <div class="form-group">
             <label for="productDescription" class="form-label"
               >Description</label
@@ -470,11 +409,18 @@
             ></textarea>
           </div>
           <div class="modal-footer">
-	        <button type="button" class="btn btn-outline" id="cancelBtn">Cancel</button>
-	        <button type= "submit" class="btn btn-primary" name="saveProductBtn" id="saveProductBtn">
-	          Save Product
-	        </button>
-     	 </div>
+            <button type="button" class="btn btn-outline" id="cancelBtn">
+              Cancel
+            </button>
+            <button
+              type="submit"
+              class="btn btn-primary"
+              name="saveProductBtn"
+              id="saveProductBtn"
+            >
+              Save Product
+            </button>
+          </div>
         </form>
       </div>
     </div>
@@ -543,6 +489,16 @@
       </div>
     </div>
 
+    <form
+      id="deleteProductForm"
+      action="<%=request.getContextPath()%>/products"
+      method="post"
+      style="display: none"
+    >
+      <input type="hidden" name="action" value="delete" />
+      <input type="hidden" id="deleteProductId" name="productId" />
+    </form>
+
     <!-- JavaScript for functionality -->
     <script>
       document.addEventListener("DOMContentLoaded", function () {
@@ -610,8 +566,8 @@
         // Search and filter functionality
         function filterProducts() {
           const searchTerm = searchInput.value.toLowerCase();
-          const categoryValue = categoryFilter.value;
-          const supplierValue = supplierFilter.value;
+          const categoryValue = categoryFilter.value; // This is already lowercase category name
+          const supplierValue = supplierFilter.value; // This will be supplier ID or "all"
           const activeView = document
             .querySelector(".view-toggle-btn.active")
             .getAttribute("data-view");
@@ -619,30 +575,24 @@
           let visibleCount = 0;
 
           productRows.forEach((row) => {
-            const productName = row.cells[0].textContent.toLowerCase();
-            const categoryClass = row.className;
+            const productNameText = row.cells[0].textContent.toLowerCase();
+            const categoryClass = row.className; // e.g., "category-groceries"
+            const supplierIdFromRow = row.dataset.supplierId;
 
             // Check if product matches search term
-            const matchesSearch = productName.includes(searchTerm);
+            const matchesSearch = productNameText.includes(searchTerm);
 
-            // Check if product matches category filter
+            // Check if product matches category filter (uses category name from class)
             const matchesCategory =
               categoryValue === "all" ||
-              (categoryValue === "groceries" &&
-                categoryClass.includes("category-groceries")) ||
-              (categoryValue === "furnitures" &&
-                categoryClass.includes("category-furnitures")) ||
-              (categoryValue === "beverages" &&
-                categoryClass.includes("category-beverages")) ||
-              (categoryValue === "clothing" &&
-                categoryClass.includes("category-clothing")) ||
-              (categoryValue === "electronics" &&
-                categoryClass.includes("category-electronics"));
+              categoryClass.includes("category-" + categoryValue);
 
-            // Check if product matches supplier filter
-            const matchesSupplier = supplierValue === "all"; // Update this based on your data structure
+            // Check if product matches supplier filter (uses supplier ID)
+            const matchesSupplier = 
+              supplierValue === "all" || 
+              supplierIdFromRow === supplierValue;
 
-            // Check if product matches view toggle
+            // Check if product matches view toggle (uses category name from class)
             const matchesView =
               activeView === "all" ||
               categoryClass.includes("category-" + activeView);
@@ -792,9 +742,13 @@
               row.cells[2].querySelector(".badge").textContent;
             viewProductQuantity.textContent = row.cells[1].textContent;
             viewProductPrice.textContent = "Rs " + row.cells[3].textContent;
-            viewProductSupplier.textContent = "Supplier 1"; // Example data
-            viewProductDescription.textContent =
-              "This is a sample description for " + row.cells[0].textContent; // Example data
+            // viewProductSupplier.textContent = "Supplier 1"; // Example data removed
+            // viewProductDescription.textContent =
+            //   "This is a sample description for " + row.cells[0].textContent; // Example data removed
+
+            // Fetch actual supplier and description if available, or leave blank/placeholder
+            viewProductSupplier.textContent = ""; // Or fetch from data attribute if available
+            viewProductDescription.textContent = ""; // Or fetch from data attribute if available
 
             openModal(viewProductModal);
           });
@@ -803,40 +757,50 @@
         // Edit Product buttons
         editButtons.forEach((button) => {
           button.addEventListener("click", function () {
-            const productId = this.getAttribute("data-id");
+            const productIdValue = this.getAttribute("data-id"); // Renamed to avoid conflict
             const row = this.closest("tr");
 
             document.getElementById("modalTitle").textContent = "Edit Product";
 
             // Populate form with data from the row
-            document.getElementById("productId").value = productId;
-            document.getElementById("productName").value =
-              row.cells[0].textContent;
-            document.getElementById("productQuantity").value =
-              row.cells[1].textContent;
-            document.getElementById("productPrice").value =
-              row.cells[3].textContent;
+            productId.value = productIdValue; // Use the renamed variable
+            productName.value = row.cells[0].textContent;
+            productQuantity.value = row.cells[1].textContent;
+            productPrice.value = row.cells[3].textContent;
 
             // Set category based on badge class
             const categoryBadge = row.cells[2].querySelector(".badge");
             const categoryClass = categoryBadge.className;
+            let categoryValue = ""; // Variable to hold the category value
 
             if (categoryClass.includes("badge-groceries")) {
-              document.getElementById("productCategory").value = "groceries";
+              categoryValue = "groceries";
             } else if (categoryClass.includes("badge-furnitures")) {
-              document.getElementById("productCategory").value = "furnitures";
+              categoryValue = "furnitures";
             } else if (categoryClass.includes("badge-beverages")) {
-              document.getElementById("productCategory").value = "beverages";
+              categoryValue = "beverages";
             } else if (categoryClass.includes("badge-clothing")) {
-              document.getElementById("productCategory").value = "clothing";
+              categoryValue = "clothing";
             } else if (categoryClass.includes("badge-electronics")) {
-              document.getElementById("productCategory").value = "electronics";
+              categoryValue = "electronics";
+            }
+            // Ensure productCategory element exists before setting its value
+            if (productCategory) {
+              productCategory.value = categoryValue;
             }
 
-            // Example data for supplier and description
-            document.getElementById("productSupplier").value = "supplier1";
-            document.getElementById("productDescription").value =
-              "This is a sample description for " + row.cells[0].textContent;
+            // Example data for supplier and description removed
+            // document.getElementById("productSupplier").value = "supplier1";
+            // document.getElementById("productDescription").value =
+            //   "This is a sample description for " + row.cells[0].textContent;
+
+            // Clear or fetch actual supplier and description
+            if (productSupplier) {
+              productSupplier.value = ""; // Or fetch from data attribute if available
+            }
+            if (productDescription) {
+              productDescription.value = ""; // Or fetch from data attribute if available
+            }
 
             openModal(productModal);
           });
@@ -855,9 +819,7 @@
             confirmDeleteBtn.setAttribute("data-id", productId);
           });
         });
-        
-        
-        
+
         // Edit from view button
         if (editFromViewBtn) {
           editFromViewBtn.addEventListener("click", function () {
@@ -865,43 +827,46 @@
 
             document.getElementById("modalTitle").textContent = "Edit Product";
 
-            document.getElementById("productName").value =
-              viewProductName.textContent;
+            productName.value = viewProductName.textContent;
 
             // Extract category from view modal
-            const category = viewProductCategory.textContent.toLowerCase();
-            if (category === "groceries") {
-              document.getElementById("productCategory").value = "groceries";
-            } else if (category === "furnitures") {
-              document.getElementById("productCategory").value = "furnitures";
-            } else if (category === "beverages") {
-              document.getElementById("productCategory").value = "beverages";
-            } else if (category === "clothing") {
-              document.getElementById("productCategory").value = "clothing";
-            } else if (category === "electronics") {
-              document.getElementById("productCategory").value = "electronics";
+            const categoryText = viewProductCategory.textContent.toLowerCase();
+            let categoryValue = "";
+            if (categoryText === "groceries") {
+              categoryValue = "groceries";
+            } else if (categoryText === "furnitures") {
+              categoryValue = "furnitures";
+            } else if (categoryText === "beverages") {
+              categoryValue = "beverages";
+            } else if (categoryText === "clothing") {
+              categoryValue = "clothing";
+            } else if (categoryText === "electronics") {
+              categoryValue = "electronics";
+            }
+            if (productCategory) {
+              productCategory.value = categoryValue;
             }
 
             // Extract quantity from view modal
-            document.getElementById("productQuantity").value =
-              viewProductQuantity.textContent;
+            productQuantity.value = viewProductQuantity.textContent;
 
             // Extract price from view modal (remove 'Rs ' prefix)
             const priceText = viewProductPrice.textContent;
-            document.getElementById("productPrice").value = priceText.replace(
-              "Rs ",
-              ""
-            );
+            productPrice.value = priceText.replace("Rs ", "");
 
-            // Set supplier and description from view modal
-            document.getElementById("productSupplier").value =
-              viewProductSupplier.textContent === "Supplier 1"
-                ? "supplier1"
-                : viewProductSupplier.textContent === "Supplier 2"
-                ? "supplier2"
-                : "supplier3";
-            document.getElementById("productDescription").value =
-              viewProductDescription.textContent;
+            // Set supplier and description from view modal - remove hardcoding
+            // productSupplier.value =
+            //   viewProductSupplier.textContent === "Supplier 1"
+            //     ? "supplier1"
+            //     : viewProductSupplier.textContent === "Supplier 2"
+            //     ? "supplier2"
+            //     : "supplier3";
+            if (productSupplier) {
+              productSupplier.value = ""; // Or map from viewProductSupplier.textContent if it holds actual value/ID
+            }
+            if (productDescription) {
+              productDescription.value = viewProductDescription.textContent; // This can stay if description is meant to be copied
+            }
 
             openModal(productModal);
           });
@@ -937,7 +902,6 @@
           saveProductBtn.addEventListener("click", function () {
             // Validate form
             if (productForm.checkValidity()) {
-            	
               // Get form data
               const formData = {
                 id: productId.value,
@@ -1017,12 +981,14 @@
                     formData.category.slice(1);
                   viewProductQuantity.textContent = formData.quantity;
                   viewProductPrice.textContent = "Rs " + formData.price;
-                  viewProductSupplier.textContent =
-                    formData.supplier === "supplier1"
-                      ? "Supplier 1"
-                      : formData.supplier === "supplier2"
-                      ? "Supplier 2"
-                      : "Supplier 3";
+                  // viewProductSupplier.textContent =
+                  //   formData.supplier === "supplier1"
+                  //     ? "Supplier 1"
+                  //     : formData.supplier === "supplier2"
+                  //     ? "Supplier 2"
+                  //     : "Supplier 3"; // Example data removed
+                  // Fetch actual supplier name based on formData.supplier (which should be an ID)
+                  viewProductSupplier.textContent = formData.supplier; // Or look up name
                   viewProductDescription.textContent = formData.description;
 
                   openModal(viewProductModal);
@@ -1032,18 +998,16 @@
                   document.getElementById("modalTitle").textContent =
                     "Edit Product";
 
-                  document.getElementById("productId").value = newId;
-                  document.getElementById("productName").value = formData.name;
-                  document.getElementById("productCategory").value =
-                    formData.category;
-                  document.getElementById("productQuantity").value =
-                    formData.quantity;
-                  document.getElementById("productPrice").value =
-                    formData.price;
-                  document.getElementById("productSupplier").value =
-                    formData.supplier;
-                  document.getElementById("productDescription").value =
-                    formData.description;
+                  productId.value = newId;
+                  productName.value = formData.name;
+                  if (productCategory)
+                    productCategory.value = formData.category;
+                  productQuantity.value = formData.quantity;
+                  productPrice.value = formData.price;
+                  if (productSupplier)
+                    productSupplier.value = formData.supplier;
+                  if (productDescription)
+                    productDescription.value = formData.description;
 
                   openModal(productModal);
                 });
@@ -1055,31 +1019,34 @@
                 });
               }
               if (productImportSelect) {
-            	  productImportSelect.addEventListener("change", function() {
-            	    const selectedImportId = this.value;
-            	    const selectedOption = this.options[this.selectedIndex];
-            	    
-            	    // Example: Enable quantity field only when import is selected
-            	    document.getElementById("productQuantity").disabled = !selectedImportId;
-            	    
-            	    // Example: Get data attributes from option
-            	    const availableStock = selectedOption.dataset.stock;
-            	    const importPrice = selectedOption.dataset.price;
-            	    
-            	    // Example: Update form fields
-            	    if (selectedImportId) {
-            	      document.getElementById("productPrice").value = importPrice || "";
-            	      document.getElementById("productQuantity").max = availableStock || 0;
-            	    }
-            	    
-            	    // Example: Show warning for out-of-stock imports
-            	    if (availableStock <= 0) {
-            	      alert("Selected import has no available stock!");
-            	      this.value = "";
-            	    }
-            	  });
-            	}
-              
+                productImportSelect.addEventListener("change", function () {
+                  const selectedImportId = this.value;
+                  const selectedOption = this.options[this.selectedIndex];
+
+                  // Example: Enable quantity field only when import is selected
+                  document.getElementById("productQuantity").disabled =
+                    !selectedImportId;
+
+                  // Example: Get data attributes from option
+                  const availableStock = selectedOption.dataset.stock;
+                  const importPrice = selectedOption.dataset.price;
+
+                  // Example: Update form fields
+                  if (selectedImportId) {
+                    document.getElementById("productPrice").value =
+                      importPrice || "";
+                    document.getElementById("productQuantity").max =
+                      availableStock || 0;
+                  }
+
+                  // Example: Show warning for out-of-stock imports
+                  if (availableStock <= 0) {
+                    alert("Selected import has no available stock!");
+                    this.value = "";
+                  }
+                });
+              }
+
               // Update stats
               const totalProductsValue = document.querySelector(
                 ".total-products-icon"
@@ -1091,7 +1058,7 @@
               totalBadge.textContent = `Total: ${
                 document.querySelectorAll("tbody tr").length
               } Products`;
-		
+
               // Close modal
               closeAllModals();
 
@@ -1107,36 +1074,57 @@
         // Confirm delete button
         if (confirmDeleteBtn) {
           confirmDeleteBtn.addEventListener("click", function () {
-            const productId = this.getAttribute("data-id");
-            const row = document
-              .querySelector(`tr .delete-btn[data-id="${productId}"]`)
-              .closest("tr");
+            const productIdToDelete = this.getAttribute("data-id");
 
-            // Remove the row
-            row.remove();
+            // Set the product ID in the hidden form and submit
+            const deleteForm = document.getElementById("deleteProductForm");
+            const deleteProductIdInput =
+              document.getElementById("deleteProductId");
 
-            // Update stats
-            const totalProductsValue = document.querySelector(
-              ".total-products-icon"
-            ).nextElementSibling;
-            totalProductsValue.textContent =
-              document.querySelectorAll("tbody tr").length;
-
-            // Update badge count
-            totalBadge.textContent = `Total: ${
-              document.querySelectorAll("tbody tr").length
-            } Products`;
-
-            // Close modal
-            closeAllModals();
-
-            // Show success message (you could add a toast notification here)
-            alert("Product deleted successfully!");
+            if (deleteForm && deleteProductIdInput) {
+              deleteProductIdInput.value = productIdToDelete;
+              deleteForm.submit();
+              // The page will reload due to form submission and redirect from servlet.
+              // Client-side row removal and alert will be handled by page reload and success/error messages from server.
+            } else {
+              console.error("Delete form or product ID input not found.");
+              alert("Error initiating delete. Please try again.");
+              closeAllModals();
+            }
           });
         }
 
         // Initialize filters
         filterProducts();
+
+        function dismissAlert(alertElement) {
+            if (alertElement) {
+                alertElement.classList.add('fade-out');
+                setTimeout(() => {
+                    if (alertElement.parentNode) {
+                        alertElement.parentNode.removeChild(alertElement);
+                    }
+                }, 300); // Matches animation duration
+            }
+        }
+
+        const alerts = document.querySelectorAll('.alert'); // Select all alerts on the page
+        if (alerts.length > 0) {
+            alerts.forEach(alert => {
+                // Auto-dismiss after 3 seconds
+                setTimeout(() => {
+                    dismissAlert(alert);
+                }, 3000);
+
+                // Allow manual dismissal
+                const dismissButton = alert.querySelector('.dismiss-btn');
+                if (dismissButton) {
+                    dismissButton.onclick = function() {
+                        dismissAlert(alert);
+                    };
+                }
+            });
+        }
       });
     </script>
   </body>

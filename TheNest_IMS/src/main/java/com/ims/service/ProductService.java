@@ -14,9 +14,6 @@ public class ProductService {
        ---------------------------------------------------------- */
     public List<ProductModel> getAllProducts() throws SQLException {
 
-        /*  You now need a JOIN to pull supplier info (if you
-            want it in the table).  One row per supplier per
-            product, so be ready to aggregate on the JSP side.   */
         String sql = """
             SELECT  p.product_id,
                     p.product_name,
@@ -47,11 +44,7 @@ public class ProductService {
                 product.setCategoryId  (rs.getInt   ("category_id"));
                 product.setDescription (rs.getString("description"));
 
-                /*  --- NEW ---
-                    If you keep supplier info inside the model,
-                    add a List<Integer> or similar.               */
-                // product.addSupplierId(rs.getInt("supplierId"));
-                // product.addSupplierName(rs.getString("supplierName"));
+                // Optional: Add supplier ID/name to the model
 
                 products.add(product);
             }
@@ -60,7 +53,7 @@ public class ProductService {
     }
 
     /* ==========================================================
-       2. ADD PRODUCT  ➜  SUPPLIER_PRODUCT  ➜  IMPORT_PRODUCT_USER
+       2. ADD PRODUCT + SUPPLIER_PRODUCT + IMPORT_PRODUCT_USER + PRODUCT_USER LOG
        ---------------------------------------------------------- */
     public void addProductWithImport(String productName,
                                      float price,
@@ -71,10 +64,8 @@ public class ProductService {
                                      int importId,
                                      int userId) throws SQLException {
 
-        /* No supplier_id column here anymore */
         final String insertProductSQL = """
-            INSERT INTO product
-              (product_name, price, stock, category_id, description)
+            INSERT INTO product (product_name, price, stock, category_id, description)
             VALUES (?,?,?,?,?)
         """;
 
@@ -88,19 +79,22 @@ public class ProductService {
             VALUES (?,?,?)
         """;
 
+        final String insertProductUserLogSQL = """
+            INSERT INTO product_user (product_id, user_id, action)
+            VALUES (?, ?, ?)
+        """;
+
         try (Connection conn = DbConfig.getDBConnection()) {
-            conn.setAutoCommit(false);        // BEGIN TRAN
+            conn.setAutoCommit(false);  // BEGIN TRAN
 
-            /* ---------- 1. PRODUCT ---------- */
             int productId;
-            try (PreparedStatement ps =
-                     conn.prepareStatement(insertProductSQL,
-                                           Statement.RETURN_GENERATED_KEYS)) {
 
+            // 1. PRODUCT
+            try (PreparedStatement ps = conn.prepareStatement(insertProductSQL, Statement.RETURN_GENERATED_KEYS)) {
                 ps.setString(1, productName);
-                ps.setFloat (2, price);
-                ps.setInt   (3, stock);
-                ps.setInt   (4, categoryId);
+                ps.setFloat(2, price);
+                ps.setInt(3, stock);
+                ps.setInt(4, categoryId);
                 ps.setString(5, description);
 
                 if (ps.executeUpdate() == 0) {
@@ -115,14 +109,14 @@ public class ProductService {
                 }
             }
 
-            /* ---------- 2. SUPPLIER ↔ PRODUCT ---------- */
+            // 2. SUPPLIER ↔ PRODUCT
             try (PreparedStatement ps = conn.prepareStatement(insertSupplierProductSQL)) {
                 ps.setInt(1, supplierId);
                 ps.setInt(2, productId);
                 ps.executeUpdate();
             }
 
-            /* ---------- 3. IMPORT ↔ PRODUCT ↔ USER ---------- */
+            // 3. IMPORT ↔ PRODUCT ↔ USER
             try (PreparedStatement ps = conn.prepareStatement(insertImportProductUserSQL)) {
                 ps.setInt(1, importId);
                 ps.setInt(2, productId);
@@ -130,7 +124,66 @@ public class ProductService {
                 ps.executeUpdate();
             }
 
-            conn.commit();                    // COMMIT
+            // 4. PRODUCT_USER LOG
+            try (PreparedStatement ps = conn.prepareStatement(insertProductUserLogSQL)) {
+                ps.setInt(1, productId);
+                ps.setInt(2, userId);
+                ps.setString(3, "created");
+                ps.executeUpdate();
+            }
+
+            conn.commit();  // COMMIT
+        }
+    }
+
+    /* ==========================================================
+       3. UPDATE PRODUCT + PRODUCT_USER LOG
+       ---------------------------------------------------------- */
+    public void updateProduct(int productId,
+                              String productName,
+                              float price,
+                              int stock,
+                              int categoryId,
+                              String description,
+                              int userId) throws SQLException {
+
+        final String updateProductSQL = """
+            UPDATE product
+            SET product_name = ?, price = ?, stock = ?, category_id = ?, description = ?
+            WHERE product_id = ?
+        """;
+
+        final String insertProductUserLogSQL = """
+            INSERT INTO product_user (product_id, user_id, action)
+            VALUES (?, ?, ?)
+        """;
+
+        try (Connection conn = DbConfig.getDBConnection()) {
+            conn.setAutoCommit(false);  // BEGIN TRAN
+
+            // 1. UPDATE PRODUCT
+            try (PreparedStatement ps = conn.prepareStatement(updateProductSQL)) {
+                ps.setString(1, productName);
+                ps.setFloat(2, price);
+                ps.setInt(3, stock);
+                ps.setInt(4, categoryId);
+                ps.setString(5, description);
+                ps.setInt(6, productId);
+
+                if (ps.executeUpdate() == 0) {
+                    throw new SQLException("Updating product failed: no rows affected.");
+                }
+            }
+
+            // 2. LOG UPDATE ACTION
+            try (PreparedStatement ps = conn.prepareStatement(insertProductUserLogSQL)) {
+                ps.setInt(1, productId);
+                ps.setInt(2, userId);
+                ps.setString(3, "updated");
+                ps.executeUpdate();
+            }
+
+            conn.commit();  // COMMIT
         }
     }
 }

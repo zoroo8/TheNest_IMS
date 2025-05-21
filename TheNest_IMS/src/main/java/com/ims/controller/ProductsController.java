@@ -73,7 +73,7 @@ public class ProductsController extends HttpServlet {
         String supplierIdStr   = request.getParameter("productSupplier");
         String description     = request.getParameter("productDescription");
         String importIdStr     = request.getParameter("productImport");
-
+        
         if (productName == null || productName.trim().isEmpty() ||
             priceStr == null   || stockStr == null   ||
             categoryIdStr == null || supplierIdStr == null ||

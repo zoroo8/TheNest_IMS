@@ -608,7 +608,7 @@ prefix="fn" %> <% Integer userId = (Integer) session.getAttribute("userId"); if
 
           // Update the total products count in the badge
           if (totalBadge) {
-            totalBadge.textContent = Total: ${visibleCount} Products;
+        	  totalBadge.textContent = `Total: ${visibleCount} Products`;
           }
         }
 
@@ -914,9 +914,7 @@ prefix="fn" %> <% Integer userId = (Integer) session.getAttribute("userId"); if
               // For demo purposes, update the UI directly
               if (formData.id) {
                 // Update existing product
-                const row = document
-                  .querySelector(tr .edit-btn[data-id="${formData.id}"])
-                  .closest("tr");
+                const row = document.querySelector(`tr .edit-btn[data-id="${formData.id}"]`);
                 row.cells[0].textContent = formData.name;
                 row.cells[1].textContent = formData.quantity;
                 row.cells[3].textContent = formData.price;
@@ -926,15 +924,15 @@ prefix="fn" %> <% Integer userId = (Integer) session.getAttribute("userId"); if
                 badge.textContent =
                   formData.category.charAt(0).toUpperCase() +
                   formData.category.slice(1);
-                badge.className = badge badge-${formData.category};
+                  badge.className = `badge badge-${formData.category}`;
 
                 // Update row class for filtering
-                row.className = category-${formData.category};
+                row.className = `category-${formData.category}`;
               } else {
                 // Add new product
                 const tbody = document.querySelector("tbody");
                 const newRow = document.createElement("tr");
-                newRow.className = category-${formData.category};
+                newRow.className = `category-${formData.category}`;
 
                 // Generate a new ID
                 const newId = Date.now().toString();
@@ -969,7 +967,7 @@ prefix="fn" %> <% Integer userId = (Integer) session.getAttribute("userId"); if
                 const newEditBtn = newRow.querySelector(".edit-btn");
                 const newDeleteBtn = newRow.querySelector(".delete-btn");
                 const supplierLabel = productSupplier
-                ? productSupplier.querySelector(option[value="${formData.supplier}"])?.textContent
+                ? productSupplier.querySelector(`option[value="${formData.supplier}"]`)?.textContent
                 : formData.supplier;
               viewProductSupplier.textContent = supplierLabel ?? "";
 

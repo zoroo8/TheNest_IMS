@@ -31,9 +31,31 @@ public class ProductsController extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         try {
-            List<CategoryModel> categories = new CategoryService().getAllCategories();
-            List<SupplierModel> suppliers = new SupplierService().getAllSuppliers();
-            List<ImportModel> imports = new ImportService().getAllImports();
+            ProductService productService = new ProductService();
+            List<com.ims.model.ProductModel> products = productService.getAllProducts();
+            request.setAttribute("products", products);
+
+            // Calculate stats
+            int totalProducts = products.size();
+            int lowStockCount = 0;
+            int outOfStockCount = 0;
+            final int LOW_STOCK_THRESHOLD = 10; // Define your low stock threshold
+
+            for (com.ims.model.ProductModel product : products) {
+                if (product.getStock() == 0) {
+                    outOfStockCount++;
+                } else if (product.getStock() < LOW_STOCK_THRESHOLD) {
+                    lowStockCount++;
+                }
+            }
+
+            request.setAttribute("totalProducts", totalProducts);
+            request.setAttribute("lowStockCount", lowStockCount);
+            request.setAttribute("outOfStockCount", outOfStockCount);
+
+            List<com.ims.model.CategoryModel> categories = new com.ims.service.CategoryService().getAllCategories();
+            List<com.ims.model.SupplierModel> suppliers = new com.ims.service.SupplierService().getAllSuppliers();
+            List<com.ims.model.ImportModel> imports = new com.ims.service.ImportService().getAllImports();
 
             request.setAttribute("categories", categories);
             request.setAttribute("suppliers", suppliers);
@@ -46,19 +68,26 @@ public class ProductsController extends HttpServlet {
         }
     }
 
-    @Override
+ @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        HttpSession session = request.getSession(false);
-        if (session == null || session.getAttribute("userId") == null) {
+        HttpSession session = request.getSession(); // Use getSession() to ensure it's created
+        if (session.getAttribute("userId") == null) {
             response.sendRedirect(request.getContextPath() + "/Login");
             return;
         }
 
         int userId = (int) session.getAttribute("userId");
+        String action = request.getParameter("action");
+
+        if ("delete".equals(action)) {
+            handleDeleteAction(request, response, session); // Pass session
+            return;
+        }
 
         try {
+            String productIdStr = request.getParameter("productId");
             String productName = request.getParameter("productName");
             String priceStr = request.getParameter("productPrice");
             String stockStr = request.getParameter("productQuantity");
@@ -68,11 +97,24 @@ public class ProductsController extends HttpServlet {
             String importIdStr = request.getParameter("productImport");
 
             if (productName == null || productName.trim().isEmpty() ||
-                priceStr == null || stockStr == null ||
-                categoryIdStr == null || supplierIdStr == null ||
-                description == null || importIdStr == null) {
+                priceStr == null || priceStr.trim().isEmpty() || 
+                stockStr == null || stockStr.trim().isEmpty() ||
+                categoryIdStr == null || categoryIdStr.trim().isEmpty() || 
+                supplierIdStr == null || supplierIdStr.trim().isEmpty() ||
+                /* description can be empty */
+                importIdStr == null || importIdStr.trim().isEmpty()) {
 
-                request.setAttribute("error", "One or more required fields are empty.");
+                try {
+                    loadFormAttributes(request);
+                } catch (Exception loadEx) {
+                    System.err.println("Error loading form attributes after validation failure: " + loadEx.getMessage());
+                    loadEx.printStackTrace();
+                }
+                session.setAttribute("errorMessage", "One or more required fields are empty.");
+                // Forward back to the products page, which will then display the modal if needed by JS
+                // Or, if you want to show the modal directly, you might need to set an attribute
+                // request.setAttribute("showAddEditModal", true); 
+                // request.setAttribute("formData", /* current form data to repopulate */);
                 request.getRequestDispatcher("/WEB-INF/pages/Products.jsp").forward(request, response);
                 return;
             }
@@ -84,22 +126,80 @@ public class ProductsController extends HttpServlet {
             int importId = Integer.parseInt(importIdStr);
 
             ProductService productService = new ProductService();
-            productService.addProductWithImport(productName, price, stock, categoryId, supplierId, description, importId, userId);
 
-            response.sendRedirect("products?success=1");
+            if (productIdStr != null && !productIdStr.trim().isEmpty()) {
+                int productId = Integer.parseInt(productIdStr);
+                productService.updateProductWithImport(productId, productName, price, stock, categoryId, supplierId, description, importId, userId);
+                session.setAttribute("successMessage", "Product updated successfully!");
+            } else {
+                productService.addProductWithImport(productName, price, stock, categoryId, supplierId, description, importId, userId);
+                session.setAttribute("successMessage", "Product added successfully!");
+            }
+            response.sendRedirect(request.getContextPath() + "/products");
 
         } catch (SQLException e) {
             e.printStackTrace();
-            request.setAttribute("error", "Database error: " + e.getMessage());
+            handleFormError(request, session, "Database error: " + e.getMessage());
             request.getRequestDispatcher("/WEB-INF/pages/Products.jsp").forward(request, response);
         } catch (NumberFormatException e) {
             e.printStackTrace();
-            request.setAttribute("error", "Invalid numeric input: " + e.getMessage());
+            handleFormError(request, session, "Invalid numeric input: " + e.getMessage());
             request.getRequestDispatcher("/WEB-INF/pages/Products.jsp").forward(request, response);
         } catch (Exception e) {
             e.printStackTrace();
-            request.setAttribute("error", "Unexpected error: " + e.getMessage());
+            handleFormError(request, session, "An unexpected error occurred: " + e.getMessage());
             request.getRequestDispatcher("/WEB-INF/pages/Products.jsp").forward(request, response);
         }
+    }
+
+    private void handleFormError(HttpServletRequest request, HttpSession session, String errorMessage) {
+        try {
+            loadFormAttributes(request); // Reload dropdowns etc.
+        } catch (Exception loadEx) {
+            System.err.println("Error loading form attributes after primary error: " + loadEx.getMessage());
+            loadEx.printStackTrace();
+        }
+        session.setAttribute("errorMessage", errorMessage);
+        // To repopulate the form and show the modal, you might set attributes here
+        // request.setAttribute("showAddEditModalOnError", true);
+        // request.setAttribute("productNameOnError", request.getParameter("productName")); // and so on for other fields
+    }
+
+
+    private void handleDeleteAction(HttpServletRequest request, HttpServletResponse response, HttpSession session) throws IOException {
+        try {
+            String productIdStr = request.getParameter("productId");
+            if (productIdStr == null || productIdStr.trim().isEmpty()) {
+                session.setAttribute("errorMessage", "Delete failed: Product ID was missing.");
+                response.sendRedirect(request.getContextPath() + "/products");
+                return;
+            }
+            int productId = Integer.parseInt(productIdStr);
+            ProductService productService = new ProductService();
+            productService.deleteProduct(productId);
+            session.setAttribute("successMessage", "Product deleted successfully!");
+        } catch (SQLException e) {
+            e.printStackTrace();
+            session.setAttribute("errorMessage", "Delete failed: Database error.");
+        } catch (NumberFormatException e) {
+            e.printStackTrace();
+            session.setAttribute("errorMessage", "Delete failed: Invalid Product ID.");
+        }
+        response.sendRedirect(request.getContextPath() + "/products");
+    }
+    
+
+    // Changed to throws Exception to cover all possible checked exceptions from service calls
+    private void loadFormAttributes(HttpServletRequest request) throws Exception {
+        List<com.ims.model.CategoryModel> categories = new com.ims.service.CategoryService().getAllCategories();
+        List<com.ims.model.SupplierModel> suppliers = new com.ims.service.SupplierService().getAllSuppliers();
+        List<com.ims.model.ImportModel> imports = new com.ims.service.ImportService().getAllImports();
+        List<com.ims.model.ProductModel> products = new ProductService().getAllProducts();
+
+
+        request.setAttribute("categories", categories);
+        request.setAttribute("suppliers", suppliers);
+        request.setAttribute("imports", imports);
+        request.setAttribute("products", products);
     }
 }

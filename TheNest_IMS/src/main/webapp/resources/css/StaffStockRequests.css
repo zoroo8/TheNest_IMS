@@ -320,30 +320,138 @@ tbody tr:hover {
   font-size: 0.75rem;
   font-weight: 500;
 }
-
-.badge-primary {
-  background-color: var(--primary-color);
+.badge-info {
+  background-color: var(--dark-color);
   color: var(--white);
 }
 
-.badge-success {
-  background-color: var(--secondary-color);
+.badge-pending {
+  background-color: var(--secondary-color)
+  color: var(--text-color);
+}
+
+.badge-approved {
+  background-color: var(--secondary-color); /* Lighter Green */
   color: var(--white);
 }
 
-.badge-warning {
+.badge-rejected {
+  background-color: var(--gray-dark)
+  color: var(--white);
+}
+
+.badge-dispatched {
+  background-color: var(--dark-color)
+  color: var(--white);
+}
+
+.badge-cancelled {
   background-color: var(--gray-medium);
   color: var(--text-color);
 }
 
-.badge-danger {
-  background-color: var(--gray-dark);
+.badge-unknown {
+  /* For cases where status might be missing */
+  background-color: var(--gray-light);
   color: var(--white);
 }
 
-.badge-info {
-  background-color: var(--dark-color);
-  color: var(--white);
+.alert {
+  padding: 12px 20px;
+  margin-bottom: 15px; /* Space between multiple alerts */
+  border-radius: var(--border-radius, 4px);
+  position: relative;
+  display: flex;
+  align-items: center;
+  animation: alertFadeIn 0.3s ease-out;
+}
+
+.alert:last-child {
+  margin-bottom: 0; /* No margin for the last alert in the container */
+}
+
+.alert-icon { /* For Material Icons */
+  margin-right: 10px;
+  font-size: 1.3rem; /* Adjust as needed */
+  line-height: 1; /* Ensure icon aligns well with text */
+}
+
+.alert-success {
+  background-color: rgba(var(--success-rgb, 76, 175, 80), 0.1);
+  color: var(--success-color, #28a745);
+  border-left: 4px solid var(--success-color, #28a745);
+}
+.alert-success .alert-icon,
+.alert-success .alert-dismiss-btn .material-icons {
+  color: var(--success-color, #28a745);
+}
+
+.alert-danger {
+  background-color: rgba(var(--danger-rgb, 220, 53, 69), 0.1);
+  color: var(--danger-color, #dc3545);
+  border-left: 4px solid var(--danger-color, #dc3545);
+}
+.alert-danger .alert-icon,
+.alert-danger .alert-dismiss-btn .material-icons {
+  color: var(--danger-color, #dc3545);
+}
+
+.alert-warning {
+  background-color: rgba(var(--warning-rgb, 255, 193, 7), 0.1);
+  color: var(--warning-color, #ffc107);
+  border-left: 4px solid var(--warning-color, #ffc107);
+}
+.alert-warning .alert-icon,
+.alert-warning .alert-dismiss-btn .material-icons {
+  color: var(--warning-color, #ffc107);
+}
+
+.alert-info {
+  background-color: rgba(var(--info-rgb, 23, 162, 184), 0.1);
+  color: var(--info-color, #17a2b8);
+  border-left: 4px solid var(--info-color, #17a2b8);
+}
+.alert-info .alert-icon,
+.alert-info .alert-dismiss-btn .material-icons {
+  color: var(--info-color, #17a2b8);
+}
+
+.alert > span { /* For the message text */
+  flex-grow: 1;
+  line-height: 1.4; /* Adjust for better vertical alignment with icon */
+}
+
+.alert-dismiss-btn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  opacity: 0.7;
+  transition: opacity 0.2s;
+  padding: 0;
+  margin-left: 15px;
+  display: flex; 
+  align-items: center; 
+}
+.alert-dismiss-btn .material-icons {
+  font-size: 1.2rem; /* Material icon size */
+}
+
+.alert-dismiss-btn:hover {
+  opacity: 1;
+}
+
+@keyframes alertFadeIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes alertFadeOut {
+  from { opacity: 1; transform: translateY(0); }
+  to { opacity: 0; transform: translateY(-10px); }
+}
+
+.alert.fade-out {
+  animation: alertFadeOut 0.3s ease-out forwards;
 }
 
 /* Priority Indicators */

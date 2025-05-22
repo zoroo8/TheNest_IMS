@@ -1,31 +1,45 @@
 package com.ims.model;
 
+
 public class RequestProductUserModel {
     private int productId;
+    private int userId; // Assuming you need userId here based on the constructor call
     private int quantity;
 
-    public RequestProductUserModel() {}
-
-    public RequestProductUserModel(int productId, int quantity) {
+    // Constructor
+    public RequestProductUserModel(int productId, int userId, int quantity) {
         this.productId = productId;
+        this.userId = userId;
         this.quantity = quantity;
     }
 
-	public int getProductId() {
-		return productId;
-	}
+    // Default constructor (optional, but good practice if you have other constructors)
+    public RequestProductUserModel() {
+    }
 
-	public void setProductId(int productId) {
-		this.productId = productId;
-	}
+    // Getters
+    public int getProductId() {
+        return productId;
+    }
 
-	public int getQuantity() {
-		return quantity;
-	}
+    public int getUserId() {
+        return userId;
+    }
 
-	public void setQuantity(int quantity) {
-		this.quantity = quantity;
-	}
+    public int getQuantity() {
+        return quantity;
+    }
 
-    
+    // Setters
+    public void setProductId(int productId) {
+        this.productId = productId;
+    }
+
+    public void setUserId(int userId) {
+        this.userId = userId;
+    }
+
+    public void setQuantity(int quantity) {
+        this.quantity = quantity;
+    }
 }

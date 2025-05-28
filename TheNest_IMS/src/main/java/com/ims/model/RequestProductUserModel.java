@@ -3,6 +3,7 @@ package com.ims.model;
 public class RequestProductUserModel {
     private int productId;
     private int quantity;
+    private int userId;
 
     public RequestProductUserModel() {}
 
@@ -10,7 +11,14 @@ public class RequestProductUserModel {
         this.productId = productId;
         this.quantity = quantity;
     }
+    
+	public int getUserId() {
+        return userId;
+    }
 
+    public void setUserId(int userId) {
+        this.userId = userId;
+    }
 	public int getProductId() {
 		return productId;
 	}

@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.sql.SQLIntegrityConstraintViolationException;
 import java.time.LocalDate;
+import java.time.Period;
 import java.time.format.DateTimeParseException;
 import java.util.List;
 import java.util.Map;
@@ -255,17 +256,44 @@ protected void doGet(HttpServletRequest request, HttpServletResponse response)
             firstName.trim().isEmpty() || lastName.trim().isEmpty() || dobStr.trim().isEmpty() || email.trim().isEmpty() || password.isEmpty() || confirmPassword.isEmpty() ||
             role == null || role.trim().isEmpty() || department == null || department.trim().isEmpty()) {
             session.setAttribute("errorMessage", "Please fill all required fields.");
-            response.sendRedirect(request.getContextPath() + "/users"); // Or back to form with error
+            response.sendRedirect(request.getContextPath() + "/users");
             return;
         }
+        
+        if (!email.matches("^[\\w.-]+@[\\w.-]+\\.[a-zA-Z]{2,}$")) {
+            session.setAttribute("errorMessage", "Invalid email format.");
+            response.sendRedirect(request.getContextPath() + "/users");
+            return;
+        }
+        
+        if (phoneNumber == null || !phoneNumber.matches("\\d{10}")) {
+            session.setAttribute("errorMessage", "Phone number must be exactly 10 digits.");
+            response.sendRedirect(request.getContextPath() + "/users");
+            return;
+        }
+        
+        if (password.length() < 8 || !password.matches(".*[A-Z].*") ||
+        	    !password.matches(".*[a-z].*") || !password.matches(".*\\d.*")) {
+        	    session.setAttribute("errorMessage", "Password must be at least 8 characters long and include uppercase, lowercase, and a number.");
+        	    response.sendRedirect(request.getContextPath() + "/users");
+        	    return;
+        	}
 
         if (!password.equals(confirmPassword)) {
             session.setAttribute("errorMessage", "Passwords do not match.");
             response.sendRedirect(request.getContextPath() + "/users");
             return;
         }
+        
 
-        LocalDate dob = LocalDate.parse(dobStr); // Can throw DateTimeParseException
+        LocalDate dob = LocalDate.parse(dobStr);
+        LocalDate today = LocalDate.now();
+        int age = Period.between(dob, today).getYears();
+        if (age < 18) {
+            session.setAttribute("errorMessage", "You must be at least 18 years old.");
+            response.sendRedirect(request.getContextPath() + "/users");
+            return;
+        }
 
         String profilePictureFileName = uploadProfilePicture(request);
 
@@ -278,7 +306,6 @@ protected void doGet(HttpServletRequest request, HttpServletResponse response)
             session.setAttribute("errorMessage", "User registration failed. Email might already exist or other database error.");
         }
         response.sendRedirect(request.getContextPath() + "/users");
-        // No return needed here as it's the end of the method after a redirect.
     }
 
     private void handleUpdateUser(HttpServletRequest request, HttpServletResponse response, HttpSession session)
@@ -291,7 +318,7 @@ protected void doGet(HttpServletRequest request, HttpServletResponse response)
         }
         int userId = Integer.parseInt(userIdParam);
 
-        UserModel user = userService.getUserById(userId); // Fetch existing user to get current email for password salt if needed
+        UserModel user = userService.getUserById(userId);
         if (user == null) {
             session.setAttribute("errorMessage", "User not found for update.");
             response.sendRedirect(request.getContextPath() + "/users");
@@ -311,13 +338,12 @@ protected void doGet(HttpServletRequest request, HttpServletResponse response)
 
         String newProfilePictureFileName = uploadProfilePicture(request);
         if (newProfilePictureFileName != null && !newProfilePictureFileName.isEmpty()) {
-            // Optionally, delete old profile picture if it exists and is different
+        	
             user.setProfilePicture(newProfilePictureFileName);
         }
 
         boolean updated = userService.updateUser(user);
 
-        // Handle password update separately if new password is provided
         String newPassword = request.getParameter("password");
         String confirmNewPassword = request.getParameter("confirmPassword");
         if (newPassword != null && !newPassword.isEmpty()) {
@@ -326,8 +352,7 @@ protected void doGet(HttpServletRequest request, HttpServletResponse response)
                 response.sendRedirect(request.getContextPath() + "/users"); // Or redirect to edit page
                 return;
             }
-            // Use the user's current email for encryption salt, as PasswordUtil might depend on it.
-            // If email can be changed, ensure PasswordUtil handles this or use a fixed salt strategy.
+
             userService.updateUserPassword(userId, newPassword, user.getEmail()); 
             session.setAttribute("successMessage", "User '" + user.getFirstName() + "' updated successfully (including password)!");
         } else if (updated) {
@@ -336,7 +361,6 @@ protected void doGet(HttpServletRequest request, HttpServletResponse response)
             session.setAttribute("errorMessage", "User update failed.");
         }
         response.sendRedirect(request.getContextPath() + "/users");
-         // No return needed here as it's the end of the method after a redirect.
     }
 
     private void handleDeleteUser(HttpServletRequest request, HttpServletResponse response, HttpSession session)
